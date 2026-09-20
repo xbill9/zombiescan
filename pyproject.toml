@@ -1,0 +1,41 @@
+[project]
+name = "zombiescan"
+version = "0.1.0"
+description = "Find the AWS resources nobody is using, and what they cost you."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "boto3>=1.34",
+    # The CRT extra is REQUIRED, not optional: boto3's `login` credential
+    # provider (used by `aws login` sessions) raises MissingDependencyException
+    # without it. See CLAUDE.md.
+    "botocore[crt]>=1.34",
+    "click>=8.1",
+    "rich>=13.0",
+]
+
+[project.scripts]
+zombiescan = "zombiescan.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zombiescan"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not live'"
+markers = ["live: hits a real AWS account; requires ZOMBIESCAN_LIVE=1"]

@@ -1,0 +1,33 @@
+{
+  "Addresses": [
+    {
+      "AllocationId": "eipalloc-00000000000000001",
+      "PublicIp": "203.0.113.10",
+      "Domain": "vpc",
+      "NetworkBorderGroup": "us-east-1",
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "old-bastion-ip"
+        }
+      ]
+    },
+    {
+      "AllocationId": "eipalloc-00000000000000002",
+      "PublicIp": "203.0.113.11",
+      "Domain": "vpc",
+      "AssociationId": "eipassoc-0001",
+      "InstanceId": "i-00000000000000001"
+    },
+    {
+      "AllocationId": "eipalloc-00000000000000003",
+      "PublicIp": "203.0.113.12",
+      "Domain": "vpc",
+      "NetworkInterfaceId": "eni-00000000000000009"
+    },
+    {
+      "PublicIp": "203.0.113.13",
+      "Domain": "standard"
+    }
+  ]
+}

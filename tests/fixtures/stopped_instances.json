@@ -1,0 +1,52 @@
+{
+  "Reservations": [
+    {
+      "Instances": [
+        {
+          "InstanceId": "i-00000000000000001",
+          "InstanceType": "m5.large",
+          "State": {
+            "Name": "stopped"
+          },
+          "StateTransitionReason": "User initiated (2025-03-04 11:22:33 GMT)",
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "forgotten-staging-box"
+            }
+          ]
+        },
+        {
+          "InstanceId": "i-00000000000000002",
+          "InstanceType": "c5d.large",
+          "State": {
+            "Name": "stopped"
+          },
+          "StateTransitionReason": "User initiated"
+        }
+      ]
+    }
+  ],
+  "Volumes": [
+    {
+      "VolumeId": "vol-00000000000000011",
+      "Size": 100,
+      "VolumeType": "gp3",
+      "Attachments": [
+        {
+          "InstanceId": "i-00000000000000001"
+        }
+      ]
+    },
+    {
+      "VolumeId": "vol-00000000000000012",
+      "Size": 500,
+      "VolumeType": "gp2",
+      "Attachments": [
+        {
+          "InstanceId": "i-00000000000000001"
+        }
+      ]
+    }
+  ]
+}

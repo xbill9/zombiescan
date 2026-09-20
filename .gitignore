@@ -1,0 +1,23 @@
+# python
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+build/
+*.egg-info/
+
+# tooling caches
+.ruff_cache/
+.pytest_cache/
+
+# credentials -- save-aws-creds.sh refuses to write here unless this is listed
+.aws_creds
+
+# local claude settings
+.claude/settings.local.json
+CLAUDE.local.md
+
+# scan output
+findings.json
+cleanup.sh
+remediation.sh

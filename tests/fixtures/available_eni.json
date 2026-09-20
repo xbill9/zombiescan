@@ -1,0 +1,22 @@
+{
+  "NetworkInterfaces": [
+    {
+      "NetworkInterfaceId": "eni-00000000000000001",
+      "Status": "available",
+      "Description": "AWS Lambda VPC ENI-my-deleted-fn",
+      "VpcId": "vpc-00000000000000001",
+      "SubnetId": "subnet-0001",
+      "InterfaceType": "lambda",
+      "PrivateIpAddress": "10.0.1.20"
+    },
+    {
+      "NetworkInterfaceId": "eni-00000000000000002",
+      "Status": "available",
+      "Description": "",
+      "VpcId": "vpc-00000000000000001",
+      "SubnetId": "subnet-0002",
+      "InterfaceType": "interface",
+      "PrivateIpAddress": "10.0.2.31"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "Snapshots": [
+    {
+      "SnapshotId": "snap-00000000000000001",
+      "VolumeId": "vol-deleted0000000001",
+      "VolumeSize": 100,
+      "StartTime": "2024-03-01T09:00:00+00:00",
+      "Description": "nightly backup"
+    },
+    {
+      "SnapshotId": "snap-00000000000000002",
+      "VolumeId": "vol-alive000000000001",
+      "VolumeSize": 50,
+      "StartTime": "2025-08-01T09:00:00+00:00",
+      "Description": "volume still exists"
+    },
+    {
+      "SnapshotId": "snap-00000000000000003",
+      "VolumeId": "vol-deleted0000000002",
+      "VolumeSize": 200,
+      "StartTime": "2024-01-01T09:00:00+00:00",
+      "Description": "backs a live AMI"
+    },
+    {
+      "SnapshotId": "snap-00000000000000004",
+      "VolumeSize": 10,
+      "StartTime": "2024-01-01T09:00:00+00:00",
+      "Description": "no source volume recorded"
+    }
+  ],
+  "Volumes": [
+    {
+      "VolumeId": "vol-alive000000000001",
+      "Size": 50,
+      "VolumeType": "gp3"
+    }
+  ],
+  "Images": [
+    {
+      "ImageId": "ami-00000000000000001",
+      "BlockDeviceMappings": [
+        {
+          "Ebs": {
+            "SnapshotId": "snap-00000000000000003"
+          }
+        }
+      ]
+    }
+  ]
+}

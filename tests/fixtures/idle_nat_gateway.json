@@ -1,0 +1,44 @@
+{
+  "NatGateways": [
+    {
+      "NatGatewayId": "nat-00000000000000001",
+      "State": "available",
+      "VpcId": "vpc-idle00000000001",
+      "SubnetId": "subnet-0001",
+      "ConnectivityType": "public",
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "leftover-nat"
+        }
+      ]
+    },
+    {
+      "NatGatewayId": "nat-00000000000000002",
+      "State": "available",
+      "VpcId": "vpc-busy00000000001",
+      "SubnetId": "subnet-0002",
+      "ConnectivityType": "public"
+    }
+  ],
+  "NetworkInterfaces": [
+    {
+      "NetworkInterfaceId": "eni-nat0000000000001",
+      "Status": "in-use",
+      "InterfaceType": "nat_gateway",
+      "VpcId": "vpc-idle00000000001"
+    },
+    {
+      "NetworkInterfaceId": "eni-nat0000000000002",
+      "Status": "in-use",
+      "InterfaceType": "nat_gateway",
+      "VpcId": "vpc-busy00000000001"
+    },
+    {
+      "NetworkInterfaceId": "eni-wrk0000000000001",
+      "Status": "in-use",
+      "InterfaceType": "interface",
+      "VpcId": "vpc-busy00000000001"
+    }
+  ]
+}
