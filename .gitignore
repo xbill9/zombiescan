@@ -21,3 +21,7 @@ CLAUDE.local.md
 findings.json
 cleanup.sh
 remediation.sh
+
+# scraped AWS Builder Center pages -- local reference only, not ours to republish
+HACKATHON.md
+RULES.md

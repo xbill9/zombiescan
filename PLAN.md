@@ -27,7 +27,7 @@ advantage over every SaaS tool in this space.
 
 This shape does **not** satisfy the Zero to Shipped ship gate, which requires a
 live application on AWS reachable by a public URL and is pass/fail with no
-exceptions (RULES.md, "SHIP GATE"). A local CLI cannot pass it.
+exceptions. A local CLI cannot pass it.
 
 That is a deliberate choice, not an oversight. The weekend challenge entry
 (comment + complete Builder profile) is already placed and qualifying. If the
