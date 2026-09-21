@@ -94,7 +94,9 @@ def _summary_rows(result: ScanResult) -> str:
     for finding in result.findings:
         row = counts.setdefault(finding.check, [0, 0.0])
         row[0] += 1
-        row[1] += finding.monthly_cost
+        # Rounded per finding before adding, so this column adds up to the
+        # headline total and to the rows below it. See ScanResult.
+        row[1] += round(finding.monthly_cost, 2)
     ordered = sorted(counts.items(), key=lambda kv: (-kv[1][1], kv[0]))
     return "\n".join(
         f'<tr><td class="mono">{_cell(name)}</td>'

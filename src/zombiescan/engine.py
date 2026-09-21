@@ -38,7 +38,16 @@ class ScanResult:
 
     @property
     def total_monthly_cost(self) -> float:
-        return sum(f.monthly_cost for f in self.findings)
+        """What the findings cost together, rounded the way they are reported.
+
+        Each finding is rounded to the cent before being added, because the
+        cent is what the report publishes for it. Adding the unrounded values
+        and rounding once gives a truer number that nobody can reproduce: on a
+        real account of 120 findings the two differ by two cents, and a total
+        that does not equal the sum of its own rows is the kind of arithmetic
+        that costs a report its credibility.
+        """
+        return round(sum(round(f.monthly_cost, 2) for f in self.findings), 2)
 
     @property
     def completely_failed(self) -> bool:

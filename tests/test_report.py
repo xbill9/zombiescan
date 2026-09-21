@@ -159,3 +159,44 @@ def test_script_comments_cannot_become_commands():
     script = to_script(ScanResult(findings=[finding], regions=["us-east-1"]))
     for line in script.splitlines():
         assert "rm -rf /" not in line or line.startswith("#")
+
+
+def test_the_total_is_the_sum_of_the_rows_the_report_publishes():
+    """A total nobody can reproduce from the rows is a total nobody trusts.
+
+    Every finding is published rounded to the cent, so the total adds up those
+    cents -- with the same `round` the publishing does, which is what keeps the
+    two in step. Adding the unrounded costs and rounding once is truer and
+    disagrees: four findings at $0.125 publish as $0.12 each and total $0.48,
+    where the exact arithmetic gives $0.50.
+    """
+    from zombiescan.report import to_json
+
+    result = ScanResult(regions=["us-east-1"], attempted=4)
+    result.findings = [_finding("half-cent", f"r-{index}", 0.125) for index in range(4)]
+
+    assert result.total_monthly_cost == 0.48
+    assert round(sum(f.monthly_cost for f in result.findings), 2) == 0.50
+
+    document = to_json(result)
+    published = round(sum(f["monthly_cost"] for f in document["findings"]), 2)
+    by_check = sum(row["monthly_cost"] for row in document["totals"]["by_check"].values())
+
+    assert document["totals"]["monthly_cost"] == published == by_check == 0.48
+    assert document["totals"]["annual_cost"] == 5.76
+
+
+def test_the_per_check_breakdown_adds_up_to_the_total():
+    from zombiescan.report import to_json
+
+    result = ScanResult(regions=["us-east-1"], attempted=6)
+    result.findings = [
+        _finding("ecr-stale-images", "repo-a", 0.515),
+        _finding("ecr-stale-images", "repo-b", 0.484),
+        _finding("unused-route53-zone", "Z1", 0.5),
+        _finding("unused-security-group", "sg-1", 0.0),
+    ]
+    document = to_json(result)
+
+    by_check = sum(row["monthly_cost"] for row in document["totals"]["by_check"].values())
+    assert by_check == document["totals"]["monthly_cost"] == result.total_monthly_cost

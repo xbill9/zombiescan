@@ -34,7 +34,7 @@ def _summary_table(result: ScanResult) -> Table:
     totals: dict[str, float] = {}
     for finding in result.findings:
         counts[finding.check] = counts.get(finding.check, 0) + 1
-        totals[finding.check] = totals.get(finding.check, 0.0) + finding.monthly_cost
+        totals[finding.check] = totals.get(finding.check, 0.0) + round(finding.monthly_cost, 2)
 
     table = Table(header_style="bold", box=None, pad_edge=False)
     table.add_column("Check", no_wrap=True)
@@ -186,11 +186,13 @@ SCHEMA_VERSION = 2
 
 
 def _by_check(result: ScanResult) -> dict[str, dict[str, Any]]:
+    # Per-finding rounding first, as in ScanResult.total_monthly_cost, so these
+    # sections add up to the headline total and to the rows underneath them.
     out: dict[str, dict[str, Any]] = {}
     for finding in result.findings:
         row = out.setdefault(finding.check, {"count": 0, "monthly_cost": 0.0})
         row["count"] += 1
-        row["monthly_cost"] += finding.monthly_cost
+        row["monthly_cost"] += round(finding.monthly_cost, 2)
     for row in out.values():
         row["monthly_cost"] = round(row["monthly_cost"], 2)
     return dict(sorted(out.items(), key=lambda kv: (-kv[1]["monthly_cost"], kv[0])))
