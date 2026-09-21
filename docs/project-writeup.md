@@ -13,6 +13,11 @@ machine, and the scan cannot change anything by construction.
 **Tags:** `workplace-efficiency` (the lane tag could not be set — see below)
 **Repository:** https://github.com/xbill9/zombiescan
 
+**Cover image:** `builder-cover-text.jpg` — 1200x675, the size Builder Center
+asks for. `builder-cover.jpg` is the no-text alternative that follows AWS's
+"text in images is not recommended" guidance; it reads as decoration, so the
+titled version is the one to upload unless that guidance is treated as a rule.
+
 ---
 
 Every AWS account accumulates things nobody is using. A volume detached from an instance that got replaced. An Elastic IP freed up during a migration that nobody released. A NAT gateway in a VPC whose workload was torn down eighteen months ago. None of it breaks. Nothing alerts. The bill just goes up.
