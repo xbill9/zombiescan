@@ -1,7 +1,7 @@
 {
   "_meta": {
     "source": "AWS Price List API (pricing:GetProducts), on-demand USD list prices",
-    "generated": "2026-09-20T21:10:06Z",
+    "generated": "2026-09-21T00:29:05Z",
     "note": "Regenerate with: uv run python -m zombiescan.pricing.refresh"
   },
   "fallback_region": "us-east-1",
@@ -640,5 +640,137 @@
     "us-west-2": 0.045,
     "us-west-2-lax-1": 0.054,
     "us-west-2-phx-1": 0.054
+  },
+  "load_balancer_hour": {
+    "af-south-1": {
+      "alb": 0.029988,
+      "nlb": 0.029988
+    },
+    "ap-east-1": {
+      "alb": 0.0277,
+      "nlb": 0.0277
+    },
+    "ap-northeast-1": {
+      "alb": 0.0243,
+      "nlb": 0.0243
+    },
+    "ap-northeast-2": {
+      "alb": 0.0225,
+      "nlb": 0.0225
+    },
+    "ap-northeast-3": {
+      "alb": 0.0243,
+      "nlb": 0.0243
+    },
+    "ap-south-1": {
+      "alb": 0.0239,
+      "nlb": 0.0239
+    },
+    "ap-southeast-1": {
+      "alb": 0.0252,
+      "nlb": 0.0252
+    },
+    "ap-southeast-2": {
+      "alb": 0.0252,
+      "nlb": 0.0252
+    },
+    "ca-central-1": {
+      "alb": 0.02475,
+      "nlb": 0.02475
+    },
+    "eu-central-1": {
+      "alb": 0.027,
+      "nlb": 0.027
+    },
+    "eu-north-1": {
+      "alb": 0.02394,
+      "nlb": 0.02394
+    },
+    "eu-south-1": {
+      "alb": 0.02646,
+      "nlb": 0.02646
+    },
+    "eu-west-1": {
+      "alb": 0.0252,
+      "nlb": 0.0252
+    },
+    "eu-west-2": {
+      "alb": 0.02646,
+      "nlb": 0.02646
+    },
+    "eu-west-3": {
+      "alb": 0.02646,
+      "nlb": 0.02646
+    },
+    "me-south-1": {
+      "alb": 0.02772,
+      "nlb": 0.02772
+    },
+    "sa-east-1": {
+      "alb": 0.034,
+      "nlb": 0.034
+    },
+    "us-east-1": {
+      "alb": 0.0225,
+      "nlb": 0.0225
+    },
+    "us-east-2": {
+      "alb": 0.0225,
+      "nlb": 0.0225
+    },
+    "us-gov-east-1": {
+      "alb": 0.032,
+      "nlb": 0.032
+    },
+    "us-gov-west-1": {
+      "alb": 0.032,
+      "nlb": 0.032
+    },
+    "us-west-1": {
+      "alb": 0.0252,
+      "nlb": 0.0252
+    },
+    "us-west-2": {
+      "alb": 0.0225,
+      "nlb": 0.0225
+    }
+  },
+  "log_storage_gb_month": {
+    "af-south-1": 0.036,
+    "ap-east-1": 0.03,
+    "ap-east-2": 0.03,
+    "ap-northeast-1": 0.033,
+    "ap-northeast-2": 0.0314,
+    "ap-northeast-3": 0.033,
+    "ap-south-1": 0.03,
+    "ap-south-2": 0.03,
+    "ap-southeast-1": 0.03,
+    "ap-southeast-2": 0.033,
+    "ap-southeast-3": 0.03,
+    "ap-southeast-4": 0.033,
+    "ap-southeast-5": 0.03,
+    "ap-southeast-6": 0.03,
+    "ap-southeast-7": 0.03,
+    "ca-central-1": 0.033,
+    "ca-west-1": 0.033,
+    "eu-central-1": 0.0324,
+    "eu-central-2": 0.0356,
+    "eu-north-1": 0.028,
+    "eu-south-1": 0.032,
+    "eu-south-2": 0.03,
+    "eu-west-1": 0.03,
+    "eu-west-2": 0.0315,
+    "eu-west-3": 0.0315,
+    "il-central-1": 0.03,
+    "me-central-1": 0.033,
+    "me-south-1": 0.03,
+    "mx-central-1": 0.03,
+    "sa-east-1": 0.0408,
+    "us-east-1": 0.03,
+    "us-east-2": 0.03,
+    "us-gov-east-1": 0.039,
+    "us-gov-west-1": 0.039,
+    "us-west-1": 0.033,
+    "us-west-2": 0.03
   }
 }

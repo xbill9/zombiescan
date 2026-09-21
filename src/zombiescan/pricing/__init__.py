@@ -71,3 +71,19 @@ class PriceTable:
         entry = self._data.get("public_ipv4_hour") or {}
         hourly = entry.get("_value", 0.0) if isinstance(entry, dict) else float(entry)
         return hourly * self._hours, False
+
+    def load_balancer_month(self, region: str, kind: str) -> tuple[float, bool]:
+        """USD per month of uptime for an ``alb`` or ``nlb``. Excludes LCU charges."""
+        rates, approximate = self._lookup("load_balancer_hour", region)
+        if not rates:
+            return 0.0, True
+        if kind in rates:
+            return rates[kind] * self._hours, approximate
+        # Gateway load balancers and anything new price differently; fall back
+        # to the ALB rate and mark it rather than reporting zero.
+        return rates.get("alb", 0.0) * self._hours, True
+
+    def log_storage_gb_month(self, region: str) -> tuple[float, bool]:
+        """USD per GB-month of Standard-class CloudWatch Logs storage."""
+        price, approximate = self._lookup("log_storage_gb_month", region)
+        return (price or 0.0), approximate

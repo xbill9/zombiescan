@@ -45,6 +45,18 @@ def list_checks() -> None:
 @click.option("--check", "checks", multiple=True, help="Run only this check (repeatable).")
 @click.option("--json", "json_path", default=None, help="Write findings as JSON to this path.")
 @click.option("--script", "script_path", default=None, help="Write the cleanup plan to this path.")
+@click.option(
+    "--min-cost",
+    default=0.0,
+    show_default=True,
+    help="Hide findings cheaper than this many USD per month.",
+)
+@click.option(
+    "--limit",
+    default=25,
+    show_default=True,
+    help="Rows in the detail table; 0 shows every finding.",
+)
 def scan_command(
     profile: str | None,
     regions: tuple[str, ...],
@@ -52,6 +64,8 @@ def scan_command(
     checks: tuple[str, ...],
     json_path: str | None,
     script_path: str | None,
+    min_cost: float,
+    limit: int,
 ) -> None:
     """Scan for unused resources."""
     console = Console()
@@ -77,7 +91,14 @@ def scan_command(
     with console.status("Scanning..."):
         result = scan(session, target_regions, selected, pricing)
 
-    report.render(result, console)
+    if min_cost > 0:
+        kept = [f for f in result.findings if f.monthly_cost >= min_cost]
+        hidden = len(result.findings) - len(kept)
+        result.findings = kept
+        if hidden:
+            console.print(f"[dim]{hidden} finding(s) below ${min_cost:,.2f}/month hidden[/dim]")
+
+    report.render(result, console, limit=limit)
 
     if json_path:
         report.write_json(result, json_path, caller_arn)

@@ -1,0 +1,21 @@
+{
+  "logGroups": [
+    {
+      "logGroupName": "/aws/lambda/forgotten-fn",
+      "storedBytes": 53687091200
+    },
+    {
+      "logGroupName": "/aws/lambda/tidy-fn",
+      "retentionInDays": 14,
+      "storedBytes": 10737418240
+    },
+    {
+      "logGroupName": "/aws/codebuild/empty-project",
+      "storedBytes": 0
+    },
+    {
+      "logGroupName": "/ecs/legacy-api",
+      "storedBytes": 1073741824
+    }
+  ]
+}

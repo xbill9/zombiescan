@@ -135,6 +135,62 @@ def fetch_nat_gateway_hours(client: Any) -> dict[str, float]:
     return table
 
 
+def fetch_load_balancer_hours(client: Any) -> dict[str, dict[str, float]]:
+    """{region: {alb|nlb: usd_per_hour}} for load balancer uptime.
+
+    Excludes LCU charges, which scale with traffic -- an idle load balancer
+    by definition is not accruing them.
+    """
+    table: dict[str, dict[str, float]] = {}
+    for family, key in [("Load Balancer-Application", "alb"), ("Load Balancer-Network", "nlb")]:
+        entries = _paginate(
+            client,
+            ServiceCode="AmazonEC2",
+            Filters=[{"Type": "TERM_MATCH", "Field": "productFamily", "Value": family}],
+        )
+        for entry in entries:
+            attrs = entry["product"]["attributes"]
+            region = attrs.get("regionCode")
+            if not region or "LCU" in attrs.get("usagetype", ""):
+                continue
+            priced = _usd_per_unit(entry)
+            if not priced:
+                continue
+            unit, price = priced
+            if unit != "Hrs" or price <= 0:
+                continue
+            table.setdefault(region, {})[key] = price
+    return table
+
+
+def fetch_log_storage(client: Any) -> dict[str, float]:
+    """{region: usd_per_gb_month} for standard-class CloudWatch Logs storage."""
+    entries = _paginate(
+        client,
+        ServiceCode="AmazonCloudWatch",
+        Filters=[{"Type": "TERM_MATCH", "Field": "productFamily", "Value": "Storage Snapshot"}],
+    )
+    table: dict[str, float] = {}
+    for entry in entries:
+        attrs = entry["product"]["attributes"]
+        region = attrs.get("regionCode")
+        usagetype = attrs.get("usagetype", "")
+        # Infrequent Access (-IA-) and Archive (-AIA-) tiers are cheaper and
+        # priced separately. A log group with no retention is Standard class.
+        if not region or not usagetype.endswith("TimedStorage-ByteHrs"):
+            continue
+        if "-IA-" in usagetype or "-AIA-" in usagetype:
+            continue
+        priced = _usd_per_unit(entry)
+        if not priced:
+            continue
+        unit, price = priced
+        if unit != "GB-Mo" or price <= 0:
+            continue
+        table[region] = price
+    return table
+
+
 def main() -> None:
     client = boto3.Session().client("pricing", region_name="us-east-1")
     print("fetching EBS volume prices...")
@@ -146,6 +202,12 @@ def main() -> None:
     print("fetching NAT gateway prices...")
     nat = fetch_nat_gateway_hours(client)
     print(f"  {len(nat)} regions")
+    print("fetching load balancer prices...")
+    load_balancers = fetch_load_balancer_hours(client)
+    print(f"  {len(load_balancers)} regions")
+    print("fetching CloudWatch Logs storage prices...")
+    logs = fetch_log_storage(client)
+    print(f"  {len(logs)} regions")
 
     payload = {
         "_meta": {
@@ -162,6 +224,8 @@ def main() -> None:
         "ebs_gb_month": dict(sorted(volumes.items())),
         "snapshot_gb_month": dict(sorted(snapshots.items())),
         "nat_gateway_hour": dict(sorted(nat.items())),
+        "load_balancer_hour": dict(sorted(load_balancers.items())),
+        "log_storage_gb_month": dict(sorted(logs.items())),
     }
     TABLE_PATH.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n")
     print(f"wrote {TABLE_PATH}")

@@ -20,7 +20,64 @@ def _money(amount: float, approximate: bool = False) -> str:
     return f"{'~' if approximate else ''}${amount:,.2f}"
 
 
-def render(result: ScanResult, console: Console) -> None:
+DEFAULT_LIMIT = 25
+
+
+def _summary_table(result: ScanResult) -> Table:
+    """One row per check: how many, and what they cost together.
+
+    With dozens of cheap findings the per-resource table stops being readable,
+    and this is what people actually act on.
+    """
+    counts: dict[str, int] = {}
+    totals: dict[str, float] = {}
+    for finding in result.findings:
+        counts[finding.check] = counts.get(finding.check, 0) + 1
+        totals[finding.check] = totals.get(finding.check, 0.0) + finding.monthly_cost
+
+    table = Table(header_style="bold", box=None, pad_edge=False)
+    table.add_column("Check", no_wrap=True)
+    table.add_column("Found", justify="right", no_wrap=True)
+    table.add_column("Monthly", justify="right", no_wrap=True)
+    for name in sorted(counts, key=lambda n: (-totals[n], n)):
+        table.add_row(name, str(counts[name]), _money(totals[name]))
+    return table
+
+
+def _detail_table(findings: list[Any], shown: int, width: int) -> Table:
+    """Per-resource rows, laid out for the terminal actually in use.
+
+    Resource identifiers get long -- CloudWatch log group names run past 90
+    characters. Pinning a wide Resource column crushes everything else, so the
+    reason column is dropped on narrow terminals instead of being squeezed to
+    six characters. The check name in the summary already says what kind of
+    finding it is, and --json always carries the full reason.
+    """
+    wide = width >= 100
+    table = Table(header_style="bold", expand=True)
+    table.add_column("Region", no_wrap=True, min_width=9)
+    table.add_column("Resource", no_wrap=True, overflow="ellipsis", ratio=3)
+    table.add_column("Monthly", justify="right", no_wrap=True, min_width=8)
+    if wide:
+        table.add_column("Why", ratio=4)
+
+    for finding in findings[:shown]:
+        row = [
+            finding.region,
+            finding.resource_id,
+            _money(finding.monthly_cost, finding.approximate_cost),
+        ]
+        if wide:
+            row.append(finding.reason)
+        table.add_row(*row)
+    return table
+
+
+def render(
+    result: ScanResult,
+    console: Console,
+    limit: int = DEFAULT_LIMIT,
+) -> None:
     region_word = "region" if len(result.regions) == 1 else "regions"
     scope = f"{len(result.regions)} {region_word}"
 
@@ -29,39 +86,36 @@ def render(result: ScanResult, console: Console) -> None:
         _render_errors(result, console)
         return
 
-    table = Table(
-        title=(
-            f"zombiescan — {len(result.findings)} finding"
-            f"{'' if len(result.findings) == 1 else 's'} across {scope}"
-        ),
-        title_style="bold",
-        header_style="bold",
-        expand=True,
+    count = len(result.findings)
+    console.print(
+        f"\n[bold]zombiescan — {count} finding{'' if count == 1 else 's'} across {scope}[/bold]\n"
     )
-    table.add_column("Region", no_wrap=True)
-    table.add_column("Resource", no_wrap=True)
-    table.add_column("Monthly", justify="right", no_wrap=True)
-    table.add_column("Why")
+    console.print(_summary_table(result))
 
-    for finding in result.findings:
-        table.add_row(
-            finding.region,
-            finding.resource_id,
-            _money(finding.monthly_cost, finding.approximate_cost),
-            finding.reason,
+    shown = count if limit <= 0 else min(limit, count)
+    console.print()
+    console.print(_detail_table(result.findings, shown, console.width))
+    if shown < count:
+        console.print(
+            f"[dim]showing the {shown} costliest of {count}; "
+            f"use --limit 0 for all, or --json for the full set[/dim]"
         )
 
-    console.print()
-    console.print(table)
-
     total = result.total_monthly_cost
-    console.print(
-        f"\n[bold]Estimated waste: {_money(total)}/month ({_money(total * 12)}/year)[/bold]"
-    )
+    if total >= 0.01:
+        console.print(
+            f"\n[bold]Estimated waste: {_money(total)}/month ({_money(total * 12)}/year)[/bold]"
+        )
+    else:
+        # Saying "$0.00/month ($0.01/year)" makes the tool look broken. These
+        # findings are real debt -- unbounded growth, blocked deletions -- they
+        # just are not on this month's bill.
+        console.print(
+            "\n[bold]Estimated waste: under $0.01/month.[/bold] "
+            "These cost almost nothing today; they are cleanup debt, not a bill."
+        )
+
     if any(f.approximate_cost for f in result.findings):
-        # The tilde covers more than one kind of imprecision -- fallback-region
-        # pricing, an unknown resource type, and snapshot upper bounds all set
-        # it -- so the legend must not claim a single cause.
         console.print(
             "[dim]~ marks an estimate or upper bound; the per-finding 'note' in "
             "--json output says why.[/dim]"

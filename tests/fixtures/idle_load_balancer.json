@@ -1,0 +1,70 @@
+{
+  "LoadBalancers": [
+    {
+      "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:111122223333:loadbalancer/app/idle-alb/aaaa1111",
+      "LoadBalancerName": "idle-alb",
+      "Type": "application",
+      "Scheme": "internet-facing",
+      "VpcId": "vpc-00000000000000001",
+      "DNSName": "idle-alb-1.us-east-1.elb.amazonaws.com",
+      "State": {
+        "Code": "active"
+      }
+    },
+    {
+      "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:111122223333:loadbalancer/net/busy-nlb/bbbb2222",
+      "LoadBalancerName": "busy-nlb",
+      "Type": "network",
+      "Scheme": "internal",
+      "VpcId": "vpc-00000000000000001",
+      "DNSName": "busy-nlb-1.us-east-1.elb.amazonaws.com",
+      "State": {
+        "Code": "active"
+      }
+    },
+    {
+      "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:111122223333:loadbalancer/app/coming-up/cccc3333",
+      "LoadBalancerName": "coming-up",
+      "Type": "application",
+      "State": {
+        "Code": "provisioning"
+      }
+    },
+    {
+      "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-east-1:111122223333:loadbalancer/net/bare-nlb/dddd4444",
+      "LoadBalancerName": "bare-nlb",
+      "Type": "network",
+      "Scheme": "internal",
+      "VpcId": "vpc-00000000000000002",
+      "State": {
+        "Code": "active"
+      }
+    }
+  ],
+  "TargetGroupsByLb": {
+    "arn:aws:elasticloadbalancing:us-east-1:111122223333:loadbalancer/app/idle-alb/aaaa1111": [
+      {
+        "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:111122223333:targetgroup/idle-tg/1111"
+      }
+    ],
+    "arn:aws:elasticloadbalancing:us-east-1:111122223333:loadbalancer/net/busy-nlb/bbbb2222": [
+      {
+        "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:111122223333:targetgroup/busy-tg/2222"
+      }
+    ],
+    "arn:aws:elasticloadbalancing:us-east-1:111122223333:loadbalancer/net/bare-nlb/dddd4444": []
+  },
+  "TargetHealthByTg": {
+    "arn:aws:elasticloadbalancing:us-east-1:111122223333:targetgroup/idle-tg/1111": [],
+    "arn:aws:elasticloadbalancing:us-east-1:111122223333:targetgroup/busy-tg/2222": [
+      {
+        "Target": {
+          "Id": "i-00000000000000001"
+        },
+        "TargetHealth": {
+          "State": "unhealthy"
+        }
+      }
+    ]
+  }
+}

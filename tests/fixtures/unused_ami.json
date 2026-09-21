@@ -1,0 +1,65 @@
+{
+  "Images": [
+    {
+      "ImageId": "ami-00000000000000001",
+      "Name": "old-golden-image-2023",
+      "CreationDate": "2023-05-01T10:00:00.000Z",
+      "BlockDeviceMappings": [
+        {
+          "Ebs": {
+            "SnapshotId": "snap-0000000000000aaa1",
+            "VolumeSize": 30
+          }
+        },
+        {
+          "Ebs": {
+            "SnapshotId": "snap-0000000000000aaa2",
+            "VolumeSize": 100
+          }
+        }
+      ]
+    },
+    {
+      "ImageId": "ami-00000000000000002",
+      "Name": "in-use-image",
+      "CreationDate": "2023-01-01T10:00:00.000Z",
+      "BlockDeviceMappings": [
+        {
+          "Ebs": {
+            "SnapshotId": "snap-0000000000000bbb1",
+            "VolumeSize": 8
+          }
+        }
+      ]
+    },
+    {
+      "ImageId": "ami-00000000000000003",
+      "Name": "fresh-rollout",
+      "CreationDate": "2026-09-15T10:00:00.000Z",
+      "BlockDeviceMappings": [
+        {
+          "Ebs": {
+            "SnapshotId": "snap-0000000000000ccc1",
+            "VolumeSize": 8
+          }
+        }
+      ]
+    },
+    {
+      "ImageId": "ami-00000000000000004",
+      "Name": "instance-store-ami",
+      "CreationDate": "2022-01-01T10:00:00.000Z",
+      "BlockDeviceMappings": []
+    }
+  ],
+  "Reservations": [
+    {
+      "Instances": [
+        {
+          "InstanceId": "i-00000000000000001",
+          "ImageId": "ami-00000000000000002"
+        }
+      ]
+    }
+  ]
+}
