@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Find the AWS Resources Nobody Is Using, and What They Cost You</title>
+  <meta name="description" content="A local-first CLI that scans an AWS account for unused resources, prices each one from the AWS Price List API, and generates or performs the cleanup. Read-only by default, with every price fetched from the live API and dated in each report." />
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+    body{font-family:-apple-system,'Segoe UI',Roboto,'Liberation Sans',Arial,sans-serif;
+         font-size:18px;line-height:1.58;max-width:42em;color:#242424;}
+    h1,h2,h3,h4{font-weight:700;line-height:1.25;margin-top:1.8em;}
+    h4{font-size:1.25em;}
+    img{max-width:100%;height:auto;display:block;margin:1.6em 0;}
+    pre{background:#f7f7f7;border:1px solid #e6e6e6;border-radius:4px;
+        padding:12px 14px;overflow-x:auto;font-size:14px;line-height:1.45;}
+    code{font-family:'Liberation Mono',Menlo,Consolas,monospace;}
+    :not(pre)>code{background:#f2f2f2;padding:1px 5px;border-radius:3px;font-size:.9em;}
+    blockquote{border-left:3px solid #ddd;margin-left:0;padding-left:1em;color:#555;}
+    hr{border:0;border-top:1px solid #e6e6e6;margin:2.4em 0;}
+  </style>
+</head>
+<body>
+<figure><img src="https://raw.githubusercontent.com/xbill9/zombiescan/main/articles/zombiescan/medium/img/devto-cover.e89ceeb8.jpg" alt="Find the AWS Resources Nobody Is Using, and What They Cost You" /></figure>
+<p>This article provides a step by step guide to auditing an AWS account
+for resources nothing is using, pricing each finding from the AWS Price
+List API, and cleaning up the ones you choose. A suite of Python checks
+is built to cover storage, compute, networking, data services and the
+account-wide services that sit outside any region.</p>
+<p><a
+href="https://github.com/xbill9/zombiescan">https://github.com/xbill9/zombiescan</a></p>
+<hr />
+<h4 id="what-gets-left-behind">What Gets Left Behind</h4>
+<p>A volume survives the instance it was attached to. An Elastic IP
+outlives the migration that freed it. A NAT gateway keeps running in a
+VPC whose workload was torn down last year. Each one bills every hour
+and reports nothing.</p>
+<p>Cost Explorer shows the total. Trusted Advisor lists candidates. The
+figure that drives a decision names one resource and its monthly
+cost.</p>
+<p><code>zombiescan</code> produces that figure for 22 classes of
+resource.</p>
+<hr />
+<h4 id="at-this-point-you-should-have">At This Point You Should
+Have…</h4>
+<ul>
+<li>An AWS account and credentials the CLI can already use, from
+<code>aws login</code>, SSO, a profile or environment variables</li>
+<li><code>uv</code> on the path</li>
+<li>Read access to EC2, RDS, ELB, CloudWatch Logs, KMS, EFS, Secrets
+Manager, S3, DynamoDB and Route 53 — the managed
+<code>ReadOnlyAccess</code> policy covers all of it</li>
+</ul>
+<hr />
+<h4 id="step-1--install">Step 1 — Install</h4>
+<pre><code>uv tool install git+https://github.com/xbill9/zombiescan</code></pre>
+<p><code>botocore[crt]</code> is a hard dependency. boto3 reads
+<code>aws login</code> sessions through its <code>login</code>
+credential provider, and that provider raises
+<code>MissingDependencyException</code> at credential load without the
+CRT extra installed.</p>
+<hr />
+<h4 id="step-2--list-the-checks">Step 2 — List the Checks</h4>
+<pre><code>zombiescan checks
+  available-eni  Unattached network interfaces
+  detached-internet-gateway  Internet gateways attached to no VPC
+  disabled-kms-key  Disabled KMS keys still being billed
+  empty-classic-lb  Classic load balancers with no instances
+  empty-vpc  VPCs with nothing in them
+  idle-load-balancer  Load balancers with no registered targets
+  idle-nat-gateway  Idle NAT gateways
+  idle-provisioned-dynamodb  Empty DynamoDB tables on provisioned billing
+  incomplete-multipart-upload  S3 buckets holding incomplete multipart uploads
+  log-group-no-retention  Log groups with no retention policy
+  orphaned-rds-snapshot  Manual RDS snapshots of deleted databases
+  orphaned-snapshot  Orphaned EBS snapshots
+  stale-secret  Secrets nothing has read in 90 days
+  stopped-instance  Stopped instances still billing for storage
+  stopped-rds-instance  Stopped RDS instances still billing for storage
+  unassociated-eip  Unassociated Elastic IPs
+  unattached-ebs  Unattached EBS volumes
+  unmounted-efs  EFS file systems with no mount targets
+  unused-ami  AMIs no instance uses
+  unused-route53-health-check  Route 53 health checks no record uses
+  unused-security-group  Security groups attached to nothing
+  unused-vpc-endpoint  Interface VPC endpoints with no workloads</code></pre>
+<p>Seventeen of these carry a monthly charge. Five cost nothing and are
+reported because they accumulate without limit and block deletions:
+unattached network interfaces, unused security groups, empty VPCs,
+detached internet gateways, and log groups with no retention policy.</p>
+<hr />
+<h4 id="step-3--scan-the-default-region">Step 3 — Scan the Default
+Region</h4>
+<pre><code>zombiescan scan</code></pre>
+<p>Every call is Describe, List or Get. The scan has no code path that
+deletes, terminates, modifies or releases anything.</p>
+<hr />
+<h4 id="step-4--scan-every-enabled-region">Step 4 — Scan Every Enabled
+Region</h4>
+<pre><code>zombiescan scan --all-regions
+Scanning as arn:aws:iam::106059658660:root
+17 region(s), 22 check(s) — read-only
+ 
+zombiescan — 86 findings across 17 regions
+ 
+Check                   Found  Monthly
+log-group-no-retention     67    $0.00
+empty-vpc                   1    $0.00
+unused-security-group      18    $0.00</code></pre>
+<p><code>--all-regions</code> asks EC2 which regions the account has
+enabled, so opted-out regions cost no calls. A 22-check sweep of 17
+regions runs in about 20 seconds against a small account.</p>
+<p>Global services run once per scan. Route 53 has no regions, and a
+check that ran in all seventeen would report one health check seventeen
+times and multiply the total to match.</p>
+<hr />
+<h4 id="step-5--read-the-per-resource-table">Step 5 — Read the
+Per-Resource Table</h4>
+<p>The detail table shows the costliest findings first, and guarantees a
+row to every check that fired.</p>
+<p><img src="https://raw.githubusercontent.com/xbill9/zombiescan/main/articles/zombiescan/medium/img/devto-zombiescan-diagram-1.png" alt="diagram" /></p>
+<p>A <code>~</code> marks an estimate or an upper bound. Three
+conditions set it: the region had no price entry and the figure fell
+back to us-east-1, the resource type was unrecognised, or the resource
+bills on what it stores instead of what it provisions. Each finding
+carries a <code>note</code> in JSON output naming which.</p>
+<p>🔎 Tip: <code>--min-cost 5</code> hides findings under five dollars a
+month, and <code>--limit 0</code> prints every row instead of the top
+25.</p>
+<hr />
+<h4 id="step-6--where-the-prices-come-from">Step 6 — Where the Prices
+Come From</h4>
+<p>The bundled price table is generated from the AWS Price List API.</p>
+<pre><code>uv run python -m zombiescan.pricing.refresh
+fetching EBS volume prices...
+  106 regions
+fetching snapshot prices...
+  40 regions
+fetching NAT gateway prices...
+  38 regions</code></pre>
+<p>Shipping the table with the package keeps a scan offline and removes
+<code>pricing:GetProducts</code> from the permissions a scan needs.
+Every report records the date the table was generated, so a reader can
+tell which rates produced the figures.</p>
+<hr />
+<h4 id="step-7--why-the-table-is-per-region">Step 7 — Why the Table Is
+Per-Region</h4>
+<p>Region changes the answer enough to change a decision.</p>
+<p><img src="https://raw.githubusercontent.com/xbill9/zombiescan/main/articles/zombiescan/medium/img/devto-zombiescan-table-1.png"
+alt="Table: Region, gp3 per GB-month, NAT gateway per month, Interface VPC endpoint per month" /></p>
+<p>A single flat rate halves a São Paulo NAT gateway and understates gp3
+there by 90%.</p>
+<hr />
+<h4 id="step-8--reading-tiered-price-entries">Step 8 — Reading Tiered
+Price Entries</h4>
+<p>A Price List entry can carry several price dimensions. S3 storage
+lists every volume tier inside one entry, and DynamoDB provisioned
+capacity lists a <code>$0.00</code> free-allowance dimension beside the
+billed rate.</p>
+<p>Selecting the highest positive rate for the requested unit gives the
+rate an account pays before tiers and allowances apply:</p>
+<pre class="python"><code>rates = [
+    float(usd)
+    for term in entry.get(&quot;terms&quot;, {}).get(&quot;OnDemand&quot;, {}).values()
+    for dim in term.get(&quot;priceDimensions&quot;, {}).values()
+    if dim.get(&quot;unit&quot;) == unit and (usd := dim.get(&quot;pricePerUnit&quot;, {}).get(&quot;USD&quot;)) is not None
+]
+positive = [r for r in rates if r &gt; 0]
+return max(positive) if positive else None</code></pre>
+<p>Filtering on <code>unit</code> keeps read capacity and write capacity
+apart, since both live under one product family with different unit
+names.</p>
+<hr />
+<h4 id="step-9--json-output">Step 9 — JSON Output</h4>
+<pre><code>zombiescan scan --all-regions --json findings.json</code></pre>
+<p>The document is a versioned contract with a published JSON Schema,
+and the test suite validates generated output against it.</p>
+<pre class="json"><code>{
+  &quot;schema_version&quot;: 1,
+  &quot;tool&quot;: { &quot;name&quot;: &quot;zombiescan&quot;, &quot;version&quot;: &quot;0.1.0&quot; },
+  &quot;scan&quot;: {
+    &quot;duration_seconds&quot;: 17.97,
+    &quot;account_id&quot;: &quot;106059658660&quot;,
+    &quot;pairs_attempted&quot;: 358,
+    &quot;complete&quot;: true
+  },
+  &quot;pricing&quot;: {
+    &quot;generated&quot;: &quot;2026-09-21T01:16:11Z&quot;,
+    &quot;basis&quot;: &quot;AWS Price List API, on-demand USD list prices&quot;,
+    &quot;excludes&quot;: [&quot;savings plans&quot;, &quot;reserved capacity&quot;, &quot;private pricing&quot;, &quot;credits&quot;]
+  }
+}</code></pre>
+<p>Two fields carry more weight than their size suggests.
+<code>pricing.generated</code> dates the rates behind every figure.
+<code>scan.complete</code> reads false when every region/check pair
+failed, which lets a consumer tell an empty result from an unreadable
+account.</p>
+<p>🔎 Tip: check <code>schema_version</code> before parsing. A consumer
+that cannot tell which version it holds breaks without saying so.</p>
+<hr />
+<h4 id="step-10--the-html-report">Step 10 — The HTML Report</h4>
+<pre><code>zombiescan scan --all-regions --html report.html</code></pre>
+<p>One file, with no stylesheet, font, script or network request in it.
+Cost reports get emailed, attached to tickets and opened on laptops with
+no connectivity, and a self-contained file renders the same in all
+three. A print stylesheet covers PDF through browser print, which keeps
+a rendering engine out of the dependency list.</p>
+<hr />
+<h4 id="step-11--the-cleanup-plan">Step 11 — The Cleanup Plan</h4>
+<pre><code>zombiescan scan --all-regions --script cleanup.sh
+#!/usr/bin/env bash
+# zombiescan cleanup plan — generated 2026-09-21T00:55:51Z
+#
+# READ EVERY LINE BEFORE RUNNING THIS.
+# zombiescan generated this file and did not run it. Deleting AWS
+# resources is not reversible. Where a backup is possible the command
+# takes one first, but a backup is not a substitute for knowing what
+# you are deleting.
+ 
+set -euo pipefail</code></pre>
+<p>Every value interpolated into a command is shell-quoted, so a
+resource name arrives as one argument to the flag it belongs to.</p>
+<hr />
+<h4 id="step-12--cleaning-up">Step 12 — Cleaning Up</h4>
+<p><code>clean</code> is a separate command, reachable only by typing
+it.</p>
+<pre><code>zombiescan clean</code></pre>
+<p>Dry run is the default and prints the calls it would make:</p>
+<pre><code>dry run — 15 of 15 finding(s) can be cleaned
+ 
+unused-security-group  sg-00122a49220e4ef1f  us-east-1 · $0.00/mo
+    → delete security group sg-00122a49220e4ef1f
+      ec2.delete_security_group({&#39;GroupId&#39;: &#39;sg-00122a49220e4ef1f&#39;})
+zombiescan clean --apply --audit audit.json</code></pre>
+<p><code>--apply</code> gates one thing: whether a planned step is sent
+to AWS. The set of planned steps is identical in both modes, which makes
+the dry run an exact preview.</p>
+<p>Backups precede destruction, and the order is enforced. Volumes are
+snapshotted before deletion, instances imaged before termination,
+databases given a final snapshot, secrets deleted with a 30-day recovery
+window. A failed step ends that finding, so the destructive step that
+depended on a backup stays unsent.</p>
+<p>🔎 Tip: <code>clean --from findings.json</code> acts on a report
+already reviewed, and refuses when that report came from a different
+account than the current credentials.</p>
+<hr />
+<h4 id="what-the-checks-leave-alone">What the Checks Leave Alone</h4>
+<p>A false positive here costs an outage, so each check states the
+condition it will not act on.</p>
+<p><img src="https://raw.githubusercontent.com/xbill9/zombiescan/main/articles/zombiescan/medium/img/devto-zombiescan-table-2.png"
+alt="Table: Condition, Treatment" /></p>
+<p><code>empty-vpc</code> has no cleanup step. A VPC deletes only after
+its subnets, route tables and gateways are gone, in an order this tool
+leaves to an operator, and the finding says so where a cleanup command
+would otherwise appear.</p>
+<p><code>unused-ami</code> reads instances and reports its own limit in
+every finding: launch templates, Auto Scaling groups and cross-account
+shares stay outside its view, so an AMI an Auto Scaling group depends on
+appears unused to it.</p>
+<hr />
+<h4 id="compare-and-contrast">Compare and Contrast</h4>
+<p><img src="https://raw.githubusercontent.com/xbill9/zombiescan/main/articles/zombiescan/medium/img/devto-zombiescan-table-3.png"
+alt="Table: zombiescan, AWS Trusted Advisor, Cost Explorer, Cross-account SaaS" /></p>
+<hr />
+<h4 id="so-which-one">So, Which One?</h4>
+<p>Cost Explorer answers what the account spent. Trusted Advisor covers
+more ground and reaches areas outside these 22 checks.</p>
+<p><code>zombiescan</code> fits the case where the answer needs to be
+per-resource, priced, and produced without granting anything a role in
+the account. A laptop, existing credentials, and about twenty
+seconds.</p>
+<hr />
+<h4 id="cost">Cost</h4>
+<p>A scan costs nothing. Describe and List calls carry no charge, and
+the price table ships with the package, so a scan makes no
+<code>pricing:GetProducts</code> call.</p>
+<p>Regenerating the table calls the Price List API, which is also
+free.</p>
+<hr />
+<h4 id="tests">Tests</h4>
+<pre><code>uv run pytest -q
+200 passed, 2 deselected in 0.79s</code></pre>
+<p>The suite runs offline against recorded API responses, with a price
+table pinned separately from the bundled one, so regenerating real
+prices leaves every assertion intact. The two deselected tests reach a
+live account and run under <code>ZOMBIESCAN_LIVE=1</code>.</p>
+<hr />
+<h4 id="teardown">Teardown</h4>
+<pre><code>uv tool uninstall zombiescan</code></pre>
+<p>Nothing is left in the account. The tool creates no role, no bucket,
+no stack and no stored state.</p>
+<hr />
+<h4 id="summary">Summary</h4>
+<p>The goal of this article was to audit an AWS account for unused
+resources and attach a monthly cost to each one. The key to the solution
+was fetching every rate from the AWS Price List API and keeping the scan
+read-only, with deletion behind a separate command that previews itself.
+The results were:</p>
+<ul>
+<li>🟢 22 checks across storage, compute, networking, data services and
+account-wide services</li>
+<li>🟢 A 17-region sweep in about 20 seconds, with per-check subtotals
+and a per-resource table</li>
+<li>🟢 Prices dated in every report, and per-region: a NAT gateway is
+$32.85 a month in us-east-1 and $67.89 in sa-east-1</li>
+<li>🟢 JSON against a published schema, a self-contained HTML report,
+and a shell cleanup plan</li>
+<li>🟢 <code>clean --apply</code> backs a resource up before removing
+it, and stops the sequence when a backup fails</li>
+<li>⚠️ <code>unused-ami</code> reads instances only; launch templates
+and Auto Scaling groups stay outside its view</li>
+<li>⚠️ Costs are on-demand list prices, excluding savings plans,
+reserved capacity, private pricing and credits</li>
+<li>❌ <code>empty-vpc</code> reports without a cleanup step, because a
+VPC needs its dependencies removed in an order the tool leaves to an
+operator</li>
+</ul>
+<p>Scope: one AWS account, 17 enabled regions, 22 checks, a single sweep
+per figure quoted, run from one laptop against <code>aws login</code>
+credentials. The 86 findings reported here come from an account whose
+waste is entirely in the free classes, so the dollar figures in the
+tables above come from the price table itself.</p>
+<p>The strategy for using per-resource pricing for AWS waste detection
+was validated with an incremental step by step approach.</p>
+<hr />
+<h4 id="references">References</h4>
+<ul>
+<li>Repository, MIT: <a
+href="https://github.com/xbill9/zombiescan">https://github.com/xbill9/zombiescan</a></li>
+<li>Findings JSON Schema: <a
+href="https://github.com/xbill9/zombiescan/blob/main/docs/findings.schema.json">https://github.com/xbill9/zombiescan/blob/main/docs/findings.schema.json</a></li>
+<li>AWS Price List API, <code>GetProducts</code>: <a
+href="https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_pricing_GetProducts.html">https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_pricing_GetProducts.html</a></li>
+<li>Amazon VPC pricing, public IPv4 addresses: <a
+href="https://aws.amazon.com/vpc/pricing/">https://aws.amazon.com/vpc/pricing/</a></li>
+<li>AWS CLI <code>aws login</code>: <a
+href="https://docs.aws.amazon.com/cli/latest/reference/login.html">https://docs.aws.amazon.com/cli/latest/reference/login.html</a></li>
+</ul>
+</body>
+</html>
