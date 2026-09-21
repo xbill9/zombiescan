@@ -569,6 +569,26 @@ def build_table(ctx: RefreshContext) -> dict[str, Any]:
     return payload
 
 
+def regressions(payload: dict[str, Any], existing: dict[str, Any]) -> list[str]:
+    """Sections the new table would lose against the one already on disk.
+
+    A fetcher that returns nothing is not a price of zero, it is a refresh
+    that failed, and writing its result would silently make every finding it
+    prices free. Checked against the previous table rather than against a
+    hardcoded list, so a pack's sections are protected the moment it ships one.
+    """
+    problems = []
+    for section, previous in sorted(existing.items()):
+        if section.startswith("_") or not isinstance(previous, dict) or not previous:
+            continue
+        fresh = payload.get(section)
+        if fresh is None:
+            problems.append(f"{section}: gone (had {len(previous)} entries)")
+        elif isinstance(fresh, dict) and not fresh:
+            problems.append(f"{section}: empty (had {len(previous)} entries)")
+    return problems
+
+
 def main() -> None:
     # Pack fetchers only exist once their packs are imported.
     from zombiescan import packs
@@ -580,9 +600,27 @@ def main() -> None:
         session=session, pricing=session.client("pricing", region_name="us-east-1")
     )
     payload = build_table(ctx)
+
+    existing = json.loads(TABLE_PATH.read_text()) if TABLE_PATH.exists() else {}
+    problems = regressions(payload, existing)
+    if problems:
+        raise SystemExit(
+            "refusing to write the price table -- this refresh would lose rates:\n  "
+            + "\n  ".join(problems)
+            + "\nThe table on disk is unchanged. A section that vanishes usually means "
+            "its fetcher never registered, not that AWS stopped charging for it."
+        )
+
     TABLE_PATH.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n")
     print(f"wrote {TABLE_PATH}")
 
 
 if __name__ == "__main__":
-    main()
+    # `python -m zombiescan.pricing.refresh` executes this file a second time,
+    # as __main__, with a FETCHERS list of its own. Packs register into the
+    # canonical zombiescan.pricing.refresh copy, so running __main__'s own
+    # main() would fetch core's sections and none of any pack's. Hand over to
+    # the canonical module instead.
+    from zombiescan.pricing.refresh import main as canonical_main
+
+    canonical_main()

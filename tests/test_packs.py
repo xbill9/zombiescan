@@ -9,6 +9,10 @@ import, and a rate key that two packs both answer to.
 
 from __future__ import annotations
 
+import subprocess
+import sys
+import textwrap
+
 import pytest
 
 from zombiescan import engine, packs
@@ -140,6 +144,54 @@ def test_every_table_section_has_exactly_one_fetcher():
         "in table, no fetcher": sorted(sections - set(declared)),
         "fetcher, not in table": sorted(set(declared) - sections),
     }
+
+
+def test_running_the_refresher_as_main_uses_the_registry_packs_write_to():
+    """`python -m zombiescan.pricing.refresh` loads this module twice.
+
+    The __main__ copy gets a FETCHERS list of its own, while packs register
+    into the canonical one, so running __main__'s own main() rebuilds the
+    table from core's sections alone and drops every pack's rates -- silently,
+    because the result is a valid table with prices of zero. Run exactly as the
+    docs say to, with main() replaced so nothing reaches AWS.
+    """
+    script = textwrap.dedent(
+        """
+        import runpy
+        import zombiescan.pricing.refresh as canonical
+        from zombiescan import packs
+
+        def fake_main():
+            packs.discover()
+            print(sorted({fetcher.pack for fetcher in canonical.FETCHERS}))
+
+        canonical.main = fake_main
+        runpy.run_module("zombiescan.pricing.refresh", run_name="__main__")
+        """
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", script], capture_output=True, text=True, timeout=120
+    )
+    assert result.returncode == 0, result.stderr
+    assert "lightsail" in result.stdout, result.stdout
+
+
+def test_a_refresh_that_would_lose_rates_is_refused():
+    """An empty section is a failed fetch, not a price of zero."""
+    from zombiescan.pricing.refresh import regressions
+
+    existing = {
+        "_meta": {"generated": "2026-09-21T00:00:00Z"},
+        "ebs_gb_month": {"us-east-1": {"gp3": 0.08}},
+        "lightsail_bundle_month": {"us-east-1": {"nano_3_0": 5.0}},
+    }
+    unchanged = {"ebs_gb_month": existing["ebs_gb_month"]}
+
+    assert regressions({**unchanged, "lightsail_bundle_month": {}}, existing) == [
+        "lightsail_bundle_month: empty (had 1 entries)"
+    ]
+    assert regressions(unchanged, existing) == ["lightsail_bundle_month: gone (had 1 entries)"]
+    assert regressions({**existing}, existing) == []
 
 
 def test_lightsail_sections_are_fetched_by_the_lightsail_pack():

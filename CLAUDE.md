@@ -100,6 +100,13 @@ needs one. Every table section must have exactly one `@price_fetcher`, which
 `docs/PACKS.md` is the pack-author guide. Keep it current — it is the contract
 third-party packs are written against, along with `PACK_API_VERSION`.
 
+`python -m zombiescan.pricing.refresh` runs this file twice — once as
+`__main__` with a `FETCHERS` list of its own, once as the canonical module that
+packs register into. The `__main__` block hands over to the canonical `main()`
+for that reason; calling `main()` directly there rebuilds the table from core's
+sections alone and writes zero prices for every pack. `main` also refuses to
+write a table that loses or empties a section the previous one had.
+
 ## The plugin and the MCP server
 
 `plugin/` is the Claude Code plugin: two slash commands, a skill, and
