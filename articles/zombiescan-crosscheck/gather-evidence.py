@@ -92,13 +92,15 @@ def main():
                 "currentDeployment_state": (s.get("currentDeployment") or {}).get("state"),
                 "createdAt": str(s.get("createdAt")),
             }
-            for s in session.client("lightsail", region_name="us-east-1")
-            .get_container_services()["containerServices"]
+            for s in session.client("lightsail", region_name="us-east-1").get_container_services()[
+                "containerServices"
+            ]
         ],
         "lightsail_container_powers_us_east_1": {
             p["name"]: p["price"]
-            for p in session.client("lightsail", region_name="us-east-1")
-            .get_container_service_powers()["powers"]
+            for p in session.client(
+                "lightsail", region_name="us-east-1"
+            ).get_container_service_powers()["powers"]
         },
         "ec2_us_east_1": {
             "volumes_present": len(ec2.describe_volumes()["Volumes"]),
@@ -145,7 +147,10 @@ def main():
             {
                 "captured_utc": NOW.strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "metric": "UnblendedCost",
-                "note": "list-price charges as billed; months after 2026-07 carry offsetting negative rows",
+                "note": (
+                    "list-price charges as billed; months after 2026-07 carry "
+                    "offsetting negative rows"
+                ),
                 "months": months,
             },
             indent=2,
@@ -177,7 +182,8 @@ def main():
         "## ECR flagged repositories",
     ]
     flagged = [
-        r for r in inventory["ecr"]["repos"]
+        r
+        for r in inventory["ecr"]["repos"]
         if r["images"] > 0 and (r["newest_push"] or "") < "2026-06-23"
     ]
     gib = sum(r["bytes"] for r in flagged) / 1024**3

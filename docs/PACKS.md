@@ -177,10 +177,12 @@ For anything these cannot express, register a resolver:
 ```python
 from zombiescan.pricing.rates import register_resolver
 
+
 def _tiered(table, region, units):
     rates, approximate = table.lookup_section("acme_tiers", region)
     ...
     return price, approximate
+
 
 register_resolver("acme.tiered_month", _tiered, pack="acme")
 ```
