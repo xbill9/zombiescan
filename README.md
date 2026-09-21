@@ -245,7 +245,11 @@ someone an outage.
 
 Two checks report **staleness**, which is a prompt to look rather than a
 verdict. `stale-secret` cannot tell an abandoned secret from break-glass
-credentials that are dormant by design.
+credentials that are dormant by design. A secret nothing has ever read is
+judged on its age instead — from the later of when it was created and when its
+value was last written, because a secret rewritten last week is being looked
+after whoever reads it. Otherwise every secret would be waste for its first
+ninety days, having never been retrieved yet.
 
 `unused-ami` is the least certain check here: it can see instances but not
 launch templates, Auto Scaling groups, or cross-account shares. An AMI your ASG
