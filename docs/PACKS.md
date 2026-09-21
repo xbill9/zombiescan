@@ -244,6 +244,12 @@ def clean_idle_widget(ctx: ScanContext, finding: Finding) -> Iterator[Step]:
 - **Back up first where the API allows it**, and order the steps so the backup
   precedes the destruction. A failed step aborts the rest of that finding, so a
   failed snapshot can never be followed by the delete that assumed it.
+- **Pass `region=` when the call does not belong to the finding's region.** A
+  step is sent to the finding's region by default, and to the operator's home
+  region for a global finding. A global finding whose remediation is regional --
+  the hosted zone a Cloud Map namespace created is global, the namespace is not
+  -- must name the region, or the delete goes wherever the operator happens to
+  be configured.
 - **Mark `irreversible=True`** on any step with no recovery window, snapshot or
   undo. It drives what the operator is warned about, so a wrong flag is a
   safety bug.

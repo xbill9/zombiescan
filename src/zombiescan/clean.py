@@ -99,7 +99,7 @@ def apply_outcome(outcome: Outcome, session: boto3.Session, home: str) -> Outcom
     the destructive one that assumed it succeeded.
     """
     for step in outcome.steps:
-        client = _client(session, step.service, outcome.finding.region, home)
+        client = _client(session, step.service, step.region or outcome.finding.region, home)
         try:
             response = getattr(client, step.operation)(**step.params)
         except botocore.exceptions.ClientError as exc:

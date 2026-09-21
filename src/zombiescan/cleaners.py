@@ -36,6 +36,12 @@ class Step:
     # Irreversible means no recovery window, no snapshot, no undo: once this
     # returns, the data is gone or on an unstoppable timer.
     irreversible: bool = False
+    # Where to send the call, when that is not the finding's own region. A
+    # global finding can still need a regional call -- the hosted zone a Cloud
+    # Map namespace created is global, the namespace is not -- and defaulting
+    # to the operator's home region would delete from whichever region they
+    # happen to be configured for.
+    region: str | None = None
 
 
 PlanFn = Callable[[ScanContext, Finding], Iterator[Step]]

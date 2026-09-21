@@ -165,6 +165,7 @@ zombiescan-mcp     # or: uv run zombiescan-mcp
 | `orphaned-rds-snapshot` | Manual snapshots of databases that no longer exist | yes |
 | `idle-provisioned-dynamodb` | Empty tables paying for provisioned capacity | yes |
 | `unused-route53-health-check` | Health checks no DNS record references | yes |
+| `unused-route53-zone` | Hosted zones holding only their default SOA and NS records | yes |
 | `log-group-no-retention` | CloudWatch log groups that never expire | grows |
 | `available-eni` | Unattached interfaces blocking subnet/SG deletion | no |
 | `unused-security-group` | Groups attached to nothing, referenced by nothing | no |
@@ -174,10 +175,23 @@ zombiescan-mcp     # or: uv run zombiescan-mcp
 The free ones are reported because they accumulate without limit and block
 deletions, not because of this month's bill.
 
-`unused-route53-health-check` is **global**: Route 53 has no regions, so it runs
-once per scan rather than once per region, and its findings are labelled
-`global`. Running it seventeen times would report one health check seventeen
+The two Route 53 checks are **global**: Route 53 has no regions, so they run
+once per scan rather than once per region, and their findings are labelled
+`global`. Running them seventeen times would report one health check seventeen
 times and multiply the waste total to match.
+
+A zone that AWS Cloud Map created is reported against its namespace:
+`delete-hosted-zone` would leave the namespace pointing at nothing, so the
+remediation is `servicediscovery delete-namespace` in the namespace's own
+region. Cloud Map stamps the namespace ARN into the zone's comment, so this
+costs no extra API call.
+
+`unused-route53-zone` prices a zone at the **marginal** rate. Hosted zones cost
+$0.50/month for the first 25 in an account and $0.10 after that, so deleting
+one from an account with thirty saves $0.10, whatever the other twenty-nine
+are priced at. A zone is flagged only when it holds exactly the SOA and NS
+records Route 53 creates with it — those two cannot be deleted, so a count of
+two means the zone publishes nothing at all.
 
 `incomplete-multipart-upload` is the one worth running today even if you skip
 the rest. Stranded multipart parts bill at full storage rates and appear in no

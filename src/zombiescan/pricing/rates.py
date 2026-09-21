@@ -182,5 +182,17 @@ def _register_irregular_rates() -> None:
         )
     )
 
+    # Hosted zones are global too, and tiered: the first 25 in an account cost
+    # more than the ones after them. The variant names the tier, because which
+    # zone falls in which is a fact about the account, not about the zone.
+    register_rate(
+        RateSpec(
+            "route53.hosted_zone_month",
+            "route53_hosted_zone_month",
+            scope="global",
+            variants=True,
+        )
+    )
+
 
 _register_irregular_rates()

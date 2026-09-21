@@ -1,0 +1,52 @@
+{
+  "HostedZones": [
+    {
+      "Id": "/hostedzone/Z00EMPTYPRIVATE",
+      "Name": "agent.local.",
+      "Config": {
+        "Comment": "service discovery for the agent VPC",
+        "PrivateZone": true
+      },
+      "ResourceRecordSetCount": 2,
+      "CallerReference": "2026-02-11T09:14:22Z"
+    },
+    {
+      "Id": "/hostedzone/Z11EMPTYPUBLIC",
+      "Name": "old-project.example.com.",
+      "Config": {
+        "PrivateZone": false
+      },
+      "ResourceRecordSetCount": 2,
+      "CallerReference": "2025-08-03T16:02:59Z"
+    },
+    {
+      "Id": "/hostedzone/Z22INUSE",
+      "Name": "example.com.",
+      "Config": {
+        "Comment": "the production zone",
+        "PrivateZone": false
+      },
+      "ResourceRecordSetCount": 14,
+      "CallerReference": "2024-01-30T11:45:00Z"
+    },
+    {
+      "Id": "/hostedzone/Z33ONERECORD",
+      "Name": "verify.example.com.",
+      "Config": {
+        "PrivateZone": false
+      },
+      "ResourceRecordSetCount": 3,
+      "CallerReference": "2026-06-19T08:20:11Z"
+    },
+    {
+      "Id": "/hostedzone/Z44CLOUDMAP",
+      "Name": "agent.local.",
+      "Config": {
+        "Comment": "Created by AWS Cloud Map namespace with ARN arn:aws:servicediscovery:eu-west-1:123456789012:namespace/ns-abcdefghij123456",
+        "PrivateZone": true
+      },
+      "ResourceRecordSetCount": 2,
+      "CallerReference": "2026-03-04T12:00:00Z"
+    }
+  ]
+}

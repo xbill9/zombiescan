@@ -1,15 +1,15 @@
 {
   "_meta": {
     "source": "AWS Price List API (pricing:GetProducts), on-demand USD list prices",
-    "generated": "2026-09-21T01:16:11Z",
-    "note": "Regenerate with: uv run python -m zombiescan.pricing.refresh"
+    "generated": "2026-09-21T15:33:49Z",
+    "note": "Regenerate with: python -m zombiescan.pricing.refresh",
+    "packs": [
+      "core",
+      "lightsail"
+    ]
   },
   "fallback_region": "us-east-1",
   "hours_per_month": 730,
-  "public_ipv4_hour": {
-    "_value": 0.005,
-    "_source": "https://aws.amazon.com/vpc/pricing/ -- flat rate, not available via the Price List API"
-  },
   "ebs_gb_month": {
     "af-south-1": {
       "gp3": 0.1047,
@@ -1794,6 +1794,102 @@
       "write": 0.00065
     }
   },
+  "route53_health_check_month": {
+    "aws": 0.5,
+    "non_aws": 0.75
+  },
+  "route53_hosted_zone_month": {
+    "additional": 0.1,
+    "first_25": 0.5
+  },
+  "public_ipv4_hour": {
+    "_source": "https://aws.amazon.com/vpc/pricing/ -- flat rate, not available via the Price List API",
+    "_value": 0.005
+  },
+  "lightsail_disk_gb_month": {
+    "ap-east-1": 0.1,
+    "ap-northeast-1": 0.1,
+    "ap-northeast-2": 0.1,
+    "ap-south-1": 0.1,
+    "ap-southeast-1": 0.1,
+    "ap-southeast-2": 0.1,
+    "ap-southeast-3": 0.1,
+    "ap-southeast-5": 0.1,
+    "ca-central-1": 0.1,
+    "eu-central-1": 0.1,
+    "eu-north-1": 0.1,
+    "eu-south-2": 0.1,
+    "eu-west-1": 0.1,
+    "eu-west-2": 0.1,
+    "eu-west-3": 0.1,
+    "sa-east-1": 0.1,
+    "us-east-1": 0.1,
+    "us-east-2": 0.1,
+    "us-west-2": 0.1
+  },
+  "lightsail_static_ip_hour": {
+    "ap-east-1": 0.005,
+    "ap-northeast-1": 0.005,
+    "ap-northeast-2": 0.005,
+    "ap-south-1": 0.005,
+    "ap-southeast-1": 0.005,
+    "ap-southeast-2": 0.005,
+    "ap-southeast-3": 0.005,
+    "ap-southeast-5": 0.005,
+    "ca-central-1": 0.005,
+    "eu-central-1": 0.005,
+    "eu-north-1": 0.005,
+    "eu-south-2": 0.005,
+    "eu-west-1": 0.005,
+    "eu-west-2": 0.005,
+    "eu-west-3": 0.005,
+    "sa-east-1": 0.005,
+    "us-east-1": 0.005,
+    "us-east-2": 0.005,
+    "us-west-2": 0.005
+  },
+  "lightsail_load_balancer_hour": {
+    "ap-east-1": 0.024193548,
+    "ap-northeast-1": 0.024193548,
+    "ap-northeast-2": 0.024193548,
+    "ap-south-1": 0.024193548,
+    "ap-southeast-1": 0.024193548,
+    "ap-southeast-2": 0.024193548,
+    "ap-southeast-3": 0.024193548,
+    "ap-southeast-5": 0.024193548,
+    "ca-central-1": 0.024193548,
+    "eu-central-1": 0.024193548,
+    "eu-north-1": 0.024193548,
+    "eu-south-2": 0.024193548,
+    "eu-west-1": 0.024193548,
+    "eu-west-2": 0.024193548,
+    "eu-west-3": 0.024193548,
+    "sa-east-1": 0.024193548,
+    "us-east-1": 0.024193548,
+    "us-east-2": 0.024193548,
+    "us-west-2": 0.024193548
+  },
+  "lightsail_snapshot_gb_month": {
+    "ap-east-1": 0.05,
+    "ap-northeast-1": 0.05,
+    "ap-northeast-2": 0.05,
+    "ap-south-1": 0.05,
+    "ap-southeast-1": 0.05,
+    "ap-southeast-2": 0.05,
+    "ap-southeast-3": 0.05,
+    "ap-southeast-5": 0.05,
+    "ca-central-1": 0.05,
+    "eu-central-1": 0.05,
+    "eu-north-1": 0.05,
+    "eu-south-2": 0.05,
+    "eu-west-1": 0.05,
+    "eu-west-2": 0.05,
+    "eu-west-3": 0.05,
+    "sa-east-1": 0.05,
+    "us-east-1": 0.05,
+    "us-east-2": 0.05,
+    "us-west-2": 0.05
+  },
   "lightsail_bundle_month": {
     "ap-northeast-1": {
       "12xlarge_3_0": 1324.0,
@@ -3447,93 +3543,5 @@
       "small": 15.0,
       "xlarge": 160.0
     }
-  },
-  "lightsail_disk_gb_month": {
-    "ap-east-1": 0.1,
-    "ap-northeast-1": 0.1,
-    "ap-northeast-2": 0.1,
-    "ap-south-1": 0.1,
-    "ap-southeast-1": 0.1,
-    "ap-southeast-2": 0.1,
-    "ap-southeast-3": 0.1,
-    "ap-southeast-5": 0.1,
-    "ca-central-1": 0.1,
-    "eu-central-1": 0.1,
-    "eu-north-1": 0.1,
-    "eu-south-2": 0.1,
-    "eu-west-1": 0.1,
-    "eu-west-2": 0.1,
-    "eu-west-3": 0.1,
-    "sa-east-1": 0.1,
-    "us-east-1": 0.1,
-    "us-east-2": 0.1,
-    "us-west-2": 0.1
-  },
-  "lightsail_load_balancer_hour": {
-    "ap-east-1": 0.024193548,
-    "ap-northeast-1": 0.024193548,
-    "ap-northeast-2": 0.024193548,
-    "ap-south-1": 0.024193548,
-    "ap-southeast-1": 0.024193548,
-    "ap-southeast-2": 0.024193548,
-    "ap-southeast-3": 0.024193548,
-    "ap-southeast-5": 0.024193548,
-    "ca-central-1": 0.024193548,
-    "eu-central-1": 0.024193548,
-    "eu-north-1": 0.024193548,
-    "eu-south-2": 0.024193548,
-    "eu-west-1": 0.024193548,
-    "eu-west-2": 0.024193548,
-    "eu-west-3": 0.024193548,
-    "sa-east-1": 0.024193548,
-    "us-east-1": 0.024193548,
-    "us-east-2": 0.024193548,
-    "us-west-2": 0.024193548
-  },
-  "lightsail_snapshot_gb_month": {
-    "ap-east-1": 0.05,
-    "ap-northeast-1": 0.05,
-    "ap-northeast-2": 0.05,
-    "ap-south-1": 0.05,
-    "ap-southeast-1": 0.05,
-    "ap-southeast-2": 0.05,
-    "ap-southeast-3": 0.05,
-    "ap-southeast-5": 0.05,
-    "ca-central-1": 0.05,
-    "eu-central-1": 0.05,
-    "eu-north-1": 0.05,
-    "eu-south-2": 0.05,
-    "eu-west-1": 0.05,
-    "eu-west-2": 0.05,
-    "eu-west-3": 0.05,
-    "sa-east-1": 0.05,
-    "us-east-1": 0.05,
-    "us-east-2": 0.05,
-    "us-west-2": 0.05
-  },
-  "lightsail_static_ip_hour": {
-    "ap-east-1": 0.005,
-    "ap-northeast-1": 0.005,
-    "ap-northeast-2": 0.005,
-    "ap-south-1": 0.005,
-    "ap-southeast-1": 0.005,
-    "ap-southeast-2": 0.005,
-    "ap-southeast-3": 0.005,
-    "ap-southeast-5": 0.005,
-    "ca-central-1": 0.005,
-    "eu-central-1": 0.005,
-    "eu-north-1": 0.005,
-    "eu-south-2": 0.005,
-    "eu-west-1": 0.005,
-    "eu-west-2": 0.005,
-    "eu-west-3": 0.005,
-    "sa-east-1": 0.005,
-    "us-east-1": 0.005,
-    "us-east-2": 0.005,
-    "us-west-2": 0.005
-  },
-  "route53_health_check_month": {
-    "non_aws": 0.75,
-    "aws": 0.5
   }
 }

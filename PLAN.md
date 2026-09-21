@@ -183,7 +183,8 @@ Shipped past the twelve rows above: `unused-vpc-endpoint`, `empty-classic-lb`,
 `stopped-rds-instance`, `disabled-kms-key`, `stale-secret`, `unmounted-efs`,
 `detached-internet-gateway`, `incomplete-multipart-upload`,
 `orphaned-rds-snapshot`, `idle-provisioned-dynamodb`,
-`unused-route53-health-check`, `ecr-stale-images`, and six Lightsail checks:
+`unused-route53-health-check`, `unused-route53-zone`, `ecr-stale-images`, and
+six Lightsail checks:
 `lightsail-stopped-instance`, `lightsail-unattached-static-ip`,
 `lightsail-unattached-disk`, `lightsail-idle-container-service`,
 `lightsail-empty-load-balancer`, `lightsail-orphaned-snapshot`.
@@ -215,6 +216,17 @@ products leave `productFamily` null.
 The engine now supports global checks (`scope="global"`), which run once per
 scan instead of once per region. Route 53 was the first; CloudFront, IAM and
 account-level S3 settings can use it next.
+
+**`unused-route53-zone` (2026-09-21).** Found by cross-checking the scanner
+against Cost Explorer: a $0.50/month private zone, `agent.local.`, holding
+nothing but the SOA and NS records Route 53 creates with a zone. Those two
+cannot be deleted, so a zone reporting two record sets is publishing nothing
+and no second call is needed to prove it.
+
+The finding is priced at the **marginal** rate, not the average: zones cost
+$0.50/month for the first 25 in an account and $0.10 beyond, so removing one
+from an account with thirty saves $0.10. Both tiers come from the Price List
+API under `AmazonRoute53` / `DNS Zone`, separated by `beginRange`.
 
 **The Claude Code plugin (2026-09-21).** Built as the second front door, in
 `plugin/`: two slash commands, a skill, and an MCP server

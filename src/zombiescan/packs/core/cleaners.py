@@ -285,6 +285,38 @@ def clean_unused_route53_health_check(ctx: ScanContext, finding: Finding) -> Ite
     )
 
 
+@cleaner("unused-route53-zone")
+def clean_unused_route53_zone(ctx: ScanContext, finding: Finding) -> Iterator[Step]:
+    # Nothing to back up: the only records in a zone this check flags are the
+    # SOA and NS sets Route 53 generates, and a recreated zone generates its
+    # own. Irreversible all the same -- a public zone's name servers go with
+    # it, so a domain delegated to them has to be repointed at whatever a new
+    # zone is given.
+    name = finding.details.get("name", "")
+    namespace = finding.details.get("cloud_map_namespace")
+    if namespace:
+        # Deleting the zone under a Cloud Map namespace orphans the namespace.
+        # Deleting the namespace takes the zone with it, in the namespace's own
+        # region rather than the operator's.
+        yield Step(
+            f"delete Cloud Map namespace {namespace} ({name}), which owns this zone".strip(),
+            "servicediscovery",
+            "delete_namespace",
+            {"Id": namespace},
+            irreversible=True,
+            region=finding.details.get("cloud_map_region"),
+        )
+        return
+
+    yield Step(
+        f"delete hosted zone {finding.resource_id} ({name})".strip(),
+        "route53",
+        "delete_hosted_zone",
+        {"Id": finding.resource_id},
+        irreversible=True,
+    )
+
+
 # `empty-vpc` has no cleaner on purpose. Deleting a VPC fails until every
 # subnet, route table, gateway and peering connection inside it is gone, and
 # working out that order safely is a different tool. The finding stays

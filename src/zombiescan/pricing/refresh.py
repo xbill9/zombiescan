@@ -496,6 +496,33 @@ def fetch_route53_health_checks(client: Any) -> dict[str, float]:
     return table
 
 
+def fetch_route53_hosted_zones(client: Any) -> dict[str, float]:
+    """{first_25|additional: usd_per_month}. Route 53 is global, so no region.
+
+    The two tiers come back as two price dimensions of the same usagetype,
+    separated by ``beginRange``: the 26th zone onwards is the cheaper one.
+    """
+    entries = paginate(
+        client,
+        ServiceCode="AmazonRoute53",
+        Filters=[{"Type": "TERM_MATCH", "Field": "productFamily", "Value": "DNS Zone"}],
+    )
+    table: dict[str, float] = {}
+    for entry in entries:
+        if entry["product"]["attributes"].get("usagetype", "") != "HostedZone":
+            # "Global-RRSets" prices record sets past the 10,000 a zone
+            # includes, which is not what a zone itself costs.
+            continue
+        for term in entry.get("terms", {}).get("OnDemand", {}).values():
+            for dimension in term.get("priceDimensions", {}).values():
+                price = dimension.get("pricePerUnit", {}).get("USD")
+                if price is None:
+                    continue
+                key = "first_25" if dimension.get("beginRange") == "0" else "additional"
+                table[key] = float(price)
+    return table
+
+
 def _register_core_fetchers() -> None:
     """Register the sections core knows how to fetch.
 
@@ -520,6 +547,7 @@ def _register_core_fetchers() -> None:
         ("rds_snapshot_gb_month", fetch_rds_snapshot_storage, "RDS snapshot"),
         ("dynamodb_capacity_hour", fetch_dynamodb_capacity, "DynamoDB capacity"),
         ("route53_health_check_month", fetch_route53_health_checks, "Route 53 health check"),
+        ("route53_hosted_zone_month", fetch_route53_hosted_zones, "Route 53 hosted zone"),
     ]
     for section, fn, label in simple:
         price_fetcher(section, label=f"{label} prices")(
