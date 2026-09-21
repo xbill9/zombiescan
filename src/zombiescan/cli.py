@@ -14,6 +14,7 @@ from rich.console import Console
 from zombiescan import __version__, clean, html, report
 from zombiescan.engine import (
     CredentialError,
+    filter_us_regions,
     resolve_regions,
     scan,
     select_checks,
@@ -46,6 +47,7 @@ def list_checks() -> None:
 @click.option("--profile", default=None, help="AWS profile to use.")
 @click.option("--region", "regions", multiple=True, help="Region to scan (repeatable).")
 @click.option("--all-regions", is_flag=True, help="Scan every region this account has enabled.")
+@click.option("--us-only", is_flag=True, help="Narrow the regions to scan to the US ones (us-*).")
 @click.option("--check", "checks", multiple=True, help="Run only this check (repeatable).")
 @click.option("--json", "json_path", default=None, help="Write findings as JSON to this path.")
 @click.option("--script", "script_path", default=None, help="Write the cleanup plan to this path.")
@@ -68,6 +70,7 @@ def scan_command(
     profile: str | None,
     regions: tuple[str, ...],
     all_regions: bool,
+    us_only: bool,
     checks: tuple[str, ...],
     json_path: str | None,
     script_path: str | None,
@@ -85,6 +88,10 @@ def scan_command(
         caller_arn = verify_credentials(session)
         selected = select_checks(checks)
         target_regions = list(regions) if regions else resolve_regions(session, all_regions)
+        if us_only:
+            # Applied after resolution, so the flag narrows an explicit
+            # --region list too rather than being silently ignored there.
+            target_regions = filter_us_regions(target_regions)
     except botocore.exceptions.ProfileNotFound:
         available = ", ".join(boto3.Session().available_profiles) or "none configured"
         console.print(f"[red]No AWS profile named '{profile}'.[/red] Available: {available}")

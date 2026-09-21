@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import TEST_PRICES
-from zombiescan.engine import scan
+from zombiescan.engine import filter_us_regions, scan
 from zombiescan.models import Finding
 from zombiescan.pricing import PriceTable
 from zombiescan.registry import CheckSpec
@@ -100,3 +100,16 @@ def test_findings_are_sorted_by_cost_descending(pricing):
 
     result = scan(None, ["us-east-1"], [CheckSpec(name="m", title="m", fn=mixed)], pricing)
     assert [f.monthly_cost for f in result.findings] == [99.0, 50.0, 1.0]
+
+
+def test_us_only_keeps_the_us_regions():
+    assert filter_us_regions(REGIONS) == ["us-east-1"]
+    assert filter_us_regions(["us-west-2", "us-gov-west-1", "eu-west-1"]) == [
+        "us-west-2",
+        "us-gov-west-1",
+    ]
+
+
+def test_us_only_refuses_to_scan_nothing():
+    with pytest.raises(ValueError, match="none of eu-west-1, ap-south-1 is a US region"):
+        filter_us_regions(["eu-west-1", "ap-south-1"])

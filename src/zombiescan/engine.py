@@ -71,6 +71,22 @@ def resolve_regions(session: boto3.Session, all_regions: bool) -> list[str]:
     return sorted(r["RegionName"] for r in described)
 
 
+def filter_us_regions(regions: list[str]) -> list[str]:
+    """Keep only the US regions of ``regions``.
+
+    A prefix test rather than a fixed list, so a US region added after this
+    ships is picked up without a code change. It also matches the GovCloud
+    names, which a commercial account's describe_regions does not return
+    anyway -- they live in another partition.
+    """
+    kept = [r for r in regions if r.startswith("us-")]
+    if not kept:
+        raise ValueError(
+            f"--us-only leaves nothing to scan: none of {', '.join(regions)} is a US region."
+        )
+    return kept
+
+
 def select_checks(names: tuple[str, ...]) -> list[CheckSpec]:
     if not names:
         return list(CHECKS.values())

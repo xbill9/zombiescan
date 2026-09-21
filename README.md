@@ -87,6 +87,7 @@ credential load if it is missing.
 zombiescan checks                     # list the checks
 zombiescan scan                       # default region
 zombiescan scan --all-regions         # every region the account has enabled
+zombiescan scan --all-regions --us-only  # narrow those to the US regions
 zombiescan scan --region eu-west-1 --region us-east-1
 zombiescan scan --check unattached-ebs --check unassociated-eip
 zombiescan scan --profile production
