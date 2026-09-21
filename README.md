@@ -90,6 +90,7 @@ zombiescan scan --profile production
 zombiescan scan --min-cost 5          # hide findings under $5/month
 zombiescan scan --limit 0             # every finding, not just the top 25
 zombiescan scan --json findings.json  # machine-readable, full detail
+zombiescan scan --html report.html    # shareable report; print to PDF from a browser
 zombiescan scan --script cleanup.sh   # write the plan (never runs it)
 ```
 
@@ -203,6 +204,29 @@ Where a backup is possible the command takes one first — volumes are
 snapshotted, instances imaged, databases given a final snapshot, secrets deleted
 with a 30-day recovery window. A backup is not a substitute for knowing what you
 are deleting.
+
+## Output formats
+
+**`--json`** is a versioned contract, not a dump. The schema lives at
+[`docs/findings.schema.json`](docs/findings.schema.json) and the suite validates
+real output against it, so the two cannot drift. Check `schema_version` before
+parsing: the shape will change, and a consumer that cannot tell which version it
+is reading breaks silently rather than loudly.
+
+Two fields matter more than they look:
+
+- `pricing.generated` — when the bundled price table was built. Without it a
+  cost report is not auditable, because nobody can tell whether it used current
+  rates.
+- `scan.complete` — false when every region/check pair failed. An incomplete
+  scan finds nothing, and "found nothing" must never be read as "you are clean".
+
+**`--html`** writes one self-contained file: no stylesheet, no font, no script,
+no network request. Cost reports get emailed, attached to tickets and opened on
+laptops with no internet, and one that renders as unstyled text in those places
+is worse than no report. It carries a print stylesheet, so a PDF is
+browser-print-to-PDF — which is how most people make one anyway, and avoids
+taking on a rendering engine as a dependency.
 
 ## Exit codes
 

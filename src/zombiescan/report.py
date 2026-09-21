@@ -13,6 +13,7 @@ from typing import Any
 from rich.console import Console
 from rich.table import Table
 
+from zombiescan import __version__
 from zombiescan.engine import ScanResult
 
 
@@ -181,14 +182,61 @@ def _render_errors(result: ScanResult, console: Console) -> None:
         console.print(f"  [dim]... and {len(result.errors) - 10} more[/dim]")
 
 
-def to_json(result: ScanResult, caller_arn: str | None = None) -> dict[str, Any]:
+SCHEMA_VERSION = 1
+
+
+def _by_check(result: ScanResult) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    for finding in result.findings:
+        row = out.setdefault(finding.check, {"count": 0, "monthly_cost": 0.0})
+        row["count"] += 1
+        row["monthly_cost"] += finding.monthly_cost
+    for row in out.values():
+        row["monthly_cost"] = round(row["monthly_cost"], 2)
+    return dict(sorted(out.items(), key=lambda kv: (-kv[1]["monthly_cost"], kv[0])))
+
+
+def to_json(
+    result: ScanResult,
+    caller_arn: str | None = None,
+    duration_seconds: float | None = None,
+    pricing_generated: str | None = None,
+) -> dict[str, Any]:
+    """The machine-readable report.
+
+    ``schema_version`` is the contract. Anything consuming this should check
+    it: the shape will change, and a consumer that cannot tell which version
+    it is reading breaks silently rather than loudly.
+    """
+    account_id = None
+    if caller_arn and caller_arn.count(":") >= 4:
+        account_id = caller_arn.split(":")[4] or None
+
     return {
-        "generated": dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "caller_arn": caller_arn,
-        "regions": result.regions,
-        "total_monthly_cost": round(result.total_monthly_cost, 2),
-        "total_annual_cost": round(result.total_monthly_cost * 12, 2),
-        "finding_count": len(result.findings),
+        "schema_version": SCHEMA_VERSION,
+        "tool": {"name": "zombiescan", "version": __version__},
+        "scan": {
+            "generated": dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "duration_seconds": round(duration_seconds, 2) if duration_seconds else None,
+            "account_id": account_id,
+            "caller_arn": caller_arn,
+            "regions": result.regions,
+            "pairs_attempted": result.attempted,
+            "complete": not result.completely_failed,
+        },
+        "pricing": {
+            # Which price table produced these numbers. Without it a report is
+            # not auditable: nobody can tell whether it used current rates.
+            "generated": pricing_generated,
+            "basis": "AWS Price List API, on-demand USD list prices",
+            "excludes": ["savings plans", "reserved capacity", "private pricing", "credits"],
+        },
+        "totals": {
+            "monthly_cost": round(result.total_monthly_cost, 2),
+            "annual_cost": round(result.total_monthly_cost * 12, 2),
+            "finding_count": len(result.findings),
+            "by_check": _by_check(result),
+        },
         "findings": [f.to_dict() for f in result.findings],
         "errors": [
             {"region": e.region, "check": e.check, "message": e.message} for e in result.errors
@@ -196,9 +244,9 @@ def to_json(result: ScanResult, caller_arn: str | None = None) -> dict[str, Any]
     }
 
 
-def write_json(result: ScanResult, path: str, caller_arn: str | None = None) -> None:
+def write_json(result: ScanResult, path: str, **kwargs: Any) -> None:
     with open(path, "w") as handle:
-        json.dump(to_json(result, caller_arn), handle, indent=2)
+        json.dump(to_json(result, **kwargs), handle, indent=2)
         handle.write("\n")
 
 

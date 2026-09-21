@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/xbill9/zombiescan/blob/main/docs/findings.schema.json",
+  "title": "zombiescan findings report",
+  "description": "Output of `zombiescan scan --json`. Check schema_version before parsing.",
+  "type": "object",
+  "required": ["schema_version", "tool", "scan", "pricing", "totals", "findings", "errors"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Incremented on any breaking change to this document."
+    },
+    "tool": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "scan": {
+      "type": "object",
+      "required": ["generated", "regions", "pairs_attempted", "complete"],
+      "additionalProperties": false,
+      "properties": {
+        "generated": { "type": "string", "description": "UTC, ISO 8601." },
+        "duration_seconds": { "type": ["number", "null"] },
+        "account_id": { "type": ["string", "null"] },
+        "caller_arn": { "type": ["string", "null"] },
+        "regions": { "type": "array", "items": { "type": "string" } },
+        "pairs_attempted": { "type": "integer", "minimum": 0 },
+        "complete": {
+          "type": "boolean",
+          "description": "False when every region/check pair failed. An incomplete scan that found nothing is NOT an all-clear."
+        }
+      }
+    },
+    "pricing": {
+      "type": "object",
+      "required": ["generated", "basis", "excludes"],
+      "additionalProperties": false,
+      "properties": {
+        "generated": {
+          "type": ["string", "null"],
+          "description": "When the bundled price table was built. Without it the report is not auditable."
+        },
+        "basis": { "type": "string" },
+        "excludes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "totals": {
+      "type": "object",
+      "required": ["monthly_cost", "annual_cost", "finding_count", "by_check"],
+      "additionalProperties": false,
+      "properties": {
+        "monthly_cost": { "type": "number", "minimum": 0 },
+        "annual_cost": { "type": "number", "minimum": 0 },
+        "finding_count": { "type": "integer", "minimum": 0 },
+        "by_check": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["count", "monthly_cost"],
+            "additionalProperties": false,
+            "properties": {
+              "count": { "type": "integer", "minimum": 1 },
+              "monthly_cost": { "type": "number", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "check",
+          "resource_id",
+          "resource_type",
+          "region",
+          "reason",
+          "monthly_cost",
+          "approximate_cost",
+          "remediation",
+          "details"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "check": { "type": "string" },
+          "resource_id": { "type": "string" },
+          "resource_type": { "type": "string" },
+          "region": {
+            "type": "string",
+            "description": "An AWS region, or \"global\" for account-wide services."
+          },
+          "reason": { "type": "string" },
+          "monthly_cost": { "type": "number", "minimum": 0 },
+          "approximate_cost": {
+            "type": "boolean",
+            "description": "True when the figure is an estimate or an upper bound. details.note says why."
+          },
+          "remediation": {
+            "type": "string",
+            "description": "A shell command. Generated, never executed. Interpolated values are shell-quoted."
+          },
+          "details": { "type": "object" }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["region", "check", "message"],
+        "additionalProperties": false,
+        "properties": {
+          "region": { "type": "string" },
+          "check": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  }
+}

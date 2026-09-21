@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import sys
+import time
 
 import boto3
 import botocore.exceptions
 import click
 from rich.console import Console
 
-from zombiescan import __version__, report
+from zombiescan import __version__, html, report
 from zombiescan.engine import (
     CredentialError,
     resolve_regions,
@@ -47,6 +48,9 @@ def list_checks() -> None:
 @click.option("--json", "json_path", default=None, help="Write findings as JSON to this path.")
 @click.option("--script", "script_path", default=None, help="Write the cleanup plan to this path.")
 @click.option(
+    "--html", "html_path", default=None, help="Write a shareable HTML report to this path."
+)
+@click.option(
     "--min-cost",
     default=0.0,
     show_default=True,
@@ -65,6 +69,7 @@ def scan_command(
     checks: tuple[str, ...],
     json_path: str | None,
     script_path: str | None,
+    html_path: str | None,
     min_cost: float,
     limit: int,
 ) -> None:
@@ -95,8 +100,10 @@ def scan_command(
     )
 
     pricing = PriceTable.load()
+    started = time.monotonic()
     with console.status("Scanning..."):
         result = scan(session, target_regions, selected, pricing)
+    elapsed = time.monotonic() - started
 
     hidden = 0
     if min_cost > 0:
@@ -109,8 +116,21 @@ def scan_command(
     report.render(result, console, limit=limit, hidden_by_filter=hidden)
 
     if json_path:
-        report.write_json(result, json_path, caller_arn)
+        report.write_json(
+            result,
+            json_path,
+            caller_arn=caller_arn,
+            duration_seconds=elapsed,
+            pricing_generated=pricing.generated,
+        )
         console.print(f"[dim]findings written to {json_path}[/dim]")
+    if html_path:
+        html.write_html(
+            result, html_path, caller_arn=caller_arn, pricing_generated=pricing.generated
+        )
+        console.print(
+            f"[dim]HTML report written to {html_path} (print to PDF from a browser)[/dim]"
+        )
     if script_path:
         report.write_script(result, script_path)
         console.print(
