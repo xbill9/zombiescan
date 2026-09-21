@@ -30,10 +30,21 @@ class ScanResult:
     findings: list[Finding] = field(default_factory=list)
     errors: list[ScanError] = field(default_factory=list)
     regions: list[str] = field(default_factory=list)
+    attempted: int = 0
 
     @property
     def total_monthly_cost(self) -> float:
         return sum(f.monthly_cost for f in self.findings)
+
+    @property
+    def completely_failed(self) -> bool:
+        """Every region/check pair errored, so "no findings" means nothing.
+
+        A scan of a region that does not exist reports zero waste and zero
+        findings, which is indistinguishable from a clean account unless the
+        caller is told the difference.
+        """
+        return self.attempted > 0 and len(self.errors) == self.attempted
 
 
 class CredentialError(RuntimeError):
@@ -97,8 +108,8 @@ def scan(
     pricing: PriceTable,
     max_workers: int = 16,
 ) -> ScanResult:
-    result = ScanResult(regions=list(regions))
     jobs = [(spec, region) for region in regions for spec in checks]
+    result = ScanResult(regions=list(regions), attempted=len(jobs))
     if not jobs:
         return result
 

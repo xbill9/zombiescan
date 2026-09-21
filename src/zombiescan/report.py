@@ -105,12 +105,26 @@ def render(
     result: ScanResult,
     console: Console,
     limit: int = DEFAULT_LIMIT,
+    hidden_by_filter: int = 0,
 ) -> None:
     region_word = "region" if len(result.regions) == 1 else "regions"
     scope = f"{len(result.regions)} {region_word}"
 
     if not result.findings:
-        console.print(f"\n[green]No waste found[/green] across {scope}. Nothing to clean up.\n")
+        if result.completely_failed:
+            # Reporting a clean account when nothing could be scanned is the
+            # worst possible outcome: a false all-clear.
+            console.print(
+                f"\n[red]Nothing could be scanned[/red] — all {result.attempted} "
+                f"region/check pairs failed. The result below is not an all-clear.\n"
+            )
+        elif hidden_by_filter:
+            console.print(
+                f"\n[yellow]All {hidden_by_filter} finding(s) were hidden by the cost "
+                f"filter.[/yellow] Lower --min-cost to see them.\n"
+            )
+        else:
+            console.print(f"\n[green]No waste found[/green] across {scope}. Nothing to clean up.\n")
         _render_errors(result, console)
         return
 
@@ -196,8 +210,9 @@ def to_script(result: ScanResult) -> str:
         "#",
         "# READ EVERY LINE BEFORE RUNNING THIS.",
         "# zombiescan generated this file and did not run it. Deleting AWS",
-        "# resources is not reversible. Volumes are snapshotted first below,",
-        "# but a snapshot is not a substitute for knowing what you are deleting.",
+        "# resources is not reversible. Where a backup is possible the command",
+        "# takes one first, but a backup is not a substitute for knowing what",
+        "# you are deleting.",
         "#",
         f"# {len(result.findings)} resource(s), about ${result.total_monthly_cost:,.2f}/month.",
         "",

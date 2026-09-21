@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 
 import boto3
+import botocore.exceptions
 import click
 from rich.console import Console
 
@@ -69,12 +70,18 @@ def scan_command(
 ) -> None:
     """Scan for unused resources."""
     console = Console()
-    session = boto3.Session(profile_name=profile) if profile else boto3.Session()
 
     try:
+        # Session construction itself raises for an unknown profile, so it
+        # belongs inside the handler rather than above it.
+        session = boto3.Session(profile_name=profile) if profile else boto3.Session()
         caller_arn = verify_credentials(session)
         selected = select_checks(checks)
         target_regions = list(regions) if regions else resolve_regions(session, all_regions)
+    except botocore.exceptions.ProfileNotFound:
+        available = ", ".join(boto3.Session().available_profiles) or "none configured"
+        console.print(f"[red]No AWS profile named '{profile}'.[/red] Available: {available}")
+        sys.exit(2)
     except CredentialError as exc:
         console.print(f"[red]{exc}[/red]")
         sys.exit(2)
@@ -91,14 +98,15 @@ def scan_command(
     with console.status("Scanning..."):
         result = scan(session, target_regions, selected, pricing)
 
+    hidden = 0
     if min_cost > 0:
         kept = [f for f in result.findings if f.monthly_cost >= min_cost]
         hidden = len(result.findings) - len(kept)
         result.findings = kept
-        if hidden:
+        if hidden and kept:
             console.print(f"[dim]{hidden} finding(s) below ${min_cost:,.2f}/month hidden[/dim]")
 
-    report.render(result, console, limit=limit)
+    report.render(result, console, limit=limit, hidden_by_filter=hidden)
 
     if json_path:
         report.write_json(result, json_path, caller_arn)
@@ -108,6 +116,11 @@ def scan_command(
         console.print(
             f"[dim]cleanup plan written to {script_path} — review it before running it[/dim]"
         )
+
+    # A scan where every single call failed found nothing because it looked at
+    # nothing. Exiting 0 would tell a CI job the account is clean.
+    if result.completely_failed:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
