@@ -60,20 +60,18 @@ commands it produces are written to a file for you to read and run yourself.
 
 ## Install
 
-Not on PyPI yet — install from the repository:
+```
+uv tool install git+https://github.com/xbill9/zombiescan
+zombiescan scan
+```
+
+Or clone it, to read the code before pointing it at your account:
 
 ```
 git clone https://github.com/xbill9/zombiescan
 cd zombiescan
 uv sync
 uv run zombiescan scan
-```
-
-Or as a standalone command, without cloning:
-
-```
-uv tool install git+https://github.com/xbill9/zombiescan
-zombiescan scan
 ```
 
 `botocore[crt]` is a hard dependency, not an optional extra: boto3 cannot read
