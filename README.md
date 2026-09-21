@@ -54,9 +54,12 @@ There is no hosted service, no account to create, no cross-account IAM role to
 grant, and nothing is sent anywhere. Every SaaS tool in this space asks you to
 hand over a role into your production account. This one never asks.
 
-It is **read-only**. Describe, List and Get calls only — there is no code path
-in it that deletes, terminates, modifies or releases anything. The cleanup
-commands it produces are written to a file for you to read and run yourself.
+**`scan` is read-only.** Describe, List and Get calls only. It cannot change
+anything, by construction.
+
+**`clean` deletes things**, and is a separate command for that reason — it is
+not a flag you can reach by typo. It dry-runs by default, asks before each
+resource, and takes a backup first wherever AWS lets it.
 
 ## Install
 
@@ -189,6 +192,49 @@ credentials that are dormant by design.
 launch templates, Auto Scaling groups, or cross-account shares. An AMI your ASG
 depends on looks unused to it, and deleting one breaks the next scale-out hours
 later. Read its findings before acting on them.
+
+## Cleaning up
+
+`scan` tells you what to delete. `clean` does it.
+
+```
+zombiescan clean                          # dry run: prints the exact API calls, changes nothing
+zombiescan clean --apply                   # asks before each resource
+zombiescan clean --apply --yes             # no prompts
+zombiescan clean --from findings.json      # act on a report you have already read
+zombiescan clean --check unassociated-eip --apply
+zombiescan clean --apply --audit audit.json
+```
+
+**Dry run is the default and it is exact.** `--apply` changes one thing: whether
+a planned call is sent. It does not change which calls get planned, so what the
+dry run shows is what the real run does.
+
+**Backups come first where AWS allows one.** Volumes are snapshotted before
+deletion, instances imaged before termination, databases given a final snapshot,
+secrets deleted with a 30-day recovery window. If the backup step fails, the
+destructive step that assumed it does not run.
+
+**Irreversible steps are labelled.** Deleting a volume after snapshotting it is
+recoverable; deleting the snapshot is not. Terminating an instance, scheduling a
+KMS key for deletion, deleting an EFS file system or setting log retention all
+destroy data with no undo, and the prompt says so before you answer.
+
+**`--audit` writes a record** of every call attempted, its parameters, its
+result and what it saved — the file you will want when someone asks what
+happened.
+
+`empty-vpc` is the one finding with no cleaner. A VPC will not delete until
+every subnet, route table and gateway inside it is gone, and working out that
+order safely is a different tool. It is reported as unsupported with that reason
+rather than attempted.
+
+### Permissions for cleaning
+
+`clean --apply` needs write access, which is a different posture from scanning.
+Grant it deliberately and scope it to what you intend to remove — an
+`AdministratorAccess` run of `clean --apply --yes` across all regions is capable
+of deleting a great deal.
 
 ## The generated script
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 import time
 
@@ -10,7 +11,7 @@ import botocore.exceptions
 import click
 from rich.console import Console
 
-from zombiescan import __version__, html, report
+from zombiescan import __version__, clean, html, report
 from zombiescan.engine import (
     CredentialError,
     resolve_regions,
@@ -18,6 +19,7 @@ from zombiescan.engine import (
     select_checks,
     verify_credentials,
 )
+from zombiescan.models import Finding
 from zombiescan.pricing import PriceTable
 from zombiescan.registry import CHECKS
 
@@ -145,3 +147,205 @@ def scan_command(
 
 if __name__ == "__main__":
     main()
+
+
+def _load_findings(path: str) -> tuple[list[Finding], str | None]:
+    """Findings from a previously written --json report."""
+    with open(path) as handle:
+        document = json.load(handle)
+    version = document.get("schema_version")
+    if version != report.SCHEMA_VERSION:
+        raise ValueError(
+            f"{path} has schema_version {version}, this build reads "
+            f"{report.SCHEMA_VERSION}. Re-run the scan."
+        )
+    findings = [Finding.from_dict(f) for f in document.get("findings", [])]
+    return findings, (document.get("scan") or {}).get("caller_arn")
+
+
+def _describe(outcome: clean.Outcome, console: Console) -> None:
+    cost = f"${outcome.finding.monthly_cost:,.2f}/mo"
+    console.print(
+        f"\n[bold]{outcome.finding.check}[/bold]  {outcome.finding.resource_id}  "
+        f"[dim]{outcome.finding.region} · {cost}[/dim]"
+    )
+    console.print(f"  [dim]{outcome.finding.reason}[/dim]")
+    for step in outcome.steps:
+        mark = "[red]IRREVERSIBLE[/red] " if step.irreversible else ""
+        console.print(f"    → {mark}{step.description}")
+        console.print(f"      [dim]{step.service}.{step.operation}({step.params})[/dim]")
+
+
+@main.command("clean")
+@click.option("--profile", default=None, help="AWS profile to use.")
+@click.option("--region", "regions", multiple=True, help="Region to scan (repeatable).")
+@click.option("--all-regions", is_flag=True, help="Scan every region this account has enabled.")
+@click.option("--check", "checks", multiple=True, help="Only this check (repeatable).")
+@click.option(
+    "--min-cost", default=0.0, show_default=True, help="Ignore findings cheaper than this."
+)
+@click.option(
+    "--from",
+    "from_path",
+    default=None,
+    help="Act on a previously written --json report instead of scanning again.",
+)
+@click.option(
+    "--apply",
+    "do_apply",
+    is_flag=True,
+    help="Actually make the calls. Without this, nothing is changed.",
+)
+@click.option("--yes", is_flag=True, help="Do not ask before each resource.")
+@click.option("--audit", "audit_path", default=None, help="Write a record of what was done.")
+def clean_command(
+    profile: str | None,
+    regions: tuple[str, ...],
+    all_regions: bool,
+    checks: tuple[str, ...],
+    min_cost: float,
+    from_path: str | None,
+    do_apply: bool,
+    yes: bool,
+    audit_path: str | None,
+) -> None:
+    """Delete the resources a scan found.
+
+    Dry run by default: it prints the exact calls it would make and changes
+    nothing. --apply performs them, asking before each resource unless --yes.
+    """
+    console = Console()
+
+    try:
+        session = boto3.Session(profile_name=profile) if profile else boto3.Session()
+        caller_arn = verify_credentials(session)
+    except botocore.exceptions.ProfileNotFound:
+        available = ", ".join(boto3.Session().available_profiles) or "none configured"
+        console.print(f"[red]No AWS profile named '{profile}'.[/red] Available: {available}")
+        sys.exit(2)
+    except CredentialError as exc:
+        console.print(f"[red]{exc}[/red]")
+        sys.exit(2)
+
+    pricing = PriceTable.load()
+    home = session.region_name or "us-east-1"
+
+    if from_path:
+        try:
+            findings, scanned_as = _load_findings(from_path)
+        except (OSError, ValueError, KeyError) as exc:
+            console.print(f"[red]{exc}[/red]")
+            sys.exit(2)
+        console.print(f"[dim]{len(findings)} finding(s) from {from_path}[/dim]")
+        if scanned_as and scanned_as != caller_arn:
+            # Cleaning one account using a report from another would delete
+            # resources nobody looked at.
+            console.print(
+                f"[red]That report was produced as {scanned_as}, but you are "
+                f"{caller_arn}.[/red] Re-scan with these credentials."
+            )
+            sys.exit(2)
+    else:
+        try:
+            selected = select_checks(checks)
+            target_regions = list(regions) if regions else resolve_regions(session, all_regions)
+        except (CredentialError, ValueError) as exc:
+            console.print(f"[red]{exc}[/red]")
+            sys.exit(2)
+        console.print(f"[dim]Scanning as {caller_arn} — {len(target_regions)} region(s)[/dim]")
+        with console.status("Scanning..."):
+            result = scan(session, target_regions, selected, pricing)
+        if result.completely_failed:
+            console.print(
+                f"[red]Nothing could be scanned — all {result.attempted} pairs failed. "
+                f"Refusing to clean on the basis of no data.[/red]"
+            )
+            sys.exit(1)
+        findings = result.findings
+
+    if checks:
+        findings = [f for f in findings if f.check in set(checks)]
+    findings = [f for f in findings if f.monthly_cost >= min_cost]
+
+    if not findings:
+        console.print("\n[green]Nothing to clean.[/green]")
+        return
+
+    outcomes = [clean.plan_for(session, f, pricing, home) for f in findings]
+    actionable = [o for o in outcomes if o.status == clean.PLANNED]
+    unsupported = [o for o in outcomes if o.status == clean.UNSUPPORTED]
+
+    mode = "[red]APPLY[/red]" if do_apply else "[green]dry run[/green]"
+    console.print(
+        f"\n{mode} — {len(actionable)} of {len(findings)} finding(s) can be cleaned"
+        + (f", {len(unsupported)} cannot" if unsupported else "")
+    )
+
+    for outcome in unsupported:
+        console.print(
+            f"  [yellow]skip[/yellow] {outcome.finding.check} "
+            f"{outcome.finding.resource_id}: {outcome.error}"
+        )
+
+    if not do_apply:
+        for outcome in actionable:
+            _describe(outcome, console)
+        total = sum(o.finding.monthly_cost for o in actionable)
+        irreversible = sum(1 for o in actionable if o.irreversible)
+        console.print(
+            f"\n[bold]Would free about ${total:,.2f}/month[/bold] across "
+            f"{len(actionable)} resource(s); {irreversible} include irreversible steps."
+        )
+        console.print("[dim]Nothing was changed. Re-run with --apply to perform these.[/dim]")
+        if audit_path:
+            _write_audit(audit_path, outcomes, False, caller_arn, console)
+        return
+
+    all_remaining = yes
+    for outcome in actionable:
+        _describe(outcome, console)
+        if not all_remaining:
+            answer = (
+                click.prompt(
+                    "  apply? [y]es / [n]o / [a]ll remaining / [q]uit",
+                    default="n",
+                    show_default=False,
+                )
+                .strip()
+                .lower()[:1]
+            )
+            if answer == "q":
+                console.print("[dim]stopped[/dim]")
+                break
+            if answer == "a":
+                all_remaining = True
+            elif answer != "y":
+                outcome.status = clean.SKIPPED
+                console.print("  [dim]skipped[/dim]")
+                continue
+        clean.apply_outcome(outcome, session, home)
+        if outcome.status == clean.APPLIED:
+            console.print("  [green]done[/green]")
+        else:
+            console.print(f"  [red]failed: {outcome.error}[/red]")
+
+    applied = [o for o in outcomes if o.status == clean.APPLIED]
+    failed = [o for o in outcomes if o.status == clean.FAILED]
+    freed = sum(o.monthly_saving for o in applied)
+    console.print(
+        f"\n[bold]{len(applied)} cleaned, {len(failed)} failed — "
+        f"about ${freed:,.2f}/month freed[/bold]"
+    )
+    if audit_path:
+        _write_audit(audit_path, outcomes, True, caller_arn, console)
+    if failed:
+        sys.exit(1)
+
+
+def _write_audit(
+    path: str, outcomes: list[clean.Outcome], applied: bool, caller_arn: str, console: Console
+) -> None:
+    with open(path, "w") as handle:
+        json.dump(clean.audit_document(outcomes, applied, caller_arn), handle, indent=2)
+        handle.write("\n")
+    console.print(f"[dim]audit written to {path}[/dim]")

@@ -31,6 +31,25 @@ class Finding:
     approximate_cost: bool = False
     details: dict[str, Any] = field(default_factory=dict)
 
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> Finding:
+        """Rebuild a finding from --json output.
+
+        Lets `clean --from report.json` act on exactly the findings someone
+        reviewed, rather than on whatever a fresh scan happens to see now.
+        """
+        return cls(
+            check=data["check"],
+            resource_id=data["resource_id"],
+            resource_type=data.get("resource_type", "unknown"),
+            region=data.get("region", "unknown"),
+            reason=data.get("reason", ""),
+            monthly_cost=float(data.get("monthly_cost", 0.0)),
+            remediation=data.get("remediation", ""),
+            approximate_cost=bool(data.get("approximate_cost", False)),
+            details=data.get("details") or {},
+        )
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "check": self.check,

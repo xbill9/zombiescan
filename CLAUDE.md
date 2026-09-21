@@ -21,13 +21,32 @@ Do not propose a hosted or deployed piece unless asked. This was decided
 deliberately and reversed twice; the tradeoff (it cannot pass the Zero to Shipped
 ship gate) is recorded in PLAN.md and is understood.
 
-## Safety: read-only, always
+## Safety: scanning and cleaning are separate
 
-The tool makes **Describe/List/Get calls only**. It must never call Delete,
-Terminate, Release, Deregister, Modify, or any other mutating AWS API.
+`zombiescan scan` is **read-only**: Describe/List/Get calls only. Never add a
+mutating call to a check. A check that changes anything is a bug.
 
-Remediation output is generated as text — a shell script the user can read and
-run themselves. Never execute it, and never add a flag that does.
+`zombiescan clean` does delete things. That was a deliberate reversal of the
+original read-only-everywhere design, and the guarantees that replaced it must
+hold:
+
+- **Dry run is the default.** `--apply` gates exactly one thing: whether a
+  planned step is sent to AWS. It must never change which steps get planned,
+  or the preview stops being worth anything.
+- **Planning is read-only.** Cleaners may make read calls to build a plan
+  (re-listing multipart uploads, say) but must only ever *yield* mutations as
+  `Step` objects for the runner to execute.
+- **Back up first where the API allows it**, and order the steps so the backup
+  precedes the destruction. A failed step aborts the rest of that finding, so a
+  failed snapshot can never be followed by the delete that assumed it.
+- **Mark `irreversible=True`** on any step with no recovery window, snapshot or
+  undo. It drives what the operator is warned about, so a wrong flag is a
+  safety bug.
+- **Refuse rather than guess.** No cleaner for a check means the finding is
+  reported as unsupported with a reason (see `UNCLEANABLE`), never
+  approximated.
+- Never clean on the basis of a failed scan, and never clean using a `--from`
+  report produced by a different account.
 
 ## Credentials
 
