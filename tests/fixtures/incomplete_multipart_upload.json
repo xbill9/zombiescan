@@ -1,0 +1,40 @@
+{
+  "Buckets": [
+    {
+      "Name": "backups-prod"
+    },
+    {
+      "Name": "tidy-bucket"
+    }
+  ],
+  "UploadsByBucket": {
+    "backups-prod": [
+      {
+        "Key": "db/2024-01.dump",
+        "UploadId": "u1",
+        "Initiated": "2024-01-15T00:00:00+00:00"
+      },
+      {
+        "Key": "db/2024-02.dump",
+        "UploadId": "u2",
+        "Initiated": "2025-06-01T00:00:00+00:00"
+      }
+    ],
+    "tidy-bucket": []
+  },
+  "PartsByUpload": {
+    "u1": [
+      {
+        "Size": 5368709120
+      },
+      {
+        "Size": 5368709120
+      }
+    ],
+    "u2": [
+      {
+        "Size": 1073741824
+      }
+    ]
+  }
+}

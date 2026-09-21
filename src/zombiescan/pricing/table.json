@@ -1,7 +1,7 @@
 {
   "_meta": {
     "source": "AWS Price List API (pricing:GetProducts), on-demand USD list prices",
-    "generated": "2026-09-21T00:49:12Z",
+    "generated": "2026-09-21T01:16:11Z",
     "note": "Regenerate with: uv run python -m zombiescan.pricing.refresh"
   },
   "fallback_region": "us-east-1",
@@ -1533,5 +1533,231 @@
     "us-gov-west-1": 0.36,
     "us-west-1": 0.33,
     "us-west-2": 0.3
+  },
+  "s3_gb_month": {
+    "af-south-1": 0.0274,
+    "ap-east-1": 0.025,
+    "ap-east-2": 0.0225,
+    "ap-northeast-1": 0.025,
+    "ap-northeast-2": 0.025,
+    "ap-northeast-3": 0.025,
+    "ap-south-1": 0.025,
+    "ap-south-2": 0.025,
+    "ap-southeast-1": 0.025,
+    "ap-southeast-2": 0.025,
+    "ap-southeast-3": 0.025,
+    "ap-southeast-4": 0.025,
+    "ap-southeast-5": 0.0225,
+    "ap-southeast-6": 0.02625,
+    "ap-southeast-7": 0.0225,
+    "ca-central-1": 0.025,
+    "ca-west-1": 0.025,
+    "eu-central-1": 0.0245,
+    "eu-central-2": 0.02695,
+    "eu-north-1": 0.023,
+    "eu-south-1": 0.024,
+    "eu-south-2": 0.023,
+    "eu-west-1": 0.023,
+    "eu-west-2": 0.024,
+    "eu-west-3": 0.024,
+    "il-central-1": 0.025,
+    "me-central-1": 0.025,
+    "me-south-1": 0.025,
+    "mx-central-1": 0.02415,
+    "sa-east-1": 0.0405,
+    "us-east-1": 0.023,
+    "us-east-2": 0.023,
+    "us-gov-east-1": 0.039,
+    "us-gov-west-1": 0.039,
+    "us-west-1": 0.026,
+    "us-west-2": 0.023
+  },
+  "rds_snapshot_gb_month": {
+    "af-south-1": 0.113,
+    "ap-east-1": 0.095,
+    "ap-east-2": 0.086,
+    "ap-northeast-1": 0.095,
+    "ap-northeast-2": 0.095,
+    "ap-northeast-3": 0.095,
+    "ap-south-1": 0.095,
+    "ap-south-2": 0.095,
+    "ap-southeast-1": 0.095,
+    "ap-southeast-2": 0.023,
+    "ap-southeast-3": 0.095,
+    "ap-southeast-4": 0.023,
+    "ap-southeast-5": 0.086,
+    "ap-southeast-6": 0.1,
+    "ap-southeast-7": 0.086,
+    "ca-central-1": 0.105,
+    "ca-west-1": 0.105,
+    "eu-central-1": 0.103,
+    "eu-central-2": 0.1133,
+    "eu-north-1": 0.09,
+    "eu-south-1": 0.1,
+    "eu-south-2": 0.095,
+    "eu-west-1": 0.095,
+    "eu-west-2": 0.1,
+    "eu-west-3": 0.1,
+    "il-central-1": 0.024,
+    "me-central-1": 0.1045,
+    "me-south-1": 0.1045,
+    "mx-central-1": 0.022,
+    "sa-east-1": 0.095,
+    "us-east-1": 0.021,
+    "us-east-2": 0.095,
+    "us-gov-east-1": 0.095,
+    "us-gov-west-1": 0.095,
+    "us-west-1": 0.095,
+    "us-west-2": 0.095
+  },
+  "dynamodb_capacity_hour": {
+    "af-south-1": {
+      "read": 0.00017493,
+      "write": 0.00087465
+    },
+    "ap-east-1": {
+      "write": 0.000814,
+      "read": 0.0001628
+    },
+    "ap-east-2": {
+      "read": 0.00013356,
+      "write": 0.0006678
+    },
+    "ap-northeast-1": {
+      "write": 0.000742,
+      "read": 0.0001484
+    },
+    "ap-northeast-2": {
+      "read": 0.00014098,
+      "write": 0.0007049
+    },
+    "ap-northeast-3": {
+      "read": 0.0001484,
+      "write": 0.000742
+    },
+    "ap-south-1": {
+      "write": 0.00074,
+      "read": 0.000148
+    },
+    "ap-south-2": {
+      "write": 0.00074,
+      "read": 0.000148
+    },
+    "ap-southeast-1": {
+      "read": 0.000148,
+      "write": 0.00074
+    },
+    "ap-southeast-2": {
+      "read": 0.000148,
+      "write": 0.00074
+    },
+    "ap-southeast-3": {
+      "write": 0.00074,
+      "read": 0.000148
+    },
+    "ap-southeast-4": {
+      "read": 0.000148,
+      "write": 0.00074
+    },
+    "ap-southeast-5": {
+      "write": 0.000666,
+      "read": 0.0001332
+    },
+    "ap-southeast-6": {
+      "write": 0.000777,
+      "read": 0.0001554
+    },
+    "ap-southeast-7": {
+      "read": 0.0001332,
+      "write": 0.000666
+    },
+    "ca-central-1": {
+      "write": 0.000715,
+      "read": 0.000143
+    },
+    "ca-west-1": {
+      "read": 0.000143,
+      "write": 0.000715
+    },
+    "eu-central-1": {
+      "read": 0.0001586,
+      "write": 0.000793
+    },
+    "eu-central-2": {
+      "write": 0.000872,
+      "read": 0.000175
+    },
+    "eu-north-1": {
+      "read": 0.00014,
+      "write": 0.000698
+    },
+    "eu-south-1": {
+      "read": 0.00015435,
+      "write": 0.00077175
+    },
+    "eu-south-2": {
+      "read": 0.000147,
+      "write": 0.000735
+    },
+    "eu-west-1": {
+      "write": 0.000735,
+      "read": 0.000147
+    },
+    "eu-west-2": {
+      "write": 0.000772,
+      "read": 0.0001544
+    },
+    "eu-west-3": {
+      "write": 0.000772,
+      "read": 0.0001544
+    },
+    "il-central-1": {
+      "write": 0.000882,
+      "read": 0.0001764
+    },
+    "me-central-1": {
+      "read": 0.0001617,
+      "write": 0.0008085
+    },
+    "me-south-1": {
+      "write": 0.0008085,
+      "read": 0.0001617
+    },
+    "mx-central-1": {
+      "write": 0.0006825,
+      "read": 0.0001365
+    },
+    "sa-east-1": {
+      "read": 0.000195,
+      "write": 0.000975
+    },
+    "us-east-1": {
+      "read": 0.00013,
+      "write": 0.00065
+    },
+    "us-east-2": {
+      "read": 0.00013,
+      "write": 0.00065
+    },
+    "us-gov-east-1": {
+      "read": 0.000156,
+      "write": 0.00078
+    },
+    "us-gov-west-1": {
+      "read": 0.000156,
+      "write": 0.00078
+    },
+    "us-west-1": {
+      "write": 0.000725,
+      "read": 0.000145
+    },
+    "us-west-2": {
+      "read": 0.00013,
+      "write": 0.00065
+    }
+  },
+  "route53_health_check_month": {
+    "non_aws": 0.75,
+    "aws": 0.5
   }
 }

@@ -1,0 +1,52 @@
+{
+  "HealthChecks": [
+    {
+      "Id": "abc-orphaned",
+      "HealthCheckConfig": {
+        "Type": "HTTPS",
+        "FullyQualifiedDomainName": "old-api.example.com",
+        "Port": 443
+      }
+    },
+    {
+      "Id": "def-in-use",
+      "HealthCheckConfig": {
+        "Type": "HTTP",
+        "FullyQualifiedDomainName": "api.example.com",
+        "Port": 80
+      }
+    },
+    {
+      "Id": "ghi-alias-target",
+      "HealthCheckConfig": {
+        "Type": "TCP",
+        "IPAddress": "203.0.113.9"
+      }
+    }
+  ],
+  "HostedZones": [
+    {
+      "Id": "/hostedzone/Z1"
+    }
+  ],
+  "RecordSetsByZone": {
+    "/hostedzone/Z1": [
+      {
+        "Name": "api.example.com.",
+        "Type": "A",
+        "HealthCheckId": "def-in-use"
+      },
+      {
+        "Name": "alias.example.com.",
+        "Type": "A",
+        "AliasTarget": {
+          "HealthCheckId": "ghi-alias-target"
+        }
+      },
+      {
+        "Name": "plain.example.com.",
+        "Type": "A"
+      }
+    ]
+  }
+}

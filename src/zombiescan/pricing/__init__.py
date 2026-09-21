@@ -129,3 +129,29 @@ class PriceTable:
         """USD per GB-month of EFS Standard regional storage."""
         price, approximate = self._lookup("efs_gb_month", region)
         return (price or 0.0), approximate
+
+    def s3_gb_month(self, region: str) -> tuple[float, bool]:
+        """USD per GB-month of S3 Standard storage."""
+        price, approximate = self._lookup("s3_gb_month", region)
+        return (price or 0.0), approximate
+
+    def rds_snapshot_gb_month(self, region: str) -> tuple[float, bool]:
+        """USD per GB-month of RDS snapshot and backup storage."""
+        price, approximate = self._lookup("rds_snapshot_gb_month", region)
+        return (price or 0.0), approximate
+
+    def dynamodb_capacity_month(
+        self, region: str, read_units: int, write_units: int
+    ) -> tuple[float, bool]:
+        """USD per month for this much provisioned read and write capacity."""
+        rates, approximate = self._lookup("dynamodb_capacity_hour", region)
+        if not rates:
+            return 0.0, True
+        hourly = read_units * rates.get("read", 0.0) + write_units * rates.get("write", 0.0)
+        return hourly * self._hours, approximate
+
+    def route53_health_check_month(self, aws_endpoint: bool = True) -> tuple[float, bool]:
+        """USD per month for one health check. Global, so no region argument."""
+        rates = self._data.get("route53_health_check_month") or {}
+        price = rates.get("aws" if aws_endpoint else "non_aws", 0.0)
+        return price, not bool(rates)

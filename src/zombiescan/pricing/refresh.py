@@ -45,17 +45,29 @@ def _paginate(client: Any, **kwargs: Any) -> list[dict[str, Any]]:
             return out
 
 
-def _usd_per_unit(entry: dict[str, Any]) -> tuple[str, float] | None:
-    """Pull the single on-demand price dimension out of a price list entry."""
-    for term in entry.get("terms", {}).get("OnDemand", {}).values():
-        for dim in term.get("priceDimensions", {}).values():
-            # China regions price in CNY and have no USD dimension. Skip them
-            # rather than crashing or silently treating CNY as dollars.
-            usd = dim.get("pricePerUnit", {}).get("USD")
-            if usd is None:
-                continue
-            return dim["unit"], float(usd)
-    return None
+def _usd_rate(entry: dict[str, Any], unit: str) -> float | None:
+    """Highest positive USD rate in this entry for the given unit, or None.
+
+    An entry can carry several price dimensions, and taking the first one is
+    wrong twice over. Volume-tiered products (S3 storage) list every tier, and
+    the order is not guaranteed. Products with a free allowance (DynamoDB
+    provisioned capacity) list a $0.00 dimension beside the real rate, and
+    reading that one makes the resource look free -- or, with a `price <= 0`
+    guard, drops the region from the table entirely.
+
+    The highest rate is what an account pays before tiers and allowances kick
+    in, which is the right basis for "what is this costing you".
+    """
+    rates = [
+        float(usd)
+        for term in entry.get("terms", {}).get("OnDemand", {}).values()
+        for dim in term.get("priceDimensions", {}).values()
+        # China regions price in CNY and have no USD dimension. Skip them
+        # rather than crashing or silently treating CNY as dollars.
+        if dim.get("unit") == unit and (usd := dim.get("pricePerUnit", {}).get("USD")) is not None
+    ]
+    positive = [r for r in rates if r > 0]
+    return max(positive) if positive else None
 
 
 def fetch_ebs_volumes(client: Any) -> dict[str, dict[str, float]]:
@@ -73,11 +85,8 @@ def fetch_ebs_volumes(client: Any) -> dict[str, dict[str, float]]:
         for entry in entries:
             attrs = entry["product"]["attributes"]
             region = attrs.get("regionCode")
-            priced = _usd_per_unit(entry)
-            if not region or not priced:
-                continue
-            unit, price = priced
-            if unit != "GB-Mo" or price <= 0:
+            price = _usd_rate(entry, "GB-Mo")
+            if not region or price is None:
                 continue
             table.setdefault(region, {})[vol_type] = price
     return table
@@ -99,11 +108,8 @@ def fetch_snapshots(client: Any) -> dict[str, float]:
         # Archive-tier snapshots are priced separately; keep the standard tier.
         if not region or "Archive" in attrs.get("usagetype", ""):
             continue
-        priced = _usd_per_unit(entry)
-        if not priced:
-            continue
-        unit, price = priced
-        if unit != "GB-Mo" or price <= 0:
+        price = _usd_rate(entry, "GB-Mo")
+        if price is None:
             continue
         table[region] = price
     return table
@@ -125,11 +131,8 @@ def fetch_nat_gateway_hours(client: Any) -> dict[str, float]:
         # provisioned-bandwidth charges among them. We want plain uptime hours.
         if not region or "Bytes" in usagetype or "Prvd" in usagetype:
             continue
-        priced = _usd_per_unit(entry)
-        if not priced:
-            continue
-        unit, price = priced
-        if unit != "Hrs" or price <= 0:
+        price = _usd_rate(entry, "Hrs")
+        if price is None:
             continue
         table[region] = price
     return table
@@ -153,11 +156,8 @@ def fetch_load_balancer_hours(client: Any) -> dict[str, dict[str, float]]:
             region = attrs.get("regionCode")
             if not region or "LCU" in attrs.get("usagetype", ""):
                 continue
-            priced = _usd_per_unit(entry)
-            if not priced:
-                continue
-            unit, price = priced
-            if unit != "Hrs" or price <= 0:
+            price = _usd_rate(entry, "Hrs")
+            if price is None:
                 continue
             table.setdefault(region, {})[key] = price
     return table
@@ -181,11 +181,8 @@ def fetch_log_storage(client: Any) -> dict[str, float]:
             continue
         if "-IA-" in usagetype or "-AIA-" in usagetype:
             continue
-        priced = _usd_per_unit(entry)
-        if not priced:
-            continue
-        unit, price = priced
-        if unit != "GB-Mo" or price <= 0:
+        price = _usd_rate(entry, "GB-Mo")
+        if price is None:
             continue
         table[region] = price
     return table
@@ -210,11 +207,8 @@ def fetch_vpc_endpoint_hours(client: Any) -> dict[str, float]:
         # endpoint uptime is the one ending VpcEndpoint-Hours.
         if not region or not attrs.get("usagetype", "").endswith("VpcEndpoint-Hours"):
             continue
-        priced = _usd_per_unit(entry)
-        if not priced:
-            continue
-        unit, price = priced
-        if unit != "Hrs" or price <= 0:
+        price = _usd_rate(entry, "Hrs")
+        if price is None:
             continue
         table[region] = price
     return table
@@ -233,11 +227,8 @@ def fetch_classic_lb_hours(client: Any) -> dict[str, float]:
         region = attrs.get("regionCode")
         if not region or "LoadBalancerUsage" not in attrs.get("usagetype", ""):
             continue
-        priced = _usd_per_unit(entry)
-        if not priced:
-            continue
-        unit, price = priced
-        if unit != "Hrs" or price <= 0:
+        price = _usd_rate(entry, "Hrs")
+        if price is None:
             continue
         table[region] = price
     return table
@@ -274,11 +265,8 @@ def fetch_rds_storage(client: Any) -> dict[str, dict[str, dict[str, float]]]:
         # "Multi-AZ", "Multi-AZ (SQL Server)", "Multi-AZ (readable standbys)"
         # all bill at the Multi-AZ rate.
         az_key = "multi" if deployment.startswith("Multi-AZ") else "single"
-        priced = _usd_per_unit(entry)
-        if not priced:
-            continue
-        unit, price = priced
-        if unit != "GB-Mo" or price <= 0:
+        price = _usd_rate(entry, "GB-Mo")
+        if price is None:
             continue
         table.setdefault(region, {}).setdefault(az_key, {}).setdefault(key, price)
     return table
@@ -294,11 +282,8 @@ def _flat_rate_by_region(client: Any, service: str, family: str, unit: str) -> d
     table: dict[str, float] = {}
     for entry in entries:
         region = entry["product"]["attributes"].get("regionCode")
-        priced = _usd_per_unit(entry)
-        if not region or not priced:
-            continue
-        found_unit, price = priced
-        if found_unit != unit or price <= 0:
+        price = _usd_rate(entry, unit)
+        if not region or price is None:
             continue
         table[region] = price
     return table
@@ -333,13 +318,116 @@ def fetch_efs_storage(client: Any) -> dict[str, float]:
             continue
         if any(marker in usagetype for marker in ("IA", "Archive", "-Z-", "ET")):
             continue
-        priced = _usd_per_unit(entry)
-        if not priced:
-            continue
-        unit, price = priced
-        if unit != "GB-Mo" or price <= 0:
+        price = _usd_rate(entry, "GB-Mo")
+        if price is None:
             continue
         table[region] = price
+    return table
+
+
+def fetch_s3_storage(client: Any) -> dict[str, float]:
+    """{region: usd_per_gb_month} for S3 Standard.
+
+    S3 storage is tiered by monthly volume. The first tier is what an account
+    with modest storage actually pays, and taking the highest published rate
+    keeps the estimate from flattering itself.
+    """
+    entries = _paginate(
+        client,
+        ServiceCode="AmazonS3",
+        Filters=[
+            {"Type": "TERM_MATCH", "Field": "productFamily", "Value": "Storage"},
+            {"Type": "TERM_MATCH", "Field": "storageClass", "Value": "General Purpose"},
+        ],
+    )
+    table: dict[str, float] = {}
+    for entry in entries:
+        attrs = entry["product"]["attributes"]
+        region = attrs.get("regionCode")
+        if not region or attrs.get("usagetype", "").endswith("Annotation-TimedStorage-ByteHrs"):
+            continue
+        if not attrs.get("usagetype", "").endswith("TimedStorage-ByteHrs"):
+            continue
+        price = _usd_rate(entry, "GB-Mo")
+        if price is None:
+            continue
+        table[region] = max(table.get(region, 0.0), price)
+    return table
+
+
+def fetch_rds_snapshot_storage(client: Any) -> dict[str, float]:
+    """{region: usd_per_gb_month} for RDS backup and snapshot storage."""
+    entries = _paginate(
+        client,
+        ServiceCode="AmazonRDS",
+        Filters=[{"Type": "TERM_MATCH", "Field": "productFamily", "Value": "Storage Snapshot"}],
+    )
+    table: dict[str, float] = {}
+    for entry in entries:
+        attrs = entry["product"]["attributes"]
+        region = attrs.get("regionCode")
+        usagetype = attrs.get("usagetype", "")
+        # RDS Custom is a separate product with its own snapshot billing.
+        if not region or "RDSCustom" in usagetype:
+            continue
+        price = _usd_rate(entry, "GB-Mo")
+        if price is None:
+            continue
+        table[region] = price
+    return table
+
+
+def fetch_dynamodb_capacity(client: Any) -> dict[str, dict[str, float]]:
+    """{region: {read|write: usd_per_capacity_unit_hour}} for provisioned tables."""
+    entries = _paginate(
+        client,
+        ServiceCode="AmazonDynamoDB",
+        Filters=[{"Type": "TERM_MATCH", "Field": "productFamily", "Value": "Provisioned IOPS"}],
+    )
+    table: dict[str, dict[str, float]] = {}
+    for entry in entries:
+        attrs = entry["product"]["attributes"]
+        region = attrs.get("regionCode")
+        usagetype = attrs.get("usagetype", "")
+        # Standard-IA tables are priced separately; the free-tier rows are $0.
+        if not region or "IA-" in usagetype:
+            continue
+        # The unit name differs per direction, and each entry carries a $0.00
+        # free-allowance dimension beside the real rate.
+        if usagetype.endswith("ReadCapacityUnit-Hrs"):
+            key, unit = "read", "ReadCapacityUnit-Hrs"
+        elif usagetype.endswith("WriteCapacityUnit-Hrs"):
+            key, unit = "write", "WriteCapacityUnit-Hrs"
+        else:
+            continue
+        price = _usd_rate(entry, unit)
+        if price is None:
+            continue
+        table.setdefault(region, {})[key] = price
+    return table
+
+
+def fetch_route53_health_checks(client: Any) -> dict[str, float]:
+    """{aws|non_aws: usd_per_month}. Route 53 is global, so there is no region."""
+    entries = _paginate(
+        client,
+        ServiceCode="AmazonRoute53",
+        Filters=[{"Type": "TERM_MATCH", "Field": "productFamily", "Value": "DNS Health Check"}],
+    )
+    table: dict[str, float] = {}
+    for entry in entries:
+        usagetype = entry["product"]["attributes"].get("usagetype", "")
+        # "Option" entries are per optional feature (latency, string matching),
+        # not per health check.
+        if "Option" in usagetype:
+            continue
+        price = _usd_rate(entry, "Mo")
+        if price is None:
+            continue
+        if usagetype.endswith("Health-Check-Non-AWS"):
+            table["non_aws"] = price
+        elif usagetype.endswith("Health-Check-AWS"):
+            table["aws"] = price
     return table
 
 
@@ -378,6 +466,18 @@ def main() -> None:
     print("fetching EFS storage prices...")
     efs = fetch_efs_storage(client)
     print(f"  {len(efs)} regions")
+    print("fetching S3 storage prices...")
+    s3 = fetch_s3_storage(client)
+    print(f"  {len(s3)} regions")
+    print("fetching RDS snapshot prices...")
+    rds_snap = fetch_rds_snapshot_storage(client)
+    print(f"  {len(rds_snap)} regions")
+    print("fetching DynamoDB capacity prices...")
+    ddb = fetch_dynamodb_capacity(client)
+    print(f"  {len(ddb)} regions")
+    print("fetching Route 53 health check prices...")
+    r53 = fetch_route53_health_checks(client)
+    print(f"  {len(r53)} rates (global)")
 
     payload = {
         "_meta": {
@@ -402,6 +502,10 @@ def main() -> None:
         "kms_key_month": dict(sorted(kms.items())),
         "secret_month": dict(sorted(secrets.items())),
         "efs_gb_month": dict(sorted(efs.items())),
+        "s3_gb_month": dict(sorted(s3.items())),
+        "rds_snapshot_gb_month": dict(sorted(rds_snap.items())),
+        "dynamodb_capacity_hour": dict(sorted(ddb.items())),
+        "route53_health_check_month": r53,
     }
     TABLE_PATH.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n")
     print(f"wrote {TABLE_PATH}")

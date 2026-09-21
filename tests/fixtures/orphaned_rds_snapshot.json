@@ -1,0 +1,33 @@
+{
+  "DBInstances": [
+    {
+      "DBInstanceIdentifier": "live-db"
+    }
+  ],
+  "DBSnapshots": [
+    {
+      "DBSnapshotIdentifier": "manual-deleted-db-final",
+      "DBInstanceIdentifier": "deleted-db",
+      "AllocatedStorage": 400,
+      "Status": "available",
+      "Engine": "postgres",
+      "SnapshotCreateTime": "2024-03-01T00:00:00+00:00"
+    },
+    {
+      "DBSnapshotIdentifier": "manual-live-db-backup",
+      "DBInstanceIdentifier": "live-db",
+      "AllocatedStorage": 100,
+      "Status": "available",
+      "Engine": "postgres",
+      "SnapshotCreateTime": "2026-09-01T00:00:00+00:00"
+    },
+    {
+      "DBSnapshotIdentifier": "still-copying",
+      "DBInstanceIdentifier": "deleted-db-2",
+      "AllocatedStorage": 50,
+      "Status": "creating",
+      "Engine": "mysql",
+      "SnapshotCreateTime": "2026-09-20T00:00:00+00:00"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "TableNames": [
+    "empty-prototype",
+    "busy-table",
+    "on-demand-empty",
+    "zero-capacity"
+  ],
+  "TablesByName": {
+    "empty-prototype": {
+      "TableName": "empty-prototype",
+      "TableStatus": "ACTIVE",
+      "ItemCount": 0,
+      "TableSizeBytes": 0,
+      "BillingModeSummary": {
+        "BillingMode": "PROVISIONED"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 25,
+        "WriteCapacityUnits": 25
+      }
+    },
+    "busy-table": {
+      "TableName": "busy-table",
+      "TableStatus": "ACTIVE",
+      "ItemCount": 91234,
+      "TableSizeBytes": 5000000,
+      "BillingModeSummary": {
+        "BillingMode": "PROVISIONED"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 10,
+        "WriteCapacityUnits": 10
+      }
+    },
+    "on-demand-empty": {
+      "TableName": "on-demand-empty",
+      "TableStatus": "ACTIVE",
+      "ItemCount": 0,
+      "TableSizeBytes": 0,
+      "BillingModeSummary": {
+        "BillingMode": "PAY_PER_REQUEST"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 0,
+        "WriteCapacityUnits": 0
+      }
+    },
+    "zero-capacity": {
+      "TableName": "zero-capacity",
+      "TableStatus": "ACTIVE",
+      "ItemCount": 0,
+      "TableSizeBytes": 0,
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 0,
+        "WriteCapacityUnits": 0
+      }
+    }
+  }
+}

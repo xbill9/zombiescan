@@ -93,7 +93,7 @@ zombiescan scan --json findings.json  # machine-readable, full detail
 zombiescan scan --script cleanup.sh   # write the plan (never runs it)
 ```
 
-A full 18-check sweep of 17 regions takes about 15 seconds.
+A full 22-check sweep of 17 regions takes about 20 seconds.
 
 ## Checks
 
@@ -112,6 +112,10 @@ A full 18-check sweep of 17 regions takes about 15 seconds.
 | `disabled-kms-key` | Customer managed keys disabled but still billed | yes |
 | `stale-secret` | Secrets nothing has read in 90 days | yes |
 | `unused-ami` | AMIs over 90 days old that no instance uses | yes |
+| `incomplete-multipart-upload` | S3 parts no object listing shows | yes |
+| `orphaned-rds-snapshot` | Manual snapshots of databases that no longer exist | yes |
+| `idle-provisioned-dynamodb` | Empty tables paying for provisioned capacity | yes |
+| `unused-route53-health-check` | Health checks no DNS record references | yes |
 | `log-group-no-retention` | CloudWatch log groups that never expire | grows |
 | `available-eni` | Unattached interfaces blocking subnet/SG deletion | no |
 | `unused-security-group` | Groups attached to nothing, referenced by nothing | no |
@@ -120,6 +124,17 @@ A full 18-check sweep of 17 regions takes about 15 seconds.
 
 The free ones are reported because they accumulate without limit and block
 deletions, not because of this month's bill.
+
+`unused-route53-health-check` is **global**: Route 53 has no regions, so it runs
+once per scan rather than once per region, and its findings are labelled
+`global`. Running it seventeen times would report one health check seventeen
+times and multiply the waste total to match.
+
+`incomplete-multipart-upload` is the one worth running today even if you skip
+the rest. Stranded multipart parts bill at full storage rates and appear in no
+object listing — not in the console, not in `aws s3 ls`, not in the bucket size
+on the overview page. They are the only finding here that is genuinely invisible
+until you ask for it by name.
 
 ## About the numbers
 
@@ -205,7 +220,7 @@ clean".
 
 Read-only. The managed `ReadOnlyAccess` policy is more than enough; a minimal
 policy needs `Describe*`/`List*`/`Get*` on ec2, rds, elasticloadbalancing, logs,
-kms, efs and secretsmanager, plus `sts:GetCallerIdentity`.
+kms, efs, secretsmanager, s3, dynamodb and route53, plus `sts:GetCallerIdentity`.
 
 Refreshing the price table additionally needs `pricing:GetProducts`, which is
 only used by `zombiescan.pricing.refresh` and never during a scan.
@@ -213,7 +228,7 @@ only used by `zombiescan.pricing.refresh` and never during a scan.
 ## Development
 
 ```
-uv run pytest                            # 132 tests, offline, no credentials
+uv run pytest                            # 165 tests, offline, no credentials
 ZOMBIESCAN_LIVE=1 uv run pytest -m live  # end-to-end against a real account
 uv run ruff format . && uv run ruff check --fix .
 ```
@@ -223,7 +238,8 @@ separately from the bundled one, so refreshing real prices cannot break an
 assertion. The live test is excluded by default because it costs money.
 
 Adding a check means a module in `src/zombiescan/checks/`, a fixture, a test, a
-pricing entry and one line in the registry. Checks make Describe/List/Get calls
+pricing entry and one line in the registry. Pass `scope="global"` to the
+`@check` decorator for account-wide services with no region of their own. Checks make Describe/List/Get calls
 only; a check that mutates anything is a bug, not a feature request.
 
 ## License

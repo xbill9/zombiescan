@@ -8,7 +8,10 @@ from zombiescan.checks import (
     empty_vpc,  # noqa: F401
     idle_load_balancer,  # noqa: F401
     idle_nat_gateway,  # noqa: F401
+    idle_provisioned_dynamodb,  # noqa: F401
+    incomplete_multipart_upload,  # noqa: F401
     log_group_no_retention,  # noqa: F401
+    orphaned_rds_snapshot,  # noqa: F401
     orphaned_snapshots,  # noqa: F401
     stale_secret,  # noqa: F401
     stopped_instances,  # noqa: F401
@@ -17,6 +20,7 @@ from zombiescan.checks import (
     unattached_ebs,  # noqa: F401
     unmounted_efs,  # noqa: F401
     unused_ami,  # noqa: F401
+    unused_route53_health_check,  # noqa: F401
     unused_security_group,  # noqa: F401
     unused_vpc_endpoint,  # noqa: F401
 )

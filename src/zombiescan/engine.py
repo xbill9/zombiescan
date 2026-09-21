@@ -108,7 +108,12 @@ def scan(
     pricing: PriceTable,
     max_workers: int = 16,
 ) -> ScanResult:
-    jobs = [(spec, region) for region in regions for spec in checks]
+    # A global check runs once, against whichever region we can reach, rather
+    # than once per region -- otherwise one Route 53 health check is reported
+    # seventeen times and the waste total is seventeen times too large.
+    home = regions[0] if regions else "us-east-1"
+    jobs = [(spec, region) for region in regions for spec in checks if not spec.is_global]
+    jobs += [(spec, home) for spec in checks if spec.is_global]
     result = ScanResult(regions=list(regions), attempted=len(jobs))
     if not jobs:
         return result

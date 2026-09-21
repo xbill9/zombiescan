@@ -36,6 +36,10 @@ TEST_PRICES = {
     "log_storage_gb_month": {"us-east-1": 0.03, "eu-west-1": 0.03},
     "vpc_endpoint_hour": {"us-east-1": 0.01, "eu-west-1": 0.011},
     "classic_lb_hour": {"us-east-1": 0.025, "eu-west-1": 0.028},
+    "s3_gb_month": {"us-east-1": 0.023, "eu-west-1": 0.024},
+    "rds_snapshot_gb_month": {"us-east-1": 0.095, "eu-west-1": 0.105},
+    "dynamodb_capacity_hour": {"us-east-1": {"read": 0.00013, "write": 0.00065}},
+    "route53_health_check_month": {"aws": 0.50, "non_aws": 0.75},
     "kms_key_month": {"us-east-1": 1.0, "eu-west-1": 1.0},
     "secret_month": {"us-east-1": 0.40, "eu-west-1": 0.40},
     "efs_gb_month": {"us-east-1": 0.30, "eu-west-1": 0.33},
@@ -56,6 +60,8 @@ _DATETIME_KEYS = (
     "LastChangedDate",
     "CreatedDate",
     "DeletedDate",
+    "Initiated",
+    "SnapshotCreateTime",
 )
 
 

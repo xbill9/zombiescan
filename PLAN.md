@@ -162,7 +162,13 @@ the Claude Code plugin in the same repo.
 
 Shipped past the twelve rows above: `unused-vpc-endpoint`, `empty-classic-lb`,
 `stopped-rds-instance`, `disabled-kms-key`, `stale-secret`, `unmounted-efs`,
-`detached-internet-gateway`.
+`detached-internet-gateway`, `incomplete-multipart-upload`,
+`orphaned-rds-snapshot`, `idle-provisioned-dynamodb`,
+`unused-route53-health-check`.
+
+The engine now supports global checks (`scope="global"`), which run once per
+scan instead of once per region. Route 53 was the first; CloudFront, IAM and
+account-level S3 settings can use it next.
 
 Wanted but not built:
 
