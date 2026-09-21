@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Put the Arithmetic in the Tool: an MCP Server for an AWS Waste Scanner</title>
+  <meta name="description" content="A cost report gets read twice: once by a person in a terminal, once by an agent through an MCP server. Making the server compute every total instead of handing back rows keeps the two answers the same, and measures the report&#x27;s own arithmetic against the AWS bill." />
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <style>
+    body{font-family:-apple-system,'Segoe UI',Roboto,'Liberation Sans',Arial,sans-serif;
+         font-size:18px;line-height:1.58;max-width:42em;color:#242424;}
+    h1,h2,h3,h4{font-weight:700;line-height:1.25;margin-top:1.8em;}
+    h4{font-size:1.25em;}
+    img{max-width:100%;height:auto;display:block;margin:1.6em 0;}
+    pre{background:#f7f7f7;border:1px solid #e6e6e6;border-radius:4px;
+        padding:12px 14px;overflow-x:auto;font-size:14px;line-height:1.45;}
+    code{font-family:'Liberation Mono',Menlo,Consolas,monospace;}
+    :not(pre)>code{background:#f2f2f2;padding:1px 5px;border-radius:3px;font-size:.9em;}
+    blockquote{border-left:3px solid #ddd;margin-left:0;padding-left:1em;color:#555;}
+    hr{border:0;border-top:1px solid #e6e6e6;margin:2.4em 0;}
+  </style>
+</head>
+<body>
+<figure><img src="https://raw.githubusercontent.com/xbill9/zombiescan/main/articles/zombiescan-mcp/medium/img/devto-cover.cde3f396.jpg" alt="Put the Arithmetic in the Tool: an MCP Server for an AWS Waste Scanner" /></figure>
+<p>This article provides a step by step guide to adding an MCP server to
+an AWS cost scanner so an agent drives the same engine a terminal does.
+Every tool returns figures the engine computed, and the two front doors
+are held to the same number by an end-to-end test.</p>
+<p><a
+href="https://github.com/xbill9/zombiescan">https://github.com/xbill9/zombiescan</a></p>
+<hr />
+<h4 id="a-report-gets-read-twice">A Report Gets Read Twice</h4>
+<p>A scan produces one JSON document. A person reads it through a
+terminal table; an agent reads it through whatever tool it is given.</p>
+<p>Both quote dollar figures to whoever asked. When the two disagree,
+one of them is wrong in a way that survives review, because each looks
+sourced.</p>
+<p>A model handed a list of rows and asked "how much is this costing"
+does the addition in the answer. Eleven small integers are enough to
+break that: one small model asked how many of eleven ids were 10 or more
+answered wrong in twenty calls out of twenty. Push the count into the
+engine and the same question is right every time.</p>
+<p>So the tools here return totals, counts, breakdowns, minima and
+maxima, and the filter that produced them.</p>
+<hr />
+<h4 id="at-this-point-you-should-have">At This Point You Should
+Have…</h4>
+<ul>
+<li>An AWS account with credentials your shell can use, from
+<code>aws login</code>, a profile, SSO or environment variables</li>
+<li>Python 3.12 and <code>uv</code></li>
+<li>Read-only access wide enough to describe resources in every region
+you scan</li>
+<li><code>ce:GetCostAndUsage</code> for the calibration step</li>
+<li>Claude Code, for the plugin at the end</li>
+</ul>
+<hr />
+<h4 id="step-1--scan-from-the-terminal">Step 1 — Scan From the
+Terminal</h4>
+<p>The scan is read-only: Describe, List and Get calls, across every
+region the account has enabled.</p>
+<pre><code>uv run zombiescan scan --all-regions --limit 8
+Scanning as arn:aws:iam::&lt;account&gt;:root
+17 region(s), 30 check(s) — read-only
+ 
+zombiescan — 120 findings across 17 regions
+ 
+Check                   Found  Monthly
+ecr-stale-images           33    $6.40
+unused-route53-zone         1    $0.50
+empty-vpc                   1    $0.00
+log-group-no-retention     67    $0.00
+unused-security-group      18    $0.00
+ 
+Estimated waste: $6.90/month ($82.80/year)</code></pre>
+<p>One hundred and twenty findings, thirty-one of them priced. That JSON
+document is what everything below reads.</p>
+<hr />
+<h4 id="step-2--serve-the-same-engine-over-stdio">Step 2 — Serve the
+Same Engine Over stdio</h4>
+<p>MCP over stdio is line-delimited JSON-RPC 2.0. A server answers
+<code>initialize</code>, <code>tools/list</code> and
+<code>tools/call</code>, and that is enough for a client to drive
+it.</p>
+<pre><code>printf &#39;%s\n&#39; &#39;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;id&quot;:1,&quot;method&quot;:&quot;initialize&quot;,&quot;params&quot;:{&quot;protocolVersion&quot;:&quot;2025-06-18&quot;}}&#39; \
+  | uv run zombiescan-mcp
+{
+  &quot;protocolVersion&quot;: &quot;2025-06-18&quot;,
+  &quot;capabilities&quot;: {&quot;tools&quot;: {&quot;listChanged&quot;: false}},
+  &quot;serverInfo&quot;: {&quot;name&quot;: &quot;zombiescan&quot;, &quot;version&quot;: &quot;0.1.0&quot;},
+  &quot;instructions&quot;: &quot;zombiescan finds AWS resources nobody is using and prices them. Every tool is read-only; nothing here deletes anything. Run scan_account once, then ask estimate_savings for any total, count or breakdown of the report it writes -- do not add up findings yourself.&quot;
+}</code></pre>
+<p>The <code>instructions</code> field is served to the client on
+connect and carries the operating rule for the whole server.</p>
+<pre><code>tools/list -&gt; [&#39;scan_account&#39;, &#39;estimate_savings&#39;, &#39;explain_finding&#39;, &#39;list_checks&#39;, &#39;plan_cleanup&#39;]</code></pre>
+<p>Five tools, about a hundred lines of framing, and no MCP SDK in the
+dependency list. A cost scanner's install has one job, and a second
+package to keep current is a second thing to break.</p>
+<p>🔎 Tip: answer <code>initialize</code> with the client's own
+<code>protocolVersion</code> when you recognise it. A client that asks
+for a version it gets back proceeds; one that gets a different string
+negotiates again.</p>
+<hr />
+<h4 id="step-3--return-figures-not-rows">Step 3 — Return Figures, Not
+Rows</h4>
+<p><code>estimate_savings</code> takes a report path and a filter, and
+answers with the arithmetic already done.</p>
+<pre class="json"><code>{
+  &quot;matched&quot;: {
+    &quot;count&quot;: 120,
+    &quot;monthly_cost&quot;: 6.9,
+    &quot;annual_cost&quot;: 82.8,
+    &quot;free_count&quot;: 89,
+    &quot;approximate_count&quot;: 100,
+    &quot;costliest&quot;: {
+      &quot;check&quot;: &quot;ecr-stale-images&quot;,
+      &quot;resource_id&quot;: &quot;ai-course-creator-app&quot;,
+      &quot;region&quot;: &quot;us-east-1&quot;,
+      &quot;monthly_cost&quot;: 0.52
+    }
+  },
+  &quot;by_check&quot;: [
+    {&quot;check&quot;: &quot;ecr-stale-images&quot;, &quot;count&quot;: 33, &quot;monthly_cost&quot;: 6.4},
+    {&quot;check&quot;: &quot;unused-route53-zone&quot;, &quot;count&quot;: 1, &quot;monthly_cost&quot;: 0.5}
+  ]
+}</code></pre>
+<p>Every how-much, how-many and which-is-biggest question is answered
+from that one call. The costliest row is picked in code, the per-check
+and per-region sections are grouped in code, and the model quotes what
+came back.</p>
+<p><code>scan_account</code> follows the same rule from the other
+direction: it returns the totals, the breakdowns and the costliest few
+findings inline, and leaves all hundred and twenty rows in the report
+file. A busy account's rows would bury the total in the context
+window.</p>
+<hr />
+<h4 id="step-4--echo-the-filter-that-produced-the-number">Step 4 — Echo
+the Filter That Produced the Number</h4>
+<p>A filter naming a check the report does not contain returns a precise
+zero with a citation, which reads as good news.</p>
+<pre><code>estimate_savings(report_path=..., checks=[&quot;unattached-ebs-volumes&quot;])
+{
+  &quot;filter_applied&quot;: {
+    &quot;checks&quot;: [&quot;unattached-ebs-volumes&quot;],
+    &quot;findings_in_report&quot;: 120,
+    &quot;findings_matched&quot;: 0,
+    &quot;no_such_checks_in_report&quot;: [&quot;unattached-ebs-volumes&quot;]
+  },
+  &quot;matched&quot;: {&quot;count&quot;: 0, &quot;monthly_cost&quot;: 0},
+  &quot;not_matched&quot;: {&quot;count&quot;: 120, &quot;monthly_cost&quot;: 6.9}
+}</code></pre>
+<p>The check is called <code>unattached-ebs</code>, so that filter
+matched nothing. <code>no_such_checks_in_report</code> says so in the
+same response, and <code>not_matched</code> shows what the filter
+excluded.</p>
+<p>🔎 Tip: check the predicate a model sent, not only the number it
+quoted. A wrong filter returns an exact figure with a source attached,
+which is harder to catch than a miscount.</p>
+<hr />
+<h4 id="step-5--keep-every-tool-read-only">Step 5 — Keep Every Tool
+Read-Only</h4>
+<p>Scanning and cleaning are separate commands in this tool, and the MCP
+server exposes only the first.</p>
+<p><code>plan_cleanup</code> builds the same plan the <code>clean</code>
+command shows on a dry run: the API calls in order, the backup step
+before the destruction where AWS allows one, and an
+<code>irreversible</code> flag on every step with no recovery window. It
+stops there. Applying a plan stays <code>zombiescan clean --apply</code>
+at a terminal, where the per-resource prompt lives.</p>
+<p>Convention is weak, so the suite holds the boundary:</p>
+<pre class="python"><code>def test_the_server_cannot_apply_a_cleanup():
+    source = pathlib.Path(mcp_server.__file__).read_text()
+    assert &quot;apply_outcome&quot; not in source
+    assert set(re.findall(r&quot;\bclean\.(\w+)&quot;, source)) == {&quot;plan_for&quot;, &quot;UNSUPPORTED&quot;}</code></pre>
+<p><code>clean.plan_for</code> yields <code>Step</code> objects.
+<code>clean.apply_outcome</code> is the one function that sends a step
+to AWS, and a tool that reaches it fails the suite instead of
+shipping.</p>
+<hr />
+<h4 id="step-6--make-the-total-the-sum-of-the-rows">Step 6 — Make the
+Total the Sum of the Rows</h4>
+<p>An end-to-end test runs both front doors over one account and
+compares them: <code>scan_account</code> writes the report,
+<code>estimate_savings</code> reads it back, and the totals must
+match.</p>
+<p>Two summation orders over the same one hundred and twenty
+findings:</p>
+<p><img src="https://raw.githubusercontent.com/xbill9/zombiescan/main/articles/zombiescan-mcp/medium/img/devto-zombiescan-mcp-table-1.png"
+alt="Table: Order, Monthly" /></p>
+<p>The report published every finding rounded to the cent and computed
+its headline from the unrounded values, so the document disagreed with
+its own rows by two cents. An agent reading the published rows can only
+reach the first figure.</p>
+<p>The rule that follows: a report's total is the sum of the rows it
+prints. <code>ScanResult.total_monthly_cost</code> rounds each finding
+before adding, with the same <code>round</code> that publishes it, and
+the per-check sections in the JSON, the terminal table and the HTML
+report do the same.</p>
+<pre class="python"><code>result.findings = [_finding(&quot;half-cent&quot;, f&quot;r-{index}&quot;, 0.125) for index in range(4)]
+ 
+assert result.total_monthly_cost == 0.48
+assert round(sum(f.monthly_cost for f in result.findings), 2) == 0.50</code></pre>
+<p>Arithmetic on four findings priced at one half-cent: at $0.125 each
+they publish as $0.12 and total $0.48, where adding first and rounding
+once gives $0.50. The truer figure loses, because a total nobody can
+reproduce from the rows in front of them is worth less than one that is
+two cents off.</p>
+<hr />
+<h4 id="step-7--calibrate-the-estimate-against-the-bill">Step 7 —
+Calibrate the Estimate Against the Bill</h4>
+<p>Thirty-three stale container repositories carry the whole dollar
+total. Cost Explorer knows what they charged.</p>
+<pre><code>aws ce get-cost-and-usage --granularity MONTHLY --metrics UnblendedCost UsageQuantity \
+  --group-by Type=DIMENSION,Key=USAGE_TYPE \
+  --filter &#39;{&quot;And&quot;:[{&quot;Dimensions&quot;:{&quot;Key&quot;:&quot;RECORD_TYPE&quot;,&quot;Values&quot;:[&quot;Usage&quot;]}},
+                    {&quot;Dimensions&quot;:{&quot;Key&quot;:&quot;SERVICE&quot;,&quot;Values&quot;:[&quot;Amazon EC2 Container Registry (ECR)&quot;]}}]}&#39;</code></pre>
+<p><img src="https://raw.githubusercontent.com/xbill9/zombiescan/main/articles/zombiescan-mcp/medium/img/devto-zombiescan-mcp-table-2.png"
+alt="Table: Figure, Value" /></p>
+<p>ECR bills unique layers once. The check sums each image's full size,
+so thirty-three repositories built from the same base layer are counted
+thirty-three times over. Every one of those findings carries
+<code>approximate_cost: true</code> and an
+<code>approximate_reason</code> of <code>shared-layers</code>, and
+<code>explain_finding</code> returns the reason with the finding.</p>
+<p>An upper bound stated as an upper bound is useful. The calibration
+puts a number on it for this account.</p>
+<hr />
+<h4 id="step-8--wire-it-up-as-a-claude-code-plugin">Step 8 — Wire It Up
+as a Claude Code Plugin</h4>
+<p>The plugin is the server plus two slash commands and a skill,
+installed from the same repository.</p>
+<pre><code>/plugin marketplace add xbill9/zombiescan
+/plugin install zombiescan@zombiescan</code></pre>
+<p><code>.mcp.json</code> at the plugin root starts the server:</p>
+<pre class="json"><code>{
+  &quot;mcpServers&quot;: {
+    &quot;zombiescan&quot;: {
+      &quot;command&quot;: &quot;uv&quot;,
+      &quot;args&quot;: [&quot;run&quot;, &quot;--quiet&quot;, &quot;--project&quot;, &quot;${CLAUDE_PLUGIN_ROOT}/..&quot;, &quot;zombiescan-mcp&quot;]
+    }
+  }
+}</code></pre>
+<p><code>${CLAUDE_PLUGIN_ROOT}</code> resolves to the installed plugin
+directory, so the same file works for a local checkout and for an
+install from GitHub.</p>
+<p>The skill carries the rules a client cannot infer from the schemas:
+scan once and keep the report path, read <code>filter_applied</code>
+before quoting a zero, treat <code>complete: false</code> as an
+incomplete scan instead of an all-clear, and hand the operator the
+<code>clean --apply</code> command instead of running it.</p>
+<hr />
+<h4 id="compare-and-contrast">Compare and Contrast</h4>
+<p><img src="https://raw.githubusercontent.com/xbill9/zombiescan/main/articles/zombiescan-mcp/medium/img/devto-zombiescan-mcp-table-3.png"
+alt="Table: Terminal, MCP server" /></p>
+<hr />
+<h4 id="so-which-one">So, Which One?</h4>
+<p>🥇 <strong>The terminal</strong> for the first look at an account.
+The table ranks and groups in one screen, and the HTML report goes in a
+ticket.</p>
+<p>🥈 <strong>The MCP server</strong> for the follow-up questions.
+"Which region holds most of it", "what would removing the ECR
+repositories save", "why is that zone waste" are three tool calls
+against one report, with no second scan and no second set of
+numbers.</p>
+<p>Both read the same engine, so a disagreement between them is a defect
+in one of the two.</p>
+<hr />
+<h4 id="step-9--run-the-tests">Step 9 — Run the Tests</h4>
+<p>The offline suite drives every check against recorded AWS API
+responses, so it needs no credentials.</p>
+<pre><code>uv run pytest -q
+343 passed, 3 deselected in 0.39s</code></pre>
+<p>The three deselected are the live tests, which need a real
+account:</p>
+<pre><code>ZOMBIESCAN_LIVE=1 uv run pytest -m live
+3 passed, 343 deselected in 25.58s</code></pre>
+<p>The third of those is the one that compares the two front doors.</p>
+<hr />
+<h4 id="summary">Summary</h4>
+<p>The goal of this article was to give a local AWS cost scanner an
+agent front door without giving up the numbers. The key to the solution
+was making every tool return figures the engine computed, and holding
+both front doors to one total in a live test. The results were:</p>
+<ul>
+<li>🟢 Five read-only MCP tools over stdio, JSON-RPC 2.0, standard
+library only</li>
+<li>🟢 One scan of 17 regions: 120 findings, $6.90 a month, $82.80 a
+year</li>
+<li>🟢 <code>estimate_savings</code> answers totals, counts, extremes
+and three breakdowns from one call</li>
+<li>🟢 A filter that matches nothing reports which of its terms the
+report never held</li>
+<li>🟢 A report's headline, its per-check sections and its rows all add
+to $6.90</li>
+<li>⚠️ Rounding each finding before adding costs two cents against the
+exact sum on this account</li>
+<li>⚠️ The ECR estimate is 2.1x the billed figure: $6.40 against $2.99
+projected from 19.96 GB-Month, because shared layers are counted once
+per image</li>
+<li>❌ The server plans cleanups and performs none;
+<code>clean --apply</code> stays a terminal command</li>
+</ul>
+<p>One AWS account, 17 enabled regions, scanned on 2026-09-21 with a
+price table generated the same day. Prices are on-demand USD list prices
+from the AWS Price List API; they ignore private pricing, savings plans
+and credits, so they will not match an invoice to the cent. The ECR
+comparison projects 20 days of billed usage to 30 and compares it
+against a single scan taken inside that window. The model-arithmetic
+figures quoted in the opening were measured on 2026-09-15 with eleven
+ids and one API call per run, twenty runs per cell.</p>
+<p>The strategy for using MCP for AWS cost reporting was validated with
+an incremental step by step approach.</p>
+<hr />
+<h4 id="references">References</h4>
+<ul>
+<li>zombiescan — <a
+href="https://github.com/xbill9/zombiescan">https://github.com/xbill9/zombiescan</a></li>
+<li>Model Context Protocol specification — <a
+href="https://modelcontextprotocol.io/specification/2025-06-18">https://modelcontextprotocol.io/specification/2025-06-18</a></li>
+<li>Claude Code plugins — <a
+href="https://docs.claude.com/en/docs/claude-code/plugins">https://docs.claude.com/en/docs/claude-code/plugins</a></li>
+<li>Cost Explorer GetCostAndUsage — <a
+href="https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_GetCostAndUsage.html">https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_GetCostAndUsage.html</a></li>
+<li>Amazon ECR pricing — <a
+href="https://aws.amazon.com/ecr/pricing/">https://aws.amazon.com/ecr/pricing/</a></li>
+<li>AWS Price List API, GetProducts — <a
+href="https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_pricing_GetProducts.html">https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_pricing_GetProducts.html</a></li>
+</ul>
+</body>
+</html>
