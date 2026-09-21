@@ -15,6 +15,11 @@ dependencies = [
     "rich>=13.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/xbill9/zombiescan"
+Repository = "https://github.com/xbill9/zombiescan"
+Issues = "https://github.com/xbill9/zombiescan/issues"
+
 [project.scripts]
 zombiescan = "zombiescan.cli:main"
 
