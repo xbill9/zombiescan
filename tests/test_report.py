@@ -123,8 +123,8 @@ def test_remediation_cannot_break_out_of_shell_quoting():
     import shlex
 
     from tests.conftest import TEST_PRICES, FakeClient
-    from zombiescan.checks.log_group_no_retention import log_group_no_retention
     from zombiescan.models import ScanContext
+    from zombiescan.packs.core.log_group_no_retention import log_group_no_retention
     from zombiescan.pricing import PriceTable
 
     ctx = ScanContext(session=None, region="us-east-1", pricing=PriceTable(TEST_PRICES))

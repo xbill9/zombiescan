@@ -23,7 +23,7 @@ CHECK_NAME = "lightsail-empty-load-balancer"
 
 def build_finding(ctx: ScanContext, balancer: dict[str, Any]) -> Finding:
     name = balancer["name"]
-    price, approximate = ctx.pricing.lightsail_load_balancer_month(ctx.region)
+    price, approximate = ctx.pricing.rate("lightsail.load_balancer_month", region=ctx.region)
 
     return Finding(
         check=CHECK_NAME,

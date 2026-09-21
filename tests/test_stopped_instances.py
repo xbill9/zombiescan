@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.stopped_instances import stopped_instances
+from zombiescan.packs.core.stopped_instances import stopped_instances
 
 
 @pytest.fixture

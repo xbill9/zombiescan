@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from tests.conftest import FakeClient
-from zombiescan.checks._shared import interfaces_by_vpc, name_tag, vpcs_with_workloads
+from zombiescan.helpers import interfaces_by_vpc, name_tag, vpcs_with_workloads
 
 _PAGES = {
     "describe_network_interfaces": [

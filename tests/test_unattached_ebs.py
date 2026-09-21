@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.unattached_ebs import unattached_ebs
+from zombiescan.packs.core.unattached_ebs import unattached_ebs
 
 
 def _run(make_context, region="us-east-1"):

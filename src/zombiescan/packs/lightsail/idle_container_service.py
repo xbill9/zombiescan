@@ -32,7 +32,9 @@ def build_finding(ctx: ScanContext, service: dict[str, Any]) -> Finding:
     name = service["containerServiceName"]
     power = service.get("power") or ""
     scale = int(service.get("scale") or 1)
-    node_price, approximate = ctx.pricing.lightsail_container_power_month(ctx.region, power)
+    node_price, approximate = ctx.pricing.rate(
+        "lightsail.container_power_month", region=ctx.region, variant=power
+    )
 
     return Finding(
         check=CHECK_NAME,

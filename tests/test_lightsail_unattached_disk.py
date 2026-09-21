@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.lightsail_unattached_disk import lightsail_unattached_disk
+from zombiescan.packs.lightsail.unattached_disk import lightsail_unattached_disk
 
 
 @pytest.fixture

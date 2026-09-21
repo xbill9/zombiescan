@@ -12,7 +12,7 @@ import pytest
 
 from tests.conftest import TEST_PRICES
 from zombiescan import clean
-from zombiescan.cleaners import CLEANERS, UNCLEANABLE
+from zombiescan.cleaners import CLEANERS
 from zombiescan.models import Finding
 from zombiescan.pricing import PriceTable
 from zombiescan.registry import CHECKS
@@ -74,8 +74,8 @@ def _finding(check, rid="r-1", region="us-east-1", cost=10.0, details=None):
 
 def test_every_check_either_has_a_cleaner_or_says_why_not():
     """A check with no cleaner and no explanation is an oversight, not a decision."""
-    for name in CHECKS:
-        assert name in CLEANERS or name in UNCLEANABLE, f"{name} has neither"
+    for name, spec in CHECKS.items():
+        assert name in CLEANERS or spec.uncleanable, f"{name} has neither"
 
 
 def test_a_volume_is_snapshotted_before_it_is_deleted(pricing):

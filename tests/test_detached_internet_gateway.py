@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.detached_internet_gateway import detached_internet_gateway
+from zombiescan.packs.core.detached_internet_gateway import detached_internet_gateway
 
 
 @pytest.fixture

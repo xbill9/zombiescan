@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 import boto3
 import botocore.exceptions
 
-import zombiescan.checks  # noqa: F401  (registers the checks)
+from zombiescan import packs
 from zombiescan.models import Finding, ScanContext
 from zombiescan.pricing import PriceTable
 from zombiescan.registry import CHECKS, CheckSpec
@@ -91,14 +91,44 @@ def filter_us_regions(regions: list[str]) -> list[str]:
     return kept
 
 
-def select_checks(names: tuple[str, ...]) -> list[CheckSpec]:
+def load_packs(disabled: frozenset[str] = frozenset()) -> packs.LoadReport:
+    """Import every enabled pack, registering its checks, cleaners and rates.
+
+    Call this before ``select_checks``: until a pack is imported, none of its
+    checks exist to be selected.
+    """
+    return packs.discover(disabled=disabled)
+
+
+def select_checks(
+    names: tuple[str, ...], disabled_packs: frozenset[str] = frozenset()
+) -> list[CheckSpec]:
+    """The checks to run, honouring --check and --disable-pack.
+
+    ``disabled_packs`` is applied here as well as at import time. Not loading a
+    pack is what normally keeps its checks out of the registry, but a pack
+    already imported by something else in the process would otherwise slip
+    through -- and a flag that silently does nothing is worse than no flag.
+    """
     if not names:
-        return list(CHECKS.values())
+        return [spec for spec in CHECKS.values() if spec.pack not in disabled_packs]
+
     unknown = sorted(set(names) - set(CHECKS))
     if unknown:
         available = ", ".join(sorted(CHECKS))
         raise ValueError(f"unknown check(s): {', '.join(unknown)}. Available: {available}")
-    return [CHECKS[n] for n in names]
+
+    selected = [CHECKS[n] for n in names]
+    contradicted = sorted({s.name for s in selected if s.pack in disabled_packs})
+    if contradicted:
+        # Asking for a check and disabling its pack in the same command is a
+        # mistake worth naming, not one to resolve by guessing which the
+        # operator meant.
+        raise ValueError(
+            f"check(s) {', '.join(contradicted)} belong to a pack disabled by "
+            "--disable-pack; drop one of the two flags"
+        )
+    return selected
 
 
 def verify_credentials(session: boto3.Session) -> str:

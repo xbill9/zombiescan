@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.lightsail_empty_load_balancer import lightsail_empty_load_balancer
+from zombiescan.packs.lightsail.empty_load_balancer import lightsail_empty_load_balancer
 
 
 @pytest.fixture

@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.lightsail_unattached_static_ip import lightsail_unattached_static_ip
+from zombiescan.packs.lightsail.unattached_static_ip import lightsail_unattached_static_ip
 
 
 @pytest.fixture

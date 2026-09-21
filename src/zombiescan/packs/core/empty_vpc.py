@@ -13,7 +13,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from typing import Any
 
-from zombiescan.checks._shared import interfaces_by_vpc, name_tag
+from zombiescan.helpers import interfaces_by_vpc, name_tag
 from zombiescan.models import Finding, ScanContext
 from zombiescan.registry import check
 
@@ -49,7 +49,14 @@ def build_finding(ctx: ScanContext, vpc: dict[str, Any]) -> Finding:
     )
 
 
-@check(CHECK_NAME, "VPCs with nothing in them")
+@check(
+    CHECK_NAME,
+    "VPCs with nothing in them",
+    uncleanable=(
+        "a VPC cannot be deleted until its subnets, route tables and gateways "
+        "are removed first, in an order this tool does not attempt to work out"
+    ),
+)
 def empty_vpc(ctx: ScanContext) -> Iterator[Finding]:
     client = ctx.client("ec2")
     vpcs: list[dict[str, Any]] = []

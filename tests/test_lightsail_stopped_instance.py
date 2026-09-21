@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.lightsail_stopped_instance import lightsail_stopped_instance
+from zombiescan.packs.lightsail.stopped_instance import lightsail_stopped_instance
 
 
 @pytest.fixture

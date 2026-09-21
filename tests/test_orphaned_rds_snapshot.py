@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.orphaned_rds_snapshot import orphaned_rds_snapshot
+from zombiescan.packs.core.orphaned_rds_snapshot import orphaned_rds_snapshot
 
 
 @pytest.fixture

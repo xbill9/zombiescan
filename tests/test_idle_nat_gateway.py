@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.idle_nat_gateway import idle_nat_gateway
+from zombiescan.packs.core.idle_nat_gateway import idle_nat_gateway
 
 
 @pytest.fixture

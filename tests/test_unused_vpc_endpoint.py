@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.unused_vpc_endpoint import unused_vpc_endpoint
+from zombiescan.packs.core.unused_vpc_endpoint import unused_vpc_endpoint
 
 
 @pytest.fixture

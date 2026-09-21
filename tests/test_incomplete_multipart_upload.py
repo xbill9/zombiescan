@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.incomplete_multipart_upload import incomplete_multipart_upload
+from zombiescan.packs.core.incomplete_multipart_upload import incomplete_multipart_upload
 
 GB = 1024**3
 

@@ -9,12 +9,15 @@ import time
 import boto3
 import botocore.exceptions
 import click
+from rich import box
 from rich.console import Console
+from rich.table import Table
 
-from zombiescan import __version__, clean, html, report
+from zombiescan import __version__, clean, html, packs, report
 from zombiescan.engine import (
     CredentialError,
     filter_us_regions,
+    load_packs,
     resolve_regions,
     scan,
     select_checks,
@@ -35,12 +38,48 @@ def main() -> None:
     """
 
 
+def _load(console: Console, disable_pack: tuple[str, ...] = ()) -> None:
+    """Import every enabled pack, and say plainly if one could not be loaded.
+
+    A failed pack is reported rather than raised: it costs the checks it would
+    have contributed, not the whole scan. Silence would be worse -- a scan that
+    quietly skipped a pack would report less waste and look like good news.
+    """
+    report_ = load_packs(disabled=frozenset(disable_pack))
+    for failure in report_.failed:
+        console.print(
+            f"[yellow]pack '{failure.name}' ({failure.source}) failed to load:[/yellow] "
+            f"{failure.message}"
+        )
+    for name in report_.skipped:
+        console.print(f"[dim]pack '{name}' disabled[/dim]")
+
+
 @main.command("checks")
 def list_checks() -> None:
     """List the available checks."""
     console = Console()
+    _load(console)
     for name, spec in sorted(CHECKS.items()):
-        console.print(f"  [bold]{name}[/bold]  {spec.title}")
+        console.print(f"  [bold]{name}[/bold]  {spec.title}  [dim]({spec.pack})[/dim]")
+
+
+@main.command("packs")
+def list_packs() -> None:
+    """List the installed packs and what each one contributes."""
+    console = Console()
+    _load(console)
+    counts: dict[str, int] = {}
+    for spec in CHECKS.values():
+        counts[spec.pack] = counts.get(spec.pack, 0) + 1
+
+    table = Table(box=box.SIMPLE, header_style="bold")
+    for column in ("Pack", "Version", "Checks", "Source"):
+        table.add_column(column)
+    for pack in sorted(packs.PACKS.values(), key=lambda p: p.name):
+        table.add_row(pack.name, pack.version, str(counts.get(pack.name, 0)), pack.source)
+    console.print(table)
+    console.print(f"[dim]pack API v{packs.PACK_API_VERSION}[/dim]")
 
 
 @main.command()
@@ -49,6 +88,11 @@ def list_checks() -> None:
 @click.option("--all-regions", is_flag=True, help="Scan every region this account has enabled.")
 @click.option("--us-only", is_flag=True, help="Narrow the regions to scan to the US ones (us-*).")
 @click.option("--check", "checks", multiple=True, help="Run only this check (repeatable).")
+@click.option(
+    "--disable-pack",
+    multiple=True,
+    help="Do not load this pack (repeatable).",
+)
 @click.option("--json", "json_path", default=None, help="Write findings as JSON to this path.")
 @click.option("--script", "script_path", default=None, help="Write the cleanup plan to this path.")
 @click.option(
@@ -72,6 +116,7 @@ def scan_command(
     all_regions: bool,
     us_only: bool,
     checks: tuple[str, ...],
+    disable_pack: tuple[str, ...],
     json_path: str | None,
     script_path: str | None,
     html_path: str | None,
@@ -80,13 +125,14 @@ def scan_command(
 ) -> None:
     """Scan for unused resources."""
     console = Console()
+    _load(console, disable_pack)
 
     try:
         # Session construction itself raises for an unknown profile, so it
         # belongs inside the handler rather than above it.
         session = boto3.Session(profile_name=profile) if profile else boto3.Session()
         caller_arn = verify_credentials(session)
-        selected = select_checks(checks)
+        selected = select_checks(checks, frozenset(disable_pack))
         target_regions = list(regions) if regions else resolve_regions(session, all_regions)
         if us_only:
             # Applied after resolution, so the flag narrows an explicit
@@ -152,10 +198,6 @@ def scan_command(
         sys.exit(1)
 
 
-if __name__ == "__main__":
-    main()
-
-
 def _load_findings(path: str) -> tuple[list[Finding], str | None]:
     """Findings from a previously written --json report."""
     with open(path) as handle:
@@ -189,6 +231,11 @@ def _describe(outcome: clean.Outcome, console: Console) -> None:
 @click.option("--all-regions", is_flag=True, help="Scan every region this account has enabled.")
 @click.option("--check", "checks", multiple=True, help="Only this check (repeatable).")
 @click.option(
+    "--disable-pack",
+    multiple=True,
+    help="Do not load this pack (repeatable).",
+)
+@click.option(
     "--min-cost", default=0.0, show_default=True, help="Ignore findings cheaper than this."
 )
 @click.option(
@@ -210,6 +257,7 @@ def clean_command(
     regions: tuple[str, ...],
     all_regions: bool,
     checks: tuple[str, ...],
+    disable_pack: tuple[str, ...],
     min_cost: float,
     from_path: str | None,
     do_apply: bool,
@@ -222,6 +270,7 @@ def clean_command(
     nothing. --apply performs them, asking before each resource unless --yes.
     """
     console = Console()
+    _load(console, disable_pack)
 
     try:
         session = boto3.Session(profile_name=profile) if profile else boto3.Session()
@@ -254,7 +303,7 @@ def clean_command(
             sys.exit(2)
     else:
         try:
-            selected = select_checks(checks)
+            selected = select_checks(checks, frozenset(disable_pack))
             target_regions = list(regions) if regions else resolve_regions(session, all_regions)
         except (CredentialError, ValueError) as exc:
             console.print(f"[red]{exc}[/red]")
@@ -356,3 +405,10 @@ def _write_audit(
         json.dump(clean.audit_document(outcomes, applied, caller_arn), handle, indent=2)
         handle.write("\n")
     console.print(f"[dim]audit written to {path}[/dim]")
+
+
+# Must stay last: everything above registers a subcommand, and running the
+# group before a command is defined silently drops it. `python -m zombiescan.cli`
+# used to lose `clean` this way.
+if __name__ == "__main__":
+    main()

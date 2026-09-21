@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.unmounted_efs import unmounted_efs
+from zombiescan.packs.core.unmounted_efs import unmounted_efs
 
 
 @pytest.fixture

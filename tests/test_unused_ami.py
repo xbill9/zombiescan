@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.unused_ami import unused_ami
+from zombiescan.packs.core.unused_ami import unused_ami
 
 
 @pytest.fixture

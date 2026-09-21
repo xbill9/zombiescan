@@ -26,7 +26,9 @@ CHECK_NAME = "lightsail-stopped-instance"
 def build_finding(ctx: ScanContext, instance: dict[str, Any]) -> Finding:
     name = instance["name"]
     bundle_id = instance.get("bundleId") or ""
-    price, approximate = ctx.pricing.lightsail_bundle_month(ctx.region, bundle_id)
+    price, approximate = ctx.pricing.rate(
+        "lightsail.bundle_month", region=ctx.region, variant=bundle_id
+    )
     quoted = shlex.quote(name)
 
     return Finding(

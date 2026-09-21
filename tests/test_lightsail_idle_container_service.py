@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.lightsail_idle_container_service import lightsail_idle_container_service
+from zombiescan.packs.lightsail.idle_container_service import lightsail_idle_container_service
 
 
 @pytest.fixture

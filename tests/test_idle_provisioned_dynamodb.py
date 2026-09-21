@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.idle_provisioned_dynamodb import idle_provisioned_dynamodb
+from zombiescan.packs.core.idle_provisioned_dynamodb import idle_provisioned_dynamodb
 
 
 @pytest.fixture

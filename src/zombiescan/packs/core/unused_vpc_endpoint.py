@@ -13,7 +13,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from typing import Any
 
-from zombiescan.checks._shared import name_tag, vpcs_with_workloads
+from zombiescan.helpers import name_tag, vpcs_with_workloads
 from zombiescan.models import Finding, ScanContext
 from zombiescan.registry import check
 

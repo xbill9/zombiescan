@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.disabled_kms_key import disabled_kms_key
+from zombiescan.packs.core.disabled_kms_key import disabled_kms_key
 
 
 @pytest.fixture

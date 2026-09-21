@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.idle_load_balancer import idle_load_balancer
+from zombiescan.packs.core.idle_load_balancer import idle_load_balancer
 
 
 @pytest.fixture

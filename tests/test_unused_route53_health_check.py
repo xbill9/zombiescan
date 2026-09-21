@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.unused_route53_health_check import unused_route53_health_check
+from zombiescan.packs.core.unused_route53_health_check import unused_route53_health_check
 from zombiescan.registry import CHECKS
 
 

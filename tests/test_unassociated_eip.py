@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.unassociated_eip import unassociated_eip
+from zombiescan.packs.core.unassociated_eip import unassociated_eip
 
 
 @pytest.fixture

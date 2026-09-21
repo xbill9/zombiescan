@@ -15,9 +15,10 @@ from typing import Any
 import boto3
 import botocore.exceptions
 
-from zombiescan.cleaners import CLEANERS, UNCLEANABLE, Step
+from zombiescan.cleaners import CLEANERS, Step
 from zombiescan.models import Finding, ScanContext
 from zombiescan.pricing import PriceTable
+from zombiescan.registry import CHECKS
 
 PLANNED = "planned"
 APPLIED = "applied"
@@ -51,11 +52,25 @@ def _client(session: boto3.Session, service: str, region: str, home: str) -> Any
 
 def plan_for(session: boto3.Session, finding: Finding, pricing: PriceTable, home: str) -> Outcome:
     """Work out the calls that would resolve this finding. Makes no changes."""
-    if finding.check in UNCLEANABLE:
-        return Outcome(finding=finding, status=UNSUPPORTED, error=UNCLEANABLE[finding.check])
+    spec = CHECKS.get(finding.check)
+    if spec is not None and spec.uncleanable:
+        return Outcome(finding=finding, status=UNSUPPORTED, error=spec.uncleanable)
 
     planner = CLEANERS.get(finding.check)
     if planner is None:
+        # A --from report can name a check this build does not have, because
+        # the pack that produced it is not installed here. Say so: "no cleaner"
+        # would send the operator looking for a bug that is really a missing
+        # dependency.
+        if spec is None:
+            return Outcome(
+                finding=finding,
+                status=UNSUPPORTED,
+                error=(
+                    f"no check named {finding.check} is installed, so its findings "
+                    "cannot be planned -- install the pack that produced this report"
+                ),
+            )
         return Outcome(
             finding=finding,
             status=UNSUPPORTED,

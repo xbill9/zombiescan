@@ -4,34 +4,116 @@
   "title": "zombiescan findings report",
   "description": "Output of `zombiescan scan --json`. Check schema_version before parsing.",
   "type": "object",
-  "required": ["schema_version", "tool", "scan", "pricing", "totals", "findings", "errors"],
+  "required": [
+    "schema_version",
+    "tool",
+    "packs",
+    "scan",
+    "pricing",
+    "totals",
+    "findings",
+    "errors"
+  ],
   "additionalProperties": false,
   "properties": {
     "schema_version": {
       "type": "integer",
-      "const": 1,
+      "const": 2,
       "description": "Incremented on any breaking change to this document."
     },
     "tool": {
       "type": "object",
-      "required": ["name", "version"],
+      "required": [
+        "name",
+        "version"
+      ],
       "additionalProperties": false,
       "properties": {
-        "name": { "type": "string" },
-        "version": { "type": "string" }
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "packs": {
+      "type": "array",
+      "description": "Packs loaded for this scan. Added in schema_version 2.",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "version",
+          "api_version",
+          "source"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "api_version": {
+            "type": "integer"
+          },
+          "source": {
+            "type": "string",
+            "description": "'built-in', or the distribution that provided the pack."
+          },
+          "homepage": {
+            "type": "string"
+          }
+        }
       }
     },
     "scan": {
       "type": "object",
-      "required": ["generated", "regions", "pairs_attempted", "complete"],
+      "required": [
+        "generated",
+        "regions",
+        "pairs_attempted",
+        "complete"
+      ],
       "additionalProperties": false,
       "properties": {
-        "generated": { "type": "string", "description": "UTC, ISO 8601." },
-        "duration_seconds": { "type": ["number", "null"] },
-        "account_id": { "type": ["string", "null"] },
-        "caller_arn": { "type": ["string", "null"] },
-        "regions": { "type": "array", "items": { "type": "string" } },
-        "pairs_attempted": { "type": "integer", "minimum": 0 },
+        "generated": {
+          "type": "string",
+          "description": "UTC, ISO 8601."
+        },
+        "duration_seconds": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "account_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "caller_arn": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pairs_attempted": {
+          "type": "integer",
+          "minimum": 0
+        },
         "pairs_unavailable": {
           "type": "integer",
           "minimum": 0,
@@ -45,34 +127,71 @@
     },
     "pricing": {
       "type": "object",
-      "required": ["generated", "basis", "excludes"],
+      "required": [
+        "generated",
+        "basis",
+        "excludes"
+      ],
       "additionalProperties": false,
       "properties": {
         "generated": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "When the bundled price table was built. Without it the report is not auditable."
         },
-        "basis": { "type": "string" },
-        "excludes": { "type": "array", "items": { "type": "string" } }
+        "basis": {
+          "type": "string"
+        },
+        "excludes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
     "totals": {
       "type": "object",
-      "required": ["monthly_cost", "annual_cost", "finding_count", "by_check"],
+      "required": [
+        "monthly_cost",
+        "annual_cost",
+        "finding_count",
+        "by_check"
+      ],
       "additionalProperties": false,
       "properties": {
-        "monthly_cost": { "type": "number", "minimum": 0 },
-        "annual_cost": { "type": "number", "minimum": 0 },
-        "finding_count": { "type": "integer", "minimum": 0 },
+        "monthly_cost": {
+          "type": "number",
+          "minimum": 0
+        },
+        "annual_cost": {
+          "type": "number",
+          "minimum": 0
+        },
+        "finding_count": {
+          "type": "integer",
+          "minimum": 0
+        },
         "by_check": {
           "type": "object",
           "additionalProperties": {
             "type": "object",
-            "required": ["count", "monthly_cost"],
+            "required": [
+              "count",
+              "monthly_cost"
+            ],
             "additionalProperties": false,
             "properties": {
-              "count": { "type": "integer", "minimum": 1 },
-              "monthly_cost": { "type": "number", "minimum": 0 }
+              "count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "monthly_cost": {
+                "type": "number",
+                "minimum": 0
+              }
             }
           }
         }
@@ -95,15 +214,26 @@
         ],
         "additionalProperties": false,
         "properties": {
-          "check": { "type": "string" },
-          "resource_id": { "type": "string" },
-          "resource_type": { "type": "string" },
+          "check": {
+            "type": "string"
+          },
+          "resource_id": {
+            "type": "string"
+          },
+          "resource_type": {
+            "type": "string"
+          },
           "region": {
             "type": "string",
             "description": "An AWS region, or \"global\" for account-wide services."
           },
-          "reason": { "type": "string" },
-          "monthly_cost": { "type": "number", "minimum": 0 },
+          "reason": {
+            "type": "string"
+          },
+          "monthly_cost": {
+            "type": "number",
+            "minimum": 0
+          },
           "approximate_cost": {
             "type": "boolean",
             "description": "True when the figure is an estimate or an upper bound. details.note says why."
@@ -112,7 +242,9 @@
             "type": "string",
             "description": "A shell command. Generated, never executed. Interpolated values are shell-quoted."
           },
-          "details": { "type": "object" }
+          "details": {
+            "type": "object"
+          }
         }
       }
     },
@@ -120,12 +252,22 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["region", "check", "message"],
+        "required": [
+          "region",
+          "check",
+          "message"
+        ],
         "additionalProperties": false,
         "properties": {
-          "region": { "type": "string" },
-          "check": { "type": "string" },
-          "message": { "type": "string" }
+          "region": {
+            "type": "string"
+          },
+          "check": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
         }
       }
     }

@@ -14,8 +14,14 @@ from typing import Any
 
 import pytest
 
+from zombiescan import engine
 from zombiescan.models import ScanContext
 from zombiescan.pricing import PriceTable
+
+# Importing a check module registers that one check. The registry-wide tests
+# ("every check has a cleaner or says why not") need every pack loaded, so do
+# it once here rather than leaving it to whichever test imported what first.
+engine.load_packs()
 
 FIXTURES = pathlib.Path(__file__).parent / "fixtures"
 
@@ -136,6 +142,15 @@ class FakeClient:
     def record(self, operation: str, kwargs: dict[str, Any]) -> None:
         self.calls[operation] = kwargs
         self.call_log.append((operation, kwargs))
+
+    def can_paginate(self, operation: str) -> bool:
+        """As boto3 does: whether this operation has a paginator.
+
+        Checks built with ``zombiescan.building`` ask before paginating, so the
+        fake has to answer. An operation configured under ``direct`` is one the
+        real client would not paginate either.
+        """
+        return operation in self._pages or operation not in self._direct
 
     def get_paginator(self, operation: str) -> FakePaginator:
         return FakePaginator(self._pages.get(operation, [{}]), operation, self)

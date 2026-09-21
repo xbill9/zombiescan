@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.log_group_no_retention import log_group_no_retention
+from zombiescan.packs.core.log_group_no_retention import log_group_no_retention
 
 
 @pytest.fixture

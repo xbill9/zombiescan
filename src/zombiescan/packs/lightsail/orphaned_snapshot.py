@@ -40,7 +40,7 @@ def build_finding(
 ) -> Finding:
     name = snapshot["name"]
     size_gb = int(snapshot.get("sizeInGb") or 0)
-    price, approximate = ctx.pricing.lightsail_snapshot_gb_month(ctx.region)
+    price, approximate = ctx.pricing.rate("lightsail.snapshot_gb_month", region=ctx.region)
     delete = "delete-instance-snapshot" if kind == "instance" else "delete-disk-snapshot"
     flag = "--instance-snapshot-name" if kind == "instance" else "--disk-snapshot-name"
 

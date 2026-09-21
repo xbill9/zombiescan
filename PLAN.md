@@ -132,15 +132,34 @@ Claude Code plugin
 ```
 zombiescan/
   src/zombiescan/
-    checks/       one module per zombie check
-    pricing/      bundled price table + refresh script
+    packs/        pack manifest, discovery, API version
+      core/         one module per zombie check, + cleaners.py
+      lightsail/    checks, cleaners, rates.py, refresh.py
+    pricing/      bundled price table, rate registry, refresh script
+    building.py   simple_check, for checks that are one call and one filter
+    helpers.py    shared describe helpers, public to packs
     engine.py     region fan-out, credential handling
     report.py     terminal table, JSON, remediation script
-    cli.py        argparse/click entry point
+    cli.py        click entry point
+  docs/PACKS.md   the pack-author contract
   plugin/         Claude Code plugin: skill, slash command, MCP server
   policy/         minimal read-only IAM policy
   tests/          check logic against recorded API fixtures
 ```
+
+**Packs (2026-09-21).** Checks are grouped into installable packs. A pack owns
+its checks, cleaners, price rates and rate fetchers; third-party packs are
+discovered through a `zombiescan.packs` entry point and declared compatible by
+`PACK_API_VERSION`. Lightsail was extracted from the core checks as the proof
+the seam carries a whole service — its own API, its own pricing source, its own
+744-hour month. The JSON report records loaded packs under `packs`
+(`schema_version` 2).
+
+The trade-off, recorded deliberately: a pack is code that runs with the local
+AWS credentials, and nothing verifies that its checks only read. The read-only
+guarantee holds for the packs in this repository because they are reviewed. A
+botocore `before-call` allowlist would make it structural; it was considered
+and deferred.
 
 **Distribution:** MIT on GitHub, installable with `pipx install zombiescan`, plus
 the Claude Code plugin in the same repo.

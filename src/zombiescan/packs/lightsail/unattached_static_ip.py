@@ -22,7 +22,7 @@ CHECK_NAME = "lightsail-unattached-static-ip"
 
 def build_finding(ctx: ScanContext, static_ip: dict[str, Any]) -> Finding:
     name = static_ip["name"]
-    price, approximate = ctx.pricing.lightsail_static_ip_month(ctx.region)
+    price, approximate = ctx.pricing.rate("lightsail.static_ip_month", region=ctx.region)
 
     return Finding(
         check=CHECK_NAME,

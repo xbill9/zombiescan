@@ -5,7 +5,7 @@ import datetime as dt
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.ecr_stale_images import ecr_stale_images
+from zombiescan.packs.core.ecr_stale_images import ecr_stale_images
 
 GB = 1024**3
 ECR_GB_MONTH = 0.10

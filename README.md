@@ -299,7 +299,7 @@ only used by `zombiescan.pricing.refresh` and never during a scan.
 ## Development
 
 ```
-uv run pytest                            # 165 tests, offline, no credentials
+uv run pytest                            # 281 tests, offline, no credentials
 ZOMBIESCAN_LIVE=1 uv run pytest -m live  # end-to-end against a real account
 uv run ruff format . && uv run ruff check --fix .
 ```
@@ -308,10 +308,31 @@ The offline suite runs against recorded API fixtures with a price table pinned
 separately from the bundled one, so refreshing real prices cannot break an
 assertion. The live test is excluded by default because it costs money.
 
-Adding a check means a module in `src/zombiescan/checks/`, a fixture, a test, a
-pricing entry and one line in the registry. Pass `scope="global"` to the
-`@check` decorator for account-wide services with no region of their own. Checks make Describe/List/Get calls
-only; a check that mutates anything is a bug, not a feature request.
+### Packs
+
+Checks are grouped into **packs**. A pack carries its own checks, cleaners,
+price rates and rate fetchers, and is discovered rather than listed — the
+built-in `core` and `lightsail` packs load through the same path as a pack
+installed from PyPI:
+
+```
+zombiescan packs                    # what is installed and what each contributes
+zombiescan scan --disable-pack lightsail
+```
+
+Adding a check means a module in `src/zombiescan/packs/<pack>/`, a fixture, a
+test, a rate plus its fetcher, and either a cleaner or an `uncleanable` reason.
+There is no import list to update. Pass `scope="global"` to the `@check`
+decorator for account-wide services with no region of their own, and use
+`simple_check` from `zombiescan.building` when a check really is one describe
+call and one filter.
+
+Checks make Describe/List/Get calls only; a check that mutates anything is a
+bug, not a feature request. Note that this is a promise kept by the people who
+write checks, not enforced by the machinery that runs them — a third-party pack
+runs with your AWS credentials like any other dependency.
+
+**[docs/PACKS.md](docs/PACKS.md) is the guide for writing one.**
 
 ## License
 

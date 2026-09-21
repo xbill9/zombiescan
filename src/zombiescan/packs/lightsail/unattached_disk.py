@@ -24,7 +24,7 @@ CHECK_NAME = "lightsail-unattached-disk"
 def build_finding(ctx: ScanContext, disk: dict[str, Any]) -> Finding:
     name = disk["name"]
     size_gb = int(disk.get("sizeInGb") or 0)
-    price, approximate = ctx.pricing.lightsail_disk_gb_month(ctx.region)
+    price, approximate = ctx.pricing.rate("lightsail.disk_gb_month", region=ctx.region)
     quoted = shlex.quote(name)
 
     return Finding(

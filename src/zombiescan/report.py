@@ -13,7 +13,7 @@ from typing import Any
 from rich.console import Console
 from rich.table import Table
 
-from zombiescan import __version__
+from zombiescan import __version__, packs
 from zombiescan.engine import ScanResult
 
 
@@ -182,7 +182,7 @@ def _render_errors(result: ScanResult, console: Console) -> None:
         console.print(f"  [dim]... and {len(result.errors) - 10} more[/dim]")
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 
 def _by_check(result: ScanResult) -> dict[str, dict[str, Any]]:
@@ -215,6 +215,11 @@ def to_json(
     return {
         "schema_version": SCHEMA_VERSION,
         "tool": {"name": "zombiescan", "version": __version__},
+        # Which packs were loaded, and at what version. A finding means nothing
+        # without knowing which check produced it, and a check means nothing
+        # without knowing which pack -- two packs may both ship a check called
+        # "idle-cluster" and disagree about what idle means.
+        "packs": packs.manifest(),
         "scan": {
             "generated": dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "duration_seconds": round(duration_seconds, 2) if duration_seconds else None,

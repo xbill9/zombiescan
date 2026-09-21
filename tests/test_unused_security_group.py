@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from tests.conftest import load_fixture
-from zombiescan.checks.unused_security_group import unused_security_group
+from zombiescan.packs.core.unused_security_group import unused_security_group
 
 
 @pytest.fixture

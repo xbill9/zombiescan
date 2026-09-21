@@ -26,6 +26,11 @@ ship gate) is recorded in PLAN.md and is understood.
 `zombiescan scan` is **read-only**: Describe/List/Get calls only. Never add a
 mutating call to a check. A check that changes anything is a bug.
 
+This is kept by convention, not enforced: nothing inspects a check's API calls
+before running them. Since packs can be installed from PyPI and run with the
+local credentials, do not claim the read-only guarantee holds for third-party
+packs — it holds for the packs in this repository because they are reviewed.
+
 `zombiescan clean` does delete things. That was a deliberate reversal of the
 original read-only-everywhere design, and the guarantees that replaced it must
 hold:
@@ -43,8 +48,9 @@ hold:
   undo. It drives what the operator is warned about, so a wrong flag is a
   safety bug.
 - **Refuse rather than guess.** No cleaner for a check means the finding is
-  reported as unsupported with a reason (see `UNCLEANABLE`), never
-  approximated.
+  reported as unsupported with a reason — pass `uncleanable="..."` to
+  `@check` — never approximated. A check with neither a cleaner nor a reason
+  fails `tests/test_clean.py`.
 - Never clean on the basis of a failed scan, and never clean using a `--from`
   report produced by a different account.
 
@@ -74,6 +80,24 @@ uv run pytest                              # tests (fixtures, offline)
 ZOMBIESCAN_LIVE=1 uv run pytest -m live    # opt-in live smoke test, real account
 uv run ruff format . && uv run ruff check --fix .
 ```
+
+## Packs
+
+Checks live in packs under `src/zombiescan/packs/<pack>/`, discovered by
+existing rather than listed in an import block. A pack owns its checks, its
+cleaners (`cleaners.py`), its price rates (`rates.py`) and the fetchers that
+refresh them (`refresh.py`). `core` and `lightsail` are built in and load
+through the same entry-point-equivalent path as an installed pack, so breaking
+the seam breaks every check and the suite says so.
+
+Prices are looked up by key — `ctx.pricing.rate("ebs.gb_month", region=...)` —
+against specs registered in `zombiescan.pricing.rates`. Do not add a method to
+`PriceTable` for a new rate; register a `RateSpec`, or a resolver if its shape
+needs one. Every table section must have exactly one `@price_fetcher`, which
+`tests/test_packs.py` enforces.
+
+`docs/PACKS.md` is the pack-author guide. Keep it current — it is the contract
+third-party packs are written against, along with `PACK_API_VERSION`.
 
 ## Testing
 
