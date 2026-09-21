@@ -1,0 +1,44 @@
+{
+  "Vpcs": [
+    {
+      "VpcId": "vpc-empty00000000001",
+      "CidrBlock": "10.9.0.0/16",
+      "IsDefault": false,
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "torn-down-staging"
+        }
+      ]
+    },
+    {
+      "VpcId": "vpc-busy000000000001",
+      "CidrBlock": "10.1.0.0/16",
+      "IsDefault": false
+    },
+    {
+      "VpcId": "vpc-default000000001",
+      "CidrBlock": "172.31.0.0/16",
+      "IsDefault": true
+    },
+    {
+      "VpcId": "vpc-debris0000000001",
+      "CidrBlock": "10.4.0.0/16",
+      "IsDefault": false
+    }
+  ],
+  "NetworkInterfaces": [
+    {
+      "NetworkInterfaceId": "eni-00000000000000001",
+      "Status": "in-use",
+      "InterfaceType": "interface",
+      "VpcId": "vpc-busy000000000001"
+    },
+    {
+      "NetworkInterfaceId": "eni-00000000000000002",
+      "Status": "available",
+      "InterfaceType": "interface",
+      "VpcId": "vpc-debris0000000001"
+    }
+  ]
+}

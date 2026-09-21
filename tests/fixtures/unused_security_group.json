@@ -1,0 +1,73 @@
+{
+  "SecurityGroups": [
+    {
+      "GroupId": "sg-00000000000000001",
+      "GroupName": "orphaned-web-sg",
+      "Description": "web tier for a deleted stack",
+      "VpcId": "vpc-00000000000000001",
+      "IpPermissions": [],
+      "IpPermissionsEgress": []
+    },
+    {
+      "GroupId": "sg-00000000000000002",
+      "GroupName": "attached-sg",
+      "Description": "on a live ENI",
+      "VpcId": "vpc-00000000000000001"
+    },
+    {
+      "GroupId": "sg-00000000000000003",
+      "GroupName": "referenced-by-another-sg",
+      "Description": "named in another group's rules",
+      "VpcId": "vpc-00000000000000001"
+    },
+    {
+      "GroupId": "sg-00000000000000004",
+      "GroupName": "referencing-sg",
+      "Description": "references sg-...003",
+      "VpcId": "vpc-00000000000000001",
+      "IpPermissions": [
+        {
+          "UserIdGroupPairs": [
+            {
+              "GroupId": "sg-00000000000000003"
+            }
+          ]
+        }
+      ],
+      "IpPermissionsEgress": []
+    },
+    {
+      "GroupId": "sg-00000000000000005",
+      "GroupName": "default",
+      "Description": "default VPC security group",
+      "VpcId": "vpc-00000000000000001"
+    },
+    {
+      "GroupId": "sg-00000000000000006",
+      "GroupName": "self-referencing-sg",
+      "Description": "only references itself",
+      "VpcId": "vpc-00000000000000001",
+      "IpPermissions": [
+        {
+          "UserIdGroupPairs": [
+            {
+              "GroupId": "sg-00000000000000006"
+            }
+          ]
+        }
+      ],
+      "IpPermissionsEgress": []
+    }
+  ],
+  "NetworkInterfaces": [
+    {
+      "NetworkInterfaceId": "eni-00000000000000001",
+      "VpcId": "vpc-00000000000000001",
+      "Groups": [
+        {
+          "GroupId": "sg-00000000000000002"
+        }
+      ]
+    }
+  ]
+}

@@ -54,10 +54,10 @@ the honest answer to "would you let this thing loose on production?"
 | ✅ Available ENIs | Left behind by deleted Lambdas and instances | $0 (hygiene) |
 | ✅ Idle load balancers | ALB/NLB with no healthy targets | ~$16–22 each |
 | ✅ Unused AMIs | Plus the snapshots behind them | snapshot cost |
-| Idle RDS instances | Zero connections over the lookback window | instance cost |
+| ✅ Stopped RDS instances | Stopped, but storage still bills | storage cost |
 | ✅ Log groups with no retention | Grows forever, nobody notices | ~$0.03/GB |
-| Empty VPCs | Flags the NAT/IGW/endpoint waste inside them | varies |
-| Unused security groups | Referenced by nothing | $0 (hygiene) |
+| ✅ Empty VPCs | Flags the NAT/IGW/endpoint waste inside them | varies |
+| ✅ Unused security groups | Referenced by nothing | $0 (hygiene) |
 
 EBS, snapshot, and NAT figures are now generated from the live Price List API by
 `src/zombiescan/pricing/refresh.py`. Public IPv4 is a documented constant: the

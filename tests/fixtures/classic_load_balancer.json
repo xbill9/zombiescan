@@ -1,0 +1,22 @@
+{
+  "LoadBalancerDescriptions": [
+    {
+      "LoadBalancerName": "legacy-empty-elb",
+      "VPCId": "vpc-00000000000000001",
+      "Scheme": "internet-facing",
+      "DNSName": "legacy-empty-elb-1.us-east-1.elb.amazonaws.com",
+      "Instances": []
+    },
+    {
+      "LoadBalancerName": "legacy-live-elb",
+      "VPCId": "vpc-00000000000000001",
+      "Scheme": "internal",
+      "DNSName": "legacy-live-elb-1.us-east-1.elb.amazonaws.com",
+      "Instances": [
+        {
+          "InstanceId": "i-00000000000000001"
+        }
+      ]
+    }
+  ]
+}

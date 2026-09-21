@@ -1,0 +1,69 @@
+{
+  "VpcEndpoints": [
+    {
+      "VpcEndpointId": "vpce-00000000000000001",
+      "VpcEndpointType": "Interface",
+      "ServiceName": "com.amazonaws.us-east-1.secretsmanager",
+      "VpcId": "vpc-idle00000000001",
+      "State": "available",
+      "NetworkInterfaceIds": [
+        "eni-vpce000000000001",
+        "eni-vpce000000000002",
+        "eni-vpce000000000003"
+      ],
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "sm-endpoint"
+        }
+      ]
+    },
+    {
+      "VpcEndpointId": "vpce-00000000000000002",
+      "VpcEndpointType": "Gateway",
+      "ServiceName": "com.amazonaws.us-east-1.s3",
+      "VpcId": "vpc-idle00000000001",
+      "State": "available"
+    },
+    {
+      "VpcEndpointId": "vpce-00000000000000003",
+      "VpcEndpointType": "Interface",
+      "ServiceName": "com.amazonaws.us-east-1.ecr.api",
+      "VpcId": "vpc-busy00000000001",
+      "State": "available",
+      "NetworkInterfaceIds": [
+        "eni-vpce000000000004"
+      ]
+    },
+    {
+      "VpcEndpointId": "vpce-00000000000000004",
+      "VpcEndpointType": "Interface",
+      "ServiceName": "com.amazonaws.us-east-1.sts",
+      "VpcId": "vpc-idle00000000001",
+      "State": "pending",
+      "NetworkInterfaceIds": [
+        "eni-vpce000000000005"
+      ]
+    }
+  ],
+  "NetworkInterfaces": [
+    {
+      "NetworkInterfaceId": "eni-vpce000000000001",
+      "Status": "in-use",
+      "InterfaceType": "vpc_endpoint",
+      "VpcId": "vpc-idle00000000001"
+    },
+    {
+      "NetworkInterfaceId": "eni-nat0000000000001",
+      "Status": "in-use",
+      "InterfaceType": "nat_gateway",
+      "VpcId": "vpc-idle00000000001"
+    },
+    {
+      "NetworkInterfaceId": "eni-wrk0000000000001",
+      "Status": "in-use",
+      "InterfaceType": "interface",
+      "VpcId": "vpc-busy00000000001"
+    }
+  ]
+}

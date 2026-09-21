@@ -39,17 +39,25 @@ uv run zombiescan scan --script cleanup.sh  # write the (unexecuted) cleanup pla
 
 ## Checks
 
-| Check | Finds |
-| --- | --- |
-| `unattached-ebs` | Volumes in the `available` state, attached to nothing |
-| `unassociated-eip` | Elastic IPs allocated but associated with nothing |
-| `orphaned-snapshot` | Snapshots whose source volume is gone and which back no AMI |
-| `stopped-instance` | Stopped instances still billing for their attached disks |
-| `idle-nat-gateway` | NAT gateways with no workload interfaces behind them |
-| `idle-load-balancer` | Load balancers with no registered targets |
-| `log-group-no-retention` | CloudWatch log groups that never expire |
-| `unused-ami` | AMIs over 90 days old that no instance uses |
-| `available-eni` | Unattached network interfaces blocking subnet/SG deletion |
+| Check | Finds | Costs money |
+| --- | --- | --- |
+| `unattached-ebs` | Volumes in the `available` state, attached to nothing | yes |
+| `unassociated-eip` | Elastic IPs allocated but associated with nothing | yes |
+| `orphaned-snapshot` | Snapshots whose source volume is gone and which back no AMI | yes |
+| `stopped-instance` | Stopped instances still billing for their attached disks | yes |
+| `stopped-rds-instance` | Stopped databases still billing for allocated storage | yes |
+| `idle-nat-gateway` | NAT gateways with no workload interfaces behind them | yes |
+| `idle-load-balancer` | ALB/NLB with no registered targets | yes |
+| `empty-classic-lb` | Classic (ELBv1) balancers with no instances | yes |
+| `unused-vpc-endpoint` | Interface endpoints in VPCs with no workloads | yes |
+| `log-group-no-retention` | CloudWatch log groups that never expire | grows |
+| `unused-ami` | AMIs over 90 days old that no instance uses | yes |
+| `available-eni` | Unattached interfaces blocking subnet/SG deletion | no |
+| `unused-security-group` | Groups attached to nothing, referenced by nothing | no |
+| `empty-vpc` | VPCs holding no network interfaces at all | no |
+
+The free ones are reported because they accumulate without limit and block
+deletions, not because of this month's bill.
 
 ## About the numbers
 
@@ -80,6 +88,9 @@ Checks would rather miss waste than invent it:
 - A snapshot backing an AMI is load-bearing.
 - An AMI under 90 days old is probably mid-rollout.
 - A log group with no retention and no data costs nothing today.
+- Gateway VPC endpoints (S3, DynamoDB) are free.
+- A VPC's default security group cannot be deleted.
+- A default VPC sitting unused is normal in every region.
 
 `unused-ami` is the least certain check in the catalog: it can see instances but
 not launch templates, Auto Scaling groups, or cross-account shares. Read its

@@ -34,6 +34,14 @@ TEST_PRICES = {
         "eu-west-1": {"alb": 0.0252, "nlb": 0.0252},
     },
     "log_storage_gb_month": {"us-east-1": 0.03, "eu-west-1": 0.03},
+    "vpc_endpoint_hour": {"us-east-1": 0.01, "eu-west-1": 0.011},
+    "classic_lb_hour": {"us-east-1": 0.025, "eu-west-1": 0.028},
+    "rds_storage_gb_month": {
+        "us-east-1": {
+            "single": {"gp2": 0.115, "gp3": 0.115, "io1": 0.125},
+            "multi": {"gp2": 0.23, "gp3": 0.23, "io1": 0.25},
+        }
+    },
 }
 
 # Keys whose values boto3 hands back as datetimes rather than strings.

@@ -1,0 +1,32 @@
+{
+  "DBInstances": [
+    {
+      "DBInstanceIdentifier": "legacy-postgres",
+      "DBInstanceStatus": "stopped",
+      "Engine": "postgres",
+      "EngineVersion": "14.7",
+      "DBInstanceClass": "db.t3.medium",
+      "AllocatedStorage": 200,
+      "StorageType": "gp2",
+      "MultiAZ": false
+    },
+    {
+      "DBInstanceIdentifier": "stopped-ha-mysql",
+      "DBInstanceStatus": "stopped",
+      "Engine": "mysql",
+      "EngineVersion": "8.0.35",
+      "DBInstanceClass": "db.r6g.large",
+      "AllocatedStorage": 100,
+      "StorageType": "gp3",
+      "MultiAZ": true
+    },
+    {
+      "DBInstanceIdentifier": "production-db",
+      "DBInstanceStatus": "available",
+      "Engine": "postgres",
+      "AllocatedStorage": 500,
+      "StorageType": "gp3",
+      "MultiAZ": true
+    }
+  ]
+}

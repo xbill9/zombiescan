@@ -87,3 +87,30 @@ class PriceTable:
         """USD per GB-month of Standard-class CloudWatch Logs storage."""
         price, approximate = self._lookup("log_storage_gb_month", region)
         return (price or 0.0), approximate
+
+    def vpc_endpoint_month(self, region: str) -> tuple[float, bool]:
+        """USD per month for one interface VPC endpoint ENI. Excludes data processing."""
+        hourly, approximate = self._lookup("vpc_endpoint_hour", region)
+        if not hourly:
+            return 0.0, True
+        return hourly * self._hours, approximate
+
+    def classic_lb_month(self, region: str) -> tuple[float, bool]:
+        """USD per month of uptime for a Classic (ELBv1) load balancer."""
+        hourly, approximate = self._lookup("classic_lb_hour", region)
+        if not hourly:
+            return 0.0, True
+        return hourly * self._hours, approximate
+
+    def rds_storage_gb_month(
+        self, region: str, storage_type: str, multi_az: bool
+    ) -> tuple[float, bool]:
+        """USD per GB-month of RDS storage for this type and deployment."""
+        by_deployment, approximate = self._lookup("rds_storage_gb_month", region)
+        if not by_deployment:
+            return 0.0, True
+        rates = by_deployment.get("multi" if multi_az else "single", {})
+        if storage_type in rates:
+            return rates[storage_type], approximate
+        # Unknown storage type: gp2 is RDS's long-standing default.
+        return rates.get("gp2", 0.0), True

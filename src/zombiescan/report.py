@@ -44,7 +44,35 @@ def _summary_table(result: ScanResult) -> Table:
     return table
 
 
-def _detail_table(findings: list[Any], shown: int, width: int) -> Table:
+def _representative(findings: list[Any], limit: int) -> list[Any]:
+    """The costliest findings, but never hiding a check entirely.
+
+    Sorting purely by cost means a tie at zero -- which is the normal case for
+    hygiene findings -- lets whichever check has the most rows fill the table
+    and push every other check out of sight. Each check gets its costliest row
+    first, then the remaining slots go to the next costliest overall.
+    """
+    if limit <= 0 or limit >= len(findings):
+        return findings
+
+    best_per_check: dict[str, Any] = {}
+    for finding in findings:  # already sorted by cost, descending
+        best_per_check.setdefault(finding.check, finding)
+
+    picked = list(best_per_check.values())[:limit]
+    chosen = {id(f) for f in picked}
+    for finding in findings:
+        if len(picked) >= limit:
+            break
+        if id(finding) not in chosen:
+            picked.append(finding)
+            chosen.add(id(finding))
+
+    picked.sort(key=lambda f: (-f.monthly_cost, f.check, f.region, f.resource_id))
+    return picked
+
+
+def _detail_table(findings: list[Any], width: int) -> Table:
     """Per-resource rows, laid out for the terminal actually in use.
 
     Resource identifiers get long -- CloudWatch log group names run past 90
@@ -61,7 +89,7 @@ def _detail_table(findings: list[Any], shown: int, width: int) -> Table:
     if wide:
         table.add_column("Why", ratio=4)
 
-    for finding in findings[:shown]:
+    for finding in findings:
         row = [
             finding.region,
             finding.resource_id,
@@ -92,13 +120,13 @@ def render(
     )
     console.print(_summary_table(result))
 
-    shown = count if limit <= 0 else min(limit, count)
+    picked = _representative(result.findings, limit)
     console.print()
-    console.print(_detail_table(result.findings, shown, console.width))
-    if shown < count:
+    console.print(_detail_table(picked, console.width))
+    if len(picked) < count:
         console.print(
-            f"[dim]showing the {shown} costliest of {count}; "
-            f"use --limit 0 for all, or --json for the full set[/dim]"
+            f"[dim]showing {len(picked)} of {count}, costliest first with every check "
+            f"represented; use --limit 0 for all, or --json for the full set[/dim]"
         )
 
     total = result.total_monthly_cost

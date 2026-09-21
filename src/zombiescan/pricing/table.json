@@ -1,7 +1,7 @@
 {
   "_meta": {
     "source": "AWS Price List API (pricing:GetProducts), on-demand USD list prices",
-    "generated": "2026-09-21T00:29:05Z",
+    "generated": "2026-09-21T00:39:58Z",
     "note": "Regenerate with: uv run python -m zombiescan.pricing.refresh"
   },
   "fallback_region": "us-east-1",
@@ -772,5 +772,652 @@
     "us-gov-west-1": 0.039,
     "us-west-1": 0.033,
     "us-west-2": 0.03
+  },
+  "vpc_endpoint_hour": {
+    "af-south-1": 0.01309,
+    "ap-east-1": 0.0143,
+    "ap-east-2": 0.0126,
+    "ap-northeast-1": 0.014,
+    "ap-northeast-2": 0.013,
+    "ap-northeast-3": 0.014,
+    "ap-south-1": 0.013,
+    "ap-south-2": 0.013,
+    "ap-southeast-1": 0.013,
+    "ap-southeast-2": 0.013,
+    "ap-southeast-3": 0.013,
+    "ap-southeast-4": 0.013,
+    "ap-southeast-5": 0.0117,
+    "ap-southeast-6": 0.01365,
+    "ap-southeast-7": 0.0117,
+    "ca-central-1": 0.011,
+    "ca-west-1": 0.011,
+    "eu-central-1": 0.012,
+    "eu-central-2": 0.0132,
+    "eu-north-1": 0.0105,
+    "eu-south-1": 0.01155,
+    "eu-south-2": 0.011,
+    "eu-west-1": 0.011,
+    "eu-west-2": 0.011,
+    "eu-west-3": 0.011,
+    "il-central-1": 0.01155,
+    "me-central-1": 0.0121,
+    "me-south-1": 0.0121,
+    "mx-central-1": 0.0105,
+    "sa-east-1": 0.021,
+    "us-east-1": 0.01,
+    "us-east-2": 0.01,
+    "us-gov-east-1": 0.0125,
+    "us-gov-west-1": 0.0125,
+    "us-west-1": 0.011,
+    "us-west-2": 0.01
+  },
+  "classic_lb_hour": {
+    "af-south-1": 0.03332,
+    "ap-east-1": 0.0308,
+    "ap-northeast-1": 0.027,
+    "ap-northeast-2": 0.025,
+    "ap-northeast-3": 0.027,
+    "ap-south-1": 0.0266,
+    "ap-southeast-1": 0.028,
+    "ap-southeast-2": 0.028,
+    "ca-central-1": 0.0275,
+    "eu-central-1": 0.03,
+    "eu-north-1": 0.0266,
+    "eu-south-1": 0.0294,
+    "eu-west-1": 0.028,
+    "eu-west-2": 0.0294,
+    "eu-west-3": 0.0294,
+    "me-south-1": 0.0308,
+    "sa-east-1": 0.034,
+    "us-east-1": 0.025,
+    "us-east-2": 0.025,
+    "us-gov-east-1": 0.032,
+    "us-gov-west-1": 0.032,
+    "us-west-1": 0.028,
+    "us-west-2": 0.025
+  },
+  "rds_storage_gb_month": {
+    "af-south-1": {
+      "single": {
+        "gp3": 0.151,
+        "io1": 0.164,
+        "gp2": 0.151,
+        "standard": 0.131,
+        "io2": 0.164
+      },
+      "multi": {
+        "standard": 0.262,
+        "gp3": 0.302,
+        "gp2": 0.301,
+        "io1": 0.328,
+        "io2": 0.328
+      }
+    },
+    "ap-east-1": {
+      "single": {
+        "io2": 0.15,
+        "gp2": 0.15,
+        "standard": 0.12,
+        "io1": 0.15,
+        "gp3": 0.15
+      },
+      "multi": {
+        "io1": 0.45,
+        "io2": 0.3,
+        "gp2": 0.3,
+        "standard": 0.24,
+        "gp3": 0.3
+      }
+    },
+    "ap-east-2": {
+      "multi": {
+        "gp2": 0.248,
+        "io1": 0.27,
+        "gp3": 0.248,
+        "io2": 0.27
+      },
+      "single": {
+        "io2": 0.135,
+        "io1": 0.135,
+        "gp2": 0.124,
+        "gp3": 0.124
+      }
+    },
+    "ap-northeast-1": {
+      "single": {
+        "gp2": 0.138,
+        "gp3": 0.138,
+        "io1": 0.15,
+        "io2": 0.15,
+        "standard": 0.12
+      },
+      "multi": {
+        "io2": 0.3,
+        "gp2": 0.276,
+        "standard": 0.24,
+        "gp3": 0.276,
+        "io1": 0.3
+      }
+    },
+    "ap-northeast-2": {
+      "multi": {
+        "gp3": 0.262,
+        "io2": 0.3,
+        "io1": 0.3,
+        "standard": 0.24,
+        "gp2": 0.276
+      },
+      "single": {
+        "io2": 0.135,
+        "gp2": 0.131,
+        "gp3": 0.131,
+        "standard": 0.12,
+        "io1": 0.135
+      }
+    },
+    "ap-northeast-3": {
+      "multi": {
+        "standard": 0.24,
+        "io2": 0.3,
+        "io1": 0.3,
+        "gp3": 0.276,
+        "gp2": 0.276
+      },
+      "single": {
+        "gp2": 0.138,
+        "io2": 0.15,
+        "io1": 0.15,
+        "gp3": 0.138,
+        "standard": 0.12
+      }
+    },
+    "ap-south-1": {
+      "multi": {
+        "gp3": 0.262,
+        "standard": 0.22,
+        "io2": 0.262,
+        "io1": 0.262,
+        "gp2": 0.262
+      },
+      "single": {
+        "standard": 0.11,
+        "gp3": 0.131,
+        "io1": 0.131,
+        "io2": 0.131,
+        "gp2": 0.131
+      }
+    },
+    "ap-south-2": {
+      "single": {
+        "gp3": 0.131,
+        "standard": 0.11,
+        "gp2": 0.131,
+        "io1": 0.131,
+        "io2": 0.131
+      },
+      "multi": {
+        "io1": 0.393,
+        "standard": 0.22,
+        "gp2": 0.262,
+        "gp3": 0.262,
+        "io2": 0.262
+      }
+    },
+    "ap-southeast-1": {
+      "single": {
+        "io1": 0.138,
+        "gp3": 0.138,
+        "io2": 0.138,
+        "gp2": 0.138,
+        "standard": 0.11
+      },
+      "multi": {
+        "gp2": 0.276,
+        "io2": 0.276,
+        "gp3": 0.276,
+        "io1": 0.276,
+        "standard": 0.22
+      }
+    },
+    "ap-southeast-2": {
+      "multi": {
+        "gp3": 0.276,
+        "io1": 0.276,
+        "standard": 0.22,
+        "io2": 0.276,
+        "gp2": 0.276
+      },
+      "single": {
+        "standard": 0.11,
+        "gp2": 0.138,
+        "gp3": 0.138,
+        "io1": 0.138,
+        "io2": 0.138
+      }
+    },
+    "ap-southeast-3": {
+      "single": {
+        "gp2": 0.138,
+        "io2": 0.138,
+        "standard": 0.11,
+        "gp3": 0.138,
+        "io1": 0.138
+      },
+      "multi": {
+        "io2": 0.414,
+        "gp3": 0.276,
+        "standard": 0.22,
+        "gp2": 0.276,
+        "io1": 0.414
+      }
+    },
+    "ap-southeast-4": {
+      "single": {
+        "io1": 0.138,
+        "standard": 0.11,
+        "io2": 0.138,
+        "gp2": 0.138,
+        "gp3": 0.138
+      },
+      "multi": {
+        "gp3": 0.414,
+        "gp2": 0.276,
+        "io1": 0.276,
+        "standard": 0.22,
+        "io2": 0.276
+      }
+    },
+    "ap-southeast-5": {
+      "single": {
+        "io2": 0.124,
+        "gp2": 0.124,
+        "gp3": 0.124,
+        "io1": 0.124,
+        "standard": 0.099
+      },
+      "multi": {
+        "io1": 0.248,
+        "io2": 0.248,
+        "gp2": 0.248,
+        "standard": 0.198,
+        "gp3": 0.248
+      }
+    },
+    "ap-southeast-6": {
+      "multi": {
+        "io2": 0.29,
+        "gp2": 0.29,
+        "io1": 0.29,
+        "gp3": 0.29
+      },
+      "single": {
+        "io1": 0.145,
+        "io2": 0.145,
+        "gp2": 0.145,
+        "gp3": 0.145
+      }
+    },
+    "ap-southeast-7": {
+      "single": {
+        "gp3": 0.124,
+        "io1": 0.124,
+        "io2": 0.124,
+        "gp2": 0.124,
+        "standard": 0.099
+      },
+      "multi": {
+        "gp3": 0.248,
+        "gp2": 0.248,
+        "io2": 0.248,
+        "io1": 0.248,
+        "standard": 0.198
+      }
+    },
+    "ca-central-1": {
+      "multi": {
+        "io1": 0.275,
+        "gp2": 0.253,
+        "io2": 0.275,
+        "standard": 0.22,
+        "gp3": 0.254
+      },
+      "single": {
+        "standard": 0.11,
+        "io1": 0.138,
+        "gp2": 0.127,
+        "gp3": 0.127,
+        "io2": 0.138
+      }
+    },
+    "ca-west-1": {
+      "multi": {
+        "gp2": 0.253,
+        "io1": 0.275,
+        "gp3": 0.254,
+        "io2": 0.276,
+        "standard": 0.22
+      },
+      "single": {
+        "io2": 0.138,
+        "standard": 0.11,
+        "gp2": 0.127,
+        "gp3": 0.127,
+        "io1": 0.138
+      }
+    },
+    "eu-central-1": {
+      "single": {
+        "io2": 0.149,
+        "io1": 0.149,
+        "gp3": 0.137,
+        "gp2": 0.137,
+        "standard": 0.119
+      },
+      "multi": {
+        "io1": 0.298,
+        "io2": 0.298,
+        "gp2": 0.273,
+        "gp3": 0.274,
+        "standard": 0.238
+      }
+    },
+    "eu-central-2": {
+      "multi": {
+        "io1": 0.4917,
+        "gp2": 0.3003,
+        "io2": 0.3278,
+        "standard": 0.2618,
+        "gp3": 0.3014
+      },
+      "single": {
+        "gp3": 0.1507,
+        "io1": 0.1639,
+        "standard": 0.1309,
+        "io2": 0.1639,
+        "gp2": 0.1507
+      }
+    },
+    "eu-north-1": {
+      "single": {
+        "gp3": 0.12,
+        "io2": 0.13,
+        "io1": 0.13,
+        "gp2": 0.12,
+        "standard": 0.11
+      },
+      "multi": {
+        "io2": 0.26,
+        "gp3": 0.24,
+        "standard": 0.22,
+        "gp2": 0.24,
+        "io1": 0.26
+      }
+    },
+    "eu-south-1": {
+      "single": {
+        "standard": 0.116,
+        "io2": 0.145,
+        "gp3": 0.133,
+        "gp2": 0.133,
+        "io1": 0.145
+      },
+      "multi": {
+        "standard": 0.231,
+        "gp2": 0.266,
+        "io1": 0.29,
+        "gp3": 0.266,
+        "io2": 0.29
+      }
+    },
+    "eu-south-2": {
+      "single": {
+        "gp3": 0.127,
+        "io1": 0.138,
+        "standard": 0.11,
+        "gp2": 0.127,
+        "io2": 0.138
+      },
+      "multi": {
+        "gp2": 0.253,
+        "standard": 0.22,
+        "io1": 0.276,
+        "io2": 0.276,
+        "gp3": 0.254
+      }
+    },
+    "eu-west-1": {
+      "single": {
+        "io2": 0.138,
+        "gp3": 0.127,
+        "standard": 0.11,
+        "io1": 0.138,
+        "gp2": 0.127
+      },
+      "multi": {
+        "gp3": 0.254,
+        "io1": 0.276,
+        "io2": 0.276,
+        "gp2": 0.253,
+        "standard": 0.22
+      }
+    },
+    "eu-west-2": {
+      "single": {
+        "io1": 0.145,
+        "io2": 0.145,
+        "standard": 0.116,
+        "gp2": 0.133,
+        "gp3": 0.133
+      },
+      "multi": {
+        "io1": 0.435,
+        "gp2": 0.266,
+        "io2": 0.29,
+        "gp3": 0.266,
+        "standard": 0.231
+      }
+    },
+    "eu-west-3": {
+      "single": {
+        "io2": 0.145,
+        "gp2": 0.133,
+        "standard": 0.116,
+        "io1": 0.145,
+        "gp3": 0.133
+      },
+      "multi": {
+        "gp2": 0.266,
+        "io1": 0.29,
+        "io2": 0.29,
+        "gp3": 0.266,
+        "standard": 0.232
+      }
+    },
+    "il-central-1": {
+      "multi": {
+        "io2": 0.332,
+        "gp2": 0.304,
+        "io1": 0.332,
+        "gp3": 0.305,
+        "standard": 0.27
+      },
+      "single": {
+        "standard": 0.14,
+        "gp2": 0.153,
+        "gp3": 0.153,
+        "io1": 0.166,
+        "io2": 0.166
+      }
+    },
+    "me-central-1": {
+      "multi": {
+        "gp3": 0.279,
+        "io2": 0.3036,
+        "gp2": 0.2783,
+        "standard": 0.242,
+        "io1": 0.3036
+      },
+      "single": {
+        "io2": 0.1518,
+        "gp3": 0.14,
+        "standard": 0.121,
+        "io1": 0.1518,
+        "gp2": 0.1397
+      }
+    },
+    "me-south-1": {
+      "single": {
+        "gp2": 0.1397,
+        "io2": 0.1518,
+        "gp3": 0.14,
+        "io1": 0.1518,
+        "standard": 0.121
+      },
+      "multi": {
+        "standard": 0.242,
+        "io1": 0.3036,
+        "gp3": 0.279,
+        "io2": 0.3036,
+        "gp2": 0.2783
+      }
+    },
+    "mx-central-1": {
+      "single": {
+        "io2": 0.131,
+        "gp3": 0.121,
+        "gp2": 0.121,
+        "io1": 0.131,
+        "standard": 0.105
+      },
+      "multi": {
+        "io2": 0.262,
+        "io1": 0.262,
+        "standard": 0.21,
+        "gp2": 0.242,
+        "gp3": 0.242
+      }
+    },
+    "sa-east-1": {
+      "single": {
+        "io1": 0.238,
+        "io2": 0.238,
+        "standard": 0.19,
+        "gp3": 0.219,
+        "gp2": 0.219
+      },
+      "multi": {
+        "gp2": 0.437,
+        "io1": 0.476,
+        "standard": 0.38,
+        "io2": 0.476,
+        "gp3": 0.438
+      }
+    },
+    "us-east-1": {
+      "single": {
+        "io2": 0.125,
+        "gp2": 0.115,
+        "standard": 0.1,
+        "gp3": 0.115,
+        "io1": 0.125
+      },
+      "multi": {
+        "io2": 0.25,
+        "io1": 0.25,
+        "gp2": 0.23,
+        "standard": 0.2,
+        "gp3": 0.23
+      }
+    },
+    "us-east-2": {
+      "multi": {
+        "io1": 0.375,
+        "gp3": 0.23,
+        "gp2": 0.23,
+        "io2": 0.25,
+        "standard": 0.2
+      },
+      "single": {
+        "gp3": 0.115,
+        "gp2": 0.115,
+        "io2": 0.125,
+        "io1": 0.125,
+        "standard": 0.1
+      }
+    },
+    "us-gov-east-1": {
+      "single": {
+        "standard": 0.13,
+        "io2": 0.15,
+        "gp2": 0.138,
+        "gp3": 0.138,
+        "io1": 0.15
+      },
+      "multi": {
+        "standard": 0.26,
+        "io1": 0.45,
+        "gp2": 0.276,
+        "io2": 0.3,
+        "gp3": 0.276
+      }
+    },
+    "us-gov-west-1": {
+      "single": {
+        "standard": 0.13,
+        "gp3": 0.138,
+        "io2": 0.15,
+        "io1": 0.15,
+        "gp2": 0.138
+      },
+      "multi": {
+        "gp3": 0.276,
+        "io2": 0.3,
+        "standard": 0.26,
+        "gp2": 0.276,
+        "io1": 0.3
+      }
+    },
+    "us-west-1": {
+      "single": {
+        "io2": 0.138,
+        "standard": 0.11,
+        "gp3": 0.138,
+        "gp2": 0.138,
+        "io1": 0.138
+      },
+      "multi": {
+        "gp3": 0.276,
+        "io2": 0.276,
+        "standard": 0.22,
+        "io1": 0.276,
+        "gp2": 0.276
+      }
+    },
+    "us-west-2": {
+      "single": {
+        "gp3": 0.115,
+        "io1": 0.125,
+        "gp2": 0.115,
+        "standard": 0.1,
+        "io2": 0.125
+      },
+      "multi": {
+        "io2": 0.25,
+        "io1": 0.25,
+        "gp3": 0.23,
+        "standard": 0.2,
+        "gp2": 0.23
+      }
+    },
+    "us-west-2-lax-1": {
+      "single": {
+        "io1": 0.15,
+        "gp2": 0.138
+      },
+      "multi": {
+        "gp2": 0.276,
+        "io1": 0.3
+      }
+    }
   }
 }
