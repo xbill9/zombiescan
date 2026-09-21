@@ -3,7 +3,7 @@ title: "Put the Arithmetic in the Tool: an MCP Server for an AWS Waste Scanner"
 published: false
 description: "A cost report gets read twice: once by a person in a terminal, once by an agent through an MCP server. Making the server compute every total instead of handing back rows keeps the two answers the same, and measures the report's own arithmetic against the AWS bill."
 tags: aws, mcp, python, devops
-cover_image: https://raw.githubusercontent.com/xbill9/zombiescan/main/articles/zombiescan-mcp/devto-cover.c1e2416d.jpg
+cover_image: https://raw.githubusercontent.com/xbill9/zombiescan/main/articles/zombiescan-mcp/devto-cover.cde3f396.jpg
 ---
 
 This article provides a step by step guide to adding an MCP server to an AWS cost scanner so an agent drives the same engine a terminal does. Every tool returns figures the engine computed, and the two front doors are held to the same number by an end-to-end test.
