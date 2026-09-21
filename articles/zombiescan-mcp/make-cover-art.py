@@ -21,7 +21,10 @@ import pathlib
 
 HERE = pathlib.Path(__file__).parent
 RAW = HERE / "raw-cover-16x9.png"
-WIDTH, HEIGHT = 1376, 578
+# One illustration, two geometries, because the destinations demand them.
+# dev.to displays a 2.381:1 centre crop of whatever it is given; Builder Center
+# asks for 1200x675 and asks for no text in it, which this art has none of.
+SIZES = {"devto-cover": (1376, 578), "builder-cover": (1200, 675)}
 MODEL = "gemini-3.1-flash-lite-image"
 
 PROMPT = """A wide cinematic flat-vector illustration for a technical article cover. \
@@ -68,21 +71,25 @@ def crop() -> None:
 
     source = Image.open(RAW)
     width, height = source.size
-    band = int(round(width / (WIDTH / HEIGHT)))
-    top = (height - band) // 2
-    cover = source.crop((0, top, width, top + band)).resize((WIDTH, HEIGHT), Image.LANCZOS)
 
-    out = HERE / "devto-cover.jpg"
-    cover.convert("RGB").save(out, quality=88, optimize=True)
-    final = out.with_name(f"devto-cover.{hashlib.sha256(out.read_bytes()).hexdigest()[:8]}.jpg")
-    if final.exists():
-        final.unlink()
-    out.rename(final)
-    print(f"wrote {final.name}  {WIDTH}x{HEIGHT}  {final.stat().st_size // 1024} KB")
-    print(
-        "cover_image: https://raw.githubusercontent.com/xbill9/zombiescan/main/"
-        f"articles/zombiescan-mcp/{final.name}"
-    )
+    for stem, (target_w, target_h) in SIZES.items():
+        band = int(round(width / (target_w / target_h)))
+        top = (height - band) // 2
+        cover = source.crop((0, top, width, top + band)).resize((target_w, target_h), Image.LANCZOS)
+
+        out = HERE / f"{stem}.jpg"
+        cover.convert("RGB").save(out, quality=88, optimize=True)
+        final = out.with_name(f"{stem}.{hashlib.sha256(out.read_bytes()).hexdigest()[:8]}.jpg")
+        if final.exists():
+            final.unlink()
+        out.rename(final)
+        size_kb = final.stat().st_size // 1024
+        print(f"wrote {final.name}  {target_w}x{target_h}  {size_kb} KB")
+        if stem == "devto-cover":
+            print(
+                "cover_image: https://raw.githubusercontent.com/xbill9/zombiescan/main/"
+                f"articles/zombiescan-mcp/{final.name}"
+            )
 
 
 if __name__ == "__main__":
