@@ -1,0 +1,42 @@
+# uv run zombiescan checks
+# captured_utc: 2026-09-21T16:13:05Z
+# cwd: /home/xbill/zombiescan
+
+  available-eni  Unattached network interfaces  (core)
+  detached-internet-gateway  Internet gateways attached to no VPC  (core)
+  disabled-kms-key  Disabled KMS keys still being billed  (core)
+  ecr-stale-images  ECR repositories nothing has pushed to in months  (core)
+  empty-classic-lb  Classic load balancers with no instances  (core)
+  empty-vpc  VPCs with nothing in them  (core)
+  idle-load-balancer  Load balancers with no registered targets  (core)
+  idle-nat-gateway  Idle NAT gateways  (core)
+  idle-provisioned-dynamodb  Empty DynamoDB tables on provisioned billing  
+(core)
+  incomplete-multipart-upload  S3 buckets holding incomplete multipart uploads  
+(core)
+  lightsail-empty-load-balancer  Lightsail load balancers with no instances 
+attached  (lightsail)
+  lightsail-idle-container-service  Lightsail container services with nothing 
+deployed  (lightsail)
+  lightsail-orphaned-snapshot  Lightsail snapshots whose source is gone  
+(lightsail)
+  lightsail-stopped-instance  Lightsail instances stopped but still billing  
+(lightsail)
+  lightsail-unattached-disk  Lightsail disks attached to no instance  
+(lightsail)
+  lightsail-unattached-static-ip  Lightsail static IPs attached to nothing  
+(lightsail)
+  log-group-no-retention  Log groups with no retention policy  (core)
+  orphaned-rds-snapshot  Manual RDS snapshots of deleted databases  (core)
+  orphaned-snapshot  Orphaned EBS snapshots  (core)
+  stale-secret  Secrets nothing has read in 90 days  (core)
+  stopped-instance  Stopped instances still billing for storage  (core)
+  stopped-rds-instance  Stopped RDS instances still billing for storage  (core)
+  unassociated-eip  Unassociated Elastic IPs  (core)
+  unattached-ebs  Unattached EBS volumes  (core)
+  unmounted-efs  EFS file systems with no mount targets  (core)
+  unused-ami  AMIs no instance uses  (core)
+  unused-route53-health-check  Route 53 health checks no record uses  (core)
+  unused-route53-zone  Hosted zones with no records in them  (core)
+  unused-security-group  Security groups attached to nothing  (core)
+  unused-vpc-endpoint  Interface VPC endpoints with no workloads  (core)

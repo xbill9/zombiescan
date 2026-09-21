@@ -1,0 +1,10 @@
+# arithmetic: four findings at one half-cent, totalled both ways
+# captured_utc: 2026-09-21T16:17:06Z
+# cwd: /home/xbill/zombiescan
+
+per-finding cost                      0.125
+as published, rounded to the cent     0.12  (x4)
+sum of the published figures          0.48
+sum of the exact costs, rounded once  0.50
+
+Python rounds a half to even, so 0.125 publishes as 0.12.

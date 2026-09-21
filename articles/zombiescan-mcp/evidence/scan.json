@@ -1,0 +1,2216 @@
+{
+  "schema_version": 2,
+  "tool": {
+    "name": "zombiescan",
+    "version": "0.1.0"
+  },
+  "packs": [
+    {
+      "name": "core",
+      "version": "0.1.0",
+      "description": "Unattached, idle and orphaned resources across EC2, RDS, S3, CloudWatch, KMS, ECR and friends.",
+      "api_version": 1,
+      "source": "built-in",
+      "homepage": "https://github.com/xbill9/zombiescan"
+    },
+    {
+      "name": "lightsail",
+      "version": "0.1.0",
+      "description": "Stopped instances, unattached disks and static IPs, idle container services and orphaned snapshots in Lightsail.",
+      "api_version": 1,
+      "source": "built-in",
+      "homepage": "https://github.com/xbill9/zombiescan"
+    }
+  ],
+  "scan": {
+    "generated": "2026-09-21T16:13:39Z",
+    "duration_seconds": null,
+    "account_id": "106059658660",
+    "caller_arn": "arn:aws:iam::106059658660:root",
+    "regions": [
+      "ap-northeast-1",
+      "ap-northeast-2",
+      "ap-northeast-3",
+      "ap-south-1",
+      "ap-southeast-1",
+      "ap-southeast-2",
+      "ca-central-1",
+      "eu-central-1",
+      "eu-north-1",
+      "eu-west-1",
+      "eu-west-2",
+      "eu-west-3",
+      "sa-east-1",
+      "us-east-1",
+      "us-east-2",
+      "us-west-1",
+      "us-west-2"
+    ],
+    "pairs_attempted": 478,
+    "pairs_unavailable": 12,
+    "complete": true
+  },
+  "pricing": {
+    "generated": "2026-09-21T15:33:49Z",
+    "basis": "AWS Price List API, on-demand USD list prices",
+    "excludes": [
+      "savings plans",
+      "reserved capacity",
+      "private pricing",
+      "credits"
+    ]
+  },
+  "totals": {
+    "monthly_cost": 6.9,
+    "annual_cost": 82.8,
+    "finding_count": 120,
+    "by_check": {
+      "ecr-stale-images": {
+        "count": 33,
+        "monthly_cost": 6.4
+      },
+      "unused-route53-zone": {
+        "count": 1,
+        "monthly_cost": 0.5
+      },
+      "empty-vpc": {
+        "count": 1,
+        "monthly_cost": 0.0
+      },
+      "log-group-no-retention": {
+        "count": 67,
+        "monthly_cost": 0.0
+      },
+      "unused-security-group": {
+        "count": 18,
+        "monthly_cost": 0.0
+      }
+    }
+  },
+  "findings": [
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "ai-course-creator-app",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "26 image(s) holding up to 5.21 GB; nothing pushed in 160 days, 25 untagged",
+      "monthly_cost": 0.52,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name ai-course-creator-app --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 26,
+        "untagged_count": 25,
+        "total_gb": 5.21,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/ai-course-creator-app",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "unused-route53-zone",
+      "resource_id": "Z0457877ZLNZ0EMC9ERY",
+      "resource_type": "route53-hosted-zone",
+      "region": "global",
+      "reason": "Private hosted zone agent.local. holds only the 2 record set(s) Route 53 creates with a zone, so it resolves nothing; it belongs to Cloud Map namespace ns-kyjziaevjp3dv2ua, which registers nothing",
+      "monthly_cost": 0.5,
+      "approximate_cost": false,
+      "remediation": "aws servicediscovery delete-namespace --id ns-kyjziaevjp3dv2ua --region us-east-1",
+      "details": {
+        "name": "agent.local.",
+        "private": true,
+        "record_set_count": 2,
+        "zones_in_account": 1,
+        "priced_as": "first_25",
+        "comment": "Created by AWS Cloud Map namespace with ARN arn:aws:servicediscovery:us-east-1:106059658660:namespace/ns-kyjziaevjp3dv2ua",
+        "cloud_map_namespace": "ns-kyjziaevjp3dv2ua",
+        "cloud_map_region": "us-east-1",
+        "note": "Cloud Map owns this zone. Delete the namespace, not the zone: delete-hosted-zone leaves the namespace behind pointing at nothing. delete-namespace refuses while any service is still registered in it, even one with no instances"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "ai-course-creator-orchestrator",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "26 image(s) holding up to 4.79 GB; nothing pushed in 160 days, 25 untagged",
+      "monthly_cost": 0.48,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name ai-course-creator-orchestrator --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 26,
+        "untagged_count": 25,
+        "total_gb": 4.791,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/ai-course-creator-orchestrator",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "course-creator-stack",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "21 image(s) holding up to 4.71 GB; nothing pushed in 149 days, 20 untagged",
+      "monthly_cost": 0.47,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name course-creator-stack --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 21,
+        "untagged_count": 20,
+        "total_gb": 4.71,
+        "newest_push_days": 149,
+        "oldest_push_days": 149,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/course-creator-stack",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "ai-course-creator-judge",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "26 image(s) holding up to 4.41 GB; nothing pushed in 160 days, 25 untagged",
+      "monthly_cost": 0.44,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name ai-course-creator-judge --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 26,
+        "untagged_count": 25,
+        "total_gb": 4.414,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/ai-course-creator-judge",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "ai-course-creator-researcher",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "26 image(s) holding up to 4.41 GB; nothing pushed in 160 days, 25 untagged",
+      "monthly_cost": 0.44,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name ai-course-creator-researcher --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 26,
+        "untagged_count": 25,
+        "total_gb": 4.414,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/ai-course-creator-researcher",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "ai-course-creator-content-builder",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "26 image(s) holding up to 4.41 GB; nothing pushed in 160 days, 25 untagged",
+      "monthly_cost": 0.44,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name ai-course-creator-content-builder --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 26,
+        "untagged_count": 25,
+        "total_gb": 4.414,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/ai-course-creator-content-builder",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "biometric-scout",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "18 image(s) holding up to 3.81 GB; nothing pushed in 149 days, 17 untagged",
+      "monthly_cost": 0.38,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name biometric-scout --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 18,
+        "untagged_count": 17,
+        "total_gb": 3.81,
+        "newest_push_days": 149,
+        "oldest_push_days": 155,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/biometric-scout",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adk-course-creator-app",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "23 image(s) holding up to 3.67 GB; nothing pushed in 159 days, 21 untagged",
+      "monthly_cost": 0.37,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adk-course-creator-app --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 23,
+        "untagged_count": 21,
+        "total_gb": 3.67,
+        "newest_push_days": 159,
+        "oldest_push_days": 160,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/adk-course-creator-app",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "biometric-scout-repo",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "25 image(s) holding up to 3.13 GB; nothing pushed in 162 days, 24 untagged",
+      "monthly_cost": 0.31,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name biometric-scout-repo --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 25,
+        "untagged_count": 24,
+        "total_gb": 3.132,
+        "newest_push_days": 162,
+        "oldest_push_days": 174,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/biometric-scout-repo",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adk-orchestrator",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "20 image(s) holding up to 2.75 GB; nothing pushed in 159 days, 19 untagged",
+      "monthly_cost": 0.27,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adk-orchestrator --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 20,
+        "untagged_count": 19,
+        "total_gb": 2.748,
+        "newest_push_days": 159,
+        "oldest_push_days": 159,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/adk-orchestrator",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adk-judge",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "20 image(s) holding up to 2.53 GB; nothing pushed in 159 days, 19 untagged",
+      "monthly_cost": 0.25,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adk-judge --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 20,
+        "untagged_count": 19,
+        "total_gb": 2.535,
+        "newest_push_days": 159,
+        "oldest_push_days": 159,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/adk-judge",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adk-researcher",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "20 image(s) holding up to 2.53 GB; nothing pushed in 159 days, 19 untagged",
+      "monthly_cost": 0.25,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adk-researcher --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 20,
+        "untagged_count": 19,
+        "total_gb": 2.535,
+        "newest_push_days": 159,
+        "oldest_push_days": 159,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/adk-researcher",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adk-content-builder",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "20 image(s) holding up to 2.53 GB; nothing pushed in 159 days, 19 untagged",
+      "monthly_cost": 0.25,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adk-content-builder --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 20,
+        "untagged_count": 19,
+        "total_gb": 2.535,
+        "newest_push_days": 159,
+        "oldest_push_days": 159,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/adk-content-builder",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adk-course-creator-repo",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "9 image(s) holding up to 1.38 GB; nothing pushed in 159 days, 8 untagged",
+      "monthly_cost": 0.14,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adk-course-creator-repo --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 9,
+        "untagged_count": 8,
+        "total_gb": 1.378,
+        "newest_push_days": 159,
+        "oldest_push_days": 160,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/adk-course-creator-repo",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "course-creator",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "8 image(s) holding up to 1.34 GB; nothing pushed in 160 days, 7 untagged",
+      "monthly_cost": 0.13,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name course-creator --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 8,
+        "untagged_count": 7,
+        "total_gb": 1.342,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/course-creator",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adk-course-creator-orchestrator",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "8 image(s) holding up to 1.27 GB; nothing pushed in 159 days, 7 untagged",
+      "monthly_cost": 0.13,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adk-course-creator-orchestrator --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 8,
+        "untagged_count": 7,
+        "total_gb": 1.266,
+        "newest_push_days": 159,
+        "oldest_push_days": 160,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/adk-course-creator-orchestrator",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "orchestrator",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "8 image(s) holding up to 1.23 GB; nothing pushed in 160 days, 7 untagged",
+      "monthly_cost": 0.12,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name orchestrator --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 8,
+        "untagged_count": 7,
+        "total_gb": 1.233,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/orchestrator",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adk-course-creator-researcher",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "8 image(s) holding up to 1.17 GB; nothing pushed in 159 days, 7 untagged",
+      "monthly_cost": 0.12,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adk-course-creator-researcher --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 8,
+        "untagged_count": 7,
+        "total_gb": 1.168,
+        "newest_push_days": 159,
+        "oldest_push_days": 160,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/adk-course-creator-researcher",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adk-course-creator-judge",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "8 image(s) holding up to 1.17 GB; nothing pushed in 159 days, 7 untagged",
+      "monthly_cost": 0.12,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adk-course-creator-judge --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 8,
+        "untagged_count": 7,
+        "total_gb": 1.168,
+        "newest_push_days": 159,
+        "oldest_push_days": 160,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/adk-course-creator-judge",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adk-course-creator-content-builder",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "8 image(s) holding up to 1.17 GB; nothing pushed in 159 days, 7 untagged",
+      "monthly_cost": 0.12,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adk-course-creator-content-builder --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 8,
+        "untagged_count": 7,
+        "total_gb": 1.168,
+        "newest_push_days": 159,
+        "oldest_push_days": 160,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/adk-course-creator-content-builder",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "judge",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "8 image(s) holding up to 1.13 GB; nothing pushed in 160 days, 7 untagged",
+      "monthly_cost": 0.11,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name judge --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 8,
+        "untagged_count": 7,
+        "total_gb": 1.135,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/judge",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "researcher",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "8 image(s) holding up to 1.13 GB; nothing pushed in 160 days, 7 untagged",
+      "monthly_cost": 0.11,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name researcher --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 8,
+        "untagged_count": 7,
+        "total_gb": 1.135,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/researcher",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "content-builder",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "8 image(s) holding up to 1.13 GB; nothing pushed in 160 days, 7 untagged",
+      "monthly_cost": 0.11,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name content-builder --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 8,
+        "untagged_count": 7,
+        "total_gb": 1.135,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/content-builder",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "course-creator-consolidated",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "6 image(s) holding up to 1.05 GB; nothing pushed in 151 days, 5 untagged",
+      "monthly_cost": 0.1,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name course-creator-consolidated --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 6,
+        "untagged_count": 5,
+        "total_gb": 1.049,
+        "newest_push_days": 151,
+        "oldest_push_days": 151,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/course-creator-consolidated",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adkui-repo",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "6 image(s) holding up to 0.98 GB; nothing pushed in 169 days, 5 untagged",
+      "monthly_cost": 0.1,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adkui-repo --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 6,
+        "untagged_count": 5,
+        "total_gb": 0.985,
+        "newest_push_days": 169,
+        "oldest_push_days": 170,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/adkui-repo",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "mcp-server-repo",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "12 image(s) holding up to 0.56 GB; nothing pushed in 169 days, 11 untagged",
+      "monthly_cost": 0.06,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name mcp-server-repo --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 12,
+        "untagged_count": 11,
+        "total_gb": 0.559,
+        "newest_push_days": 169,
+        "oldest_push_days": 174,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/mcp-server-repo",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "biometric-scout-lambda",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "1 image(s) holding up to 0.19 GB; nothing pushed in 156 days",
+      "monthly_cost": 0.02,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name biometric-scout-lambda --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 1,
+        "untagged_count": 0,
+        "total_gb": 0.191,
+        "newest_push_days": 156,
+        "oldest_push_days": 156,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/biometric-scout-lambda",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "adk-comic-pipeline-lambda",
+      "resource_type": "ecr-repository",
+      "region": "us-west-2",
+      "reason": "1 image(s) holding up to 0.17 GB; nothing pushed in 162 days",
+      "monthly_cost": 0.02,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name adk-comic-pipeline-lambda --region us-west-2  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 1,
+        "untagged_count": 0,
+        "total_gb": 0.167,
+        "newest_push_days": 162,
+        "oldest_push_days": 162,
+        "repository_uri": "106059658660.dkr.ecr.us-west-2.amazonaws.com/adk-comic-pipeline-lambda",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "mcp-server-lightsail",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "1 image(s) holding up to 0.07 GB; nothing pushed in 191 days",
+      "monthly_cost": 0.01,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name mcp-server-lightsail --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 1,
+        "untagged_count": 0,
+        "total_gb": 0.068,
+        "newest_push_days": 191,
+        "oldest_push_days": 191,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/mcp-server-lightsail",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "mcp-ebs-rust-aws",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "11 image(s) holding up to 0.06 GB; nothing pushed in 135 days, 10 untagged",
+      "monthly_cost": 0.01,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name mcp-ebs-rust-aws --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 11,
+        "untagged_count": 10,
+        "total_gb": 0.059,
+        "newest_push_days": 135,
+        "oldest_push_days": 135,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/mcp-ebs-rust-aws",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "mcp-server-eb",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "7 image(s) holding up to 0.04 GB; nothing pushed in 135 days, 6 untagged",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name mcp-server-eb --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 7,
+        "untagged_count": 6,
+        "total_gb": 0.039,
+        "newest_push_days": 135,
+        "oldest_push_days": 135,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/mcp-server-eb",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "mcp-lambda-rust-aws",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "3 image(s) holding up to 0.03 GB; nothing pushed in 131 days, 2 untagged",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name mcp-lambda-rust-aws --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 3,
+        "untagged_count": 2,
+        "total_gb": 0.034,
+        "newest_push_days": 131,
+        "oldest_push_days": 131,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/mcp-lambda-rust-aws",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "course-creator-researcher",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "1 image(s) holding up to 0.00 GB; nothing pushed in 154 days",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name course-creator-researcher --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 1,
+        "untagged_count": 0,
+        "total_gb": 0.004,
+        "newest_push_days": 154,
+        "oldest_push_days": 154,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/course-creator-researcher",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/apprunner/mcp-apprunner-python-aws/5d3b4b6570c14e7884b62433163b3bf2/application",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.01 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/apprunner/mcp-apprunner-python-aws/5d3b4b6570c14e7884b62433163b3bf2/application --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.011,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/mcpBedrockRustAws_mcp_server-tA4fEWBdAl-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/mcpBedrockRustAws_mcp_server-tA4fEWBdAl-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.003,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/currency_aws-9c5IMB2L1X-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-west-2",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/currency_aws-9c5IMB2L1X-DEFAULT --retention-in-days 30 --region us-west-2",
+      "details": {
+        "stored_gb": 0.002,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/ecs/biometric-scout-task",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /ecs/biometric-scout-task --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.002,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/adkui-ecsexpress-13d5",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/adkui-ecsexpress-13d5 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.002,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/ecs/adk-fargate-task",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /ecs/adk-fargate-task --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.002,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/research_aws-Renyp76J4J-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-west-2",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/research_aws-Renyp76J4J-DEFAULT --retention-in-days 30 --region us-west-2",
+      "details": {
+        "stored_gb": 0.002,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/course-creator-orchestrator",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/course-creator-orchestrator --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.002,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/mcp-express-python-aws-ddf2",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/mcp-express-python-aws-ddf2 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.001,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/biometric-scout-service-d6df",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/biometric-scout-service-d6df --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.001,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/currencybench_CurrencyWorker-3e78B18kS0-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/currencybench_CurrencyWorker-3e78B18kS0-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.001,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/currency_master-z2l7of4nC6-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-west-2",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/currency_master-z2l7of4nC6-DEFAULT --retention-in-days 30 --region us-west-2",
+      "details": {
+        "stored_gb": 0.001,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/currency_aws-Z3xfNz6IqZ-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-west-2",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/currency_aws-Z3xfNz6IqZ-DEFAULT --retention-in-days 30 --region us-west-2",
+      "details": {
+        "stored_gb": 0.001,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/mcpbedrockpython_hello_world_server-aNKhbOFglk-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/mcpbedrockpython_hello_world_server-aNKhbOFglk-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.001,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/adkui-lambda",
+      "resource_type": "log-group",
+      "region": "us-west-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/adkui-lambda --retention-in-days 30 --region us-west-1",
+      "details": {
+        "stored_gb": 0.001,
+        "usd_per_gb_month": 0.033,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/currencybench_CurrencyAgent-8HZuhtHQdV-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/currencybench_CurrencyAgent-8HZuhtHQdV-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.001,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/mcp-lambda-python-aws",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/mcp-lambda-python-aws --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.001,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/adk-researcher-fa31",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/adk-researcher-fa31 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/adk-orchestrator-48b9",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/adk-orchestrator-48b9 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/McpBedrockPythonAws_hello_world_server-9LQDLpDzQO-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/McpBedrockPythonAws_hello_world_server-9LQDLpDzQO-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/adk-judge-04be",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/adk-judge-04be --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/course-creator-course-builder",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/course-creator-course-builder --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/currencybench_CurrencyCoordinator-CtG1KFApnx-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/currencybench_CurrencyCoordinator-CtG1KFApnx-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/adk-content-builder-449e",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/adk-content-builder-449e --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/course-creator-researcher",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/course-creator-researcher --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/course-creator-judge",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/course-creator-judge --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/course-creator-content-builder",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/course-creator-content-builder --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/research_aws-HP2I7RDeUm-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-west-2",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/research_aws-HP2I7RDeUm-DEFAULT --retention-in-days 30 --region us-west-2",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/codebuild/AgentCore-mcpBedrockRustAws-default-container-builder",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/codebuild/AgentCore-mcpBedrockRustAws-default-container-builder --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/v2-researcher-4fdb",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/v2-researcher-4fdb --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/application-signals/data",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/application-signals/data --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/v2-judge-febd",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/v2-judge-febd --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/mcp-express-python-aws-d3b1",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/mcp-express-python-aws-d3b1 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/McpBedrockPythonAws_agent3_comic_server-Wu9DsQG7cG-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/McpBedrockPythonAws_agent3_comic_server-Wu9DsQG7cG-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/currencybench_CurrencyCoordinator-vsXQSXExHv-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/currencybench_CurrencyCoordinator-vsXQSXExHv-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/adk-course-creator-fbc5",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/adk-course-creator-fbc5 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/v2-content-builder-69a2",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/v2-content-builder-69a2 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/ecs/course-creator",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /ecs/course-creator --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/biometric-scout",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/biometric-scout --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/biometric-scout-service-7e39",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/biometric-scout-service-7e39 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/ecs/orchestrator",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /ecs/orchestrator --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/ecs/content-builder",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /ecs/content-builder --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/orchestrator-47f3",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/orchestrator-47f3 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/course-creator-consolidated",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/course-creator-consolidated --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/researcher-5174",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/researcher-5174 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/mcp-lambda-rust-aws",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/mcp-lambda-rust-aws --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/mcp-ecsexpress-rust-aws-43cb",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/mcp-ecsexpress-rust-aws-43cb --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/v2-orchestrator-ca70",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/v2-orchestrator-ca70 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/bedrocksre_bedrocksre-SXr42846zR-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/bedrocksre_bedrocksre-SXr42846zR-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/biometric-scout-d455",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/biometric-scout-d455 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/content-builder-c5f5",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/content-builder-c5f5 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/ecs/researcher",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /ecs/researcher --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/judge-1800",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/judge-1800 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/ecs/judge",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /ecs/judge --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/adk-comic-pipeline-lambda",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/adk-comic-pipeline-lambda --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/v2-researcher-0639",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/v2-researcher-0639 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/adkbedrock_bedrock_agent-2hmwgtBKuG-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/adkbedrock_bedrock_agent-2hmwgtBKuG-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/v2-judge-a489",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/v2-judge-a489 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/lambda/biometric-scout-v3",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/lambda/biometric-scout-v3 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/apprunner/mcp-apprunner-rust-aws/3954273232474b1ca0ede3f55757384f/service",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/apprunner/mcp-apprunner-rust-aws/3954273232474b1ca0ede3f55757384f/service --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/apprunner/mcp-apprunner-rust-aws/3954273232474b1ca0ede3f55757384f/application",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/apprunner/mcp-apprunner-rust-aws/3954273232474b1ca0ede3f55757384f/application --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/apprunner/mcp-apprunner-python-aws/5d3b4b6570c14e7884b62433163b3bf2/service",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/apprunner/mcp-apprunner-python-aws/5d3b4b6570c14e7884b62433163b3bf2/service --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/course-creator-ef19",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/course-creator-ef19 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/McpBedrockPythonAws_agent3_comic_server-1mQlCpHaiH-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/McpBedrockPythonAws_agent3_comic_server-1mQlCpHaiH-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/McpBedrockPythonAws_agent3_comic_server-XTn6DlHHDk-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/McpBedrockPythonAws_agent3_comic_server-XTn6DlHHDk-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/bedrock-agentcore/runtimes/McpBedrockPythonAws_agent3_comic_server-5QMxqNAaaU-DEFAULT",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/bedrock-agentcore/runtimes/McpBedrockPythonAws_agent3_comic_server-5QMxqNAaaU-DEFAULT --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "log-group-no-retention",
+      "resource_id": "/aws/ecs/default/v2-course-creator-82d8",
+      "resource_type": "log-group",
+      "region": "us-east-1",
+      "reason": "Log group has no retention policy and holds 0.00 GB that will never expire",
+      "monthly_cost": 0.0,
+      "approximate_cost": true,
+      "remediation": "aws logs put-retention-policy --log-group-name /aws/ecs/default/v2-course-creator-82d8 --retention-in-days 30 --region us-east-1",
+      "details": {
+        "stored_gb": 0.0,
+        "usd_per_gb_month": 0.03,
+        "suggested_retention_days": 30,
+        "note": "cost shown is current storage, not guaranteed saving: a retention policy only deletes data older than the window it sets",
+        "approximate_reason": "retention-window"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-00122a49220e4ef1f",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'eksctl-mcp-eks-cluster-cluster-ControlPlaneSecurityGroup-E3JU7pIrqFvm' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-00122a49220e4ef1f --region us-east-1",
+      "details": {
+        "group_name": "eksctl-mcp-eks-cluster-cluster-ControlPlaneSecurityGroup-E3JU7pIrqFvm",
+        "description": "Communication between the control plane and worker nodegroups",
+        "vpc_id": "vpc-0b52b7e6ebc50ba38",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-01ee54036d37aa770",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'gpu-jax-g5g-2b-sg' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-01ee54036d37aa770 --region us-east-1",
+      "details": {
+        "group_name": "gpu-jax-g5g-2b-sg",
+        "description": "gpu-jax-g5g-2b: JAX OpenAI endpoint on 8000",
+        "vpc_id": "vpc-0bfdd15d906e0c008",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-027c9ec52dab01592",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'eksctl-mcp-eks-cluster-nodegroup-standard-nodes-remoteAccess' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-027c9ec52dab01592 --region us-east-1",
+      "details": {
+        "group_name": "eksctl-mcp-eks-cluster-nodegroup-standard-nodes-remoteAccess",
+        "description": "Allow SSH access",
+        "vpc_id": "vpc-0b52b7e6ebc50ba38",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-02dc9d3c34bbb29e1",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'k8s-elb-a27c61bc6fb3c425ca13d862e0fe4aed' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-02dc9d3c34bbb29e1 --region us-east-1",
+      "details": {
+        "group_name": "k8s-elb-a27c61bc6fb3c425ca13d862e0fe4aed",
+        "description": "Security group for Kubernetes ELB a27c61bc6fb3c425ca13d862e0fe4aed (default/course-creator)",
+        "vpc_id": "vpc-0bfdd15d906e0c008",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-035d7d4a2766bc2f5",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'launch-wizard-4' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-035d7d4a2766bc2f5 --region us-east-1",
+      "details": {
+        "group_name": "launch-wizard-4",
+        "description": "launch-wizard-4 created 2026-03-10T22:33:28.252Z",
+        "vpc_id": "vpc-0bfdd15d906e0c008",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-05798dcb63f66defd",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'adk-fargate-sg' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-05798dcb63f66defd --region us-east-1",
+      "details": {
+        "group_name": "adk-fargate-sg",
+        "description": "ADK Fargate Security Group",
+        "vpc_id": "vpc-0bfdd15d906e0c008",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-06043bb71336282f5",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'launch-wizard-2' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-06043bb71336282f5 --region us-east-1",
+      "details": {
+        "group_name": "launch-wizard-2",
+        "description": "launch-wizard-2 created 2026-03-09T15:34:12.232Z",
+        "vpc_id": "vpc-0bfdd15d906e0c008",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-065c6975cbd84dad3",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'vllm-devops-sg' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-065c6975cbd84dad3 --region us-east-1",
+      "details": {
+        "group_name": "vllm-devops-sg",
+        "description": "Security Group for vLLM DevOps Agent",
+        "vpc_id": "vpc-0bfdd15d906e0c008",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-06b7dcd4df991e6fb",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'launch-wizard-1' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-06b7dcd4df991e6fb --region us-east-1",
+      "details": {
+        "group_name": "launch-wizard-1",
+        "description": "launch-wizard-1 created 2026-03-09T14:54:31.987Z",
+        "vpc_id": "vpc-0bfdd15d906e0c008",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-079649e89ed485925",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'launch-wizard-5' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-079649e89ed485925 --region us-east-1",
+      "details": {
+        "group_name": "launch-wizard-5",
+        "description": "launch-wizard-5 created 2026-03-10T22:40:38.116Z",
+        "vpc_id": "vpc-0bfdd15d906e0c008",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-0b02cb843e6918991",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'launch-wizard-3' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-0b02cb843e6918991 --region us-east-1",
+      "details": {
+        "group_name": "launch-wizard-3",
+        "description": "launch-wizard-3 created 2026-03-09T15:39:46.196Z",
+        "vpc_id": "vpc-0bfdd15d906e0c008",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-0c33f618ffdf23a2d",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'vllm-devops-sg' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-0c33f618ffdf23a2d --region us-east-1",
+      "details": {
+        "group_name": "vllm-devops-sg",
+        "description": "Security Group for vLLM DevOps Agent",
+        "vpc_id": "vpc-0b52b7e6ebc50ba38",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-0d57a8e5b748e4618",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'gpu-pytorch-g6-2b-sg' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-0d57a8e5b748e4618 --region us-east-1",
+      "details": {
+        "group_name": "gpu-pytorch-g6-2b-sg",
+        "description": "gpu-pytorch-g6-2b: Gemma 4 E2B serving endpoint, operator IP only",
+        "vpc_id": "vpc-0bfdd15d906e0c008",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-0f2531fc936acf37a",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'gpu-vllm-g6-2b-sg' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-0f2531fc936acf37a --region us-east-1",
+      "details": {
+        "group_name": "gpu-vllm-g6-2b-sg",
+        "description": "gpu-vllm-g6-2b: vLLM API 8000 from operator IP only; no SSH",
+        "vpc_id": "vpc-0bfdd15d906e0c008",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-0fc8372ad2c120e07",
+      "resource_type": "security-group",
+      "region": "us-east-1",
+      "reason": "Security group 'k8s-elb-aadf6b26ff7dc4c848e44c93dff53238' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-0fc8372ad2c120e07 --region us-east-1",
+      "details": {
+        "group_name": "k8s-elb-aadf6b26ff7dc4c848e44c93dff53238",
+        "description": "Security group for Kubernetes ELB aadf6b26ff7dc4c848e44c93dff53238 (default/mcp-server-image-service)",
+        "vpc_id": "vpc-0b52b7e6ebc50ba38",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "empty-vpc",
+      "resource_id": "vpc-0b52b7e6ebc50ba38",
+      "resource_type": "vpc",
+      "region": "us-east-1",
+      "reason": "VPC 'eksctl-mcp-eks-cluster-cluster/VPC' holds no network interfaces of any kind",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 describe-subnets --filters Name=vpc-id,Values=vpc-0b52b7e6ebc50ba38 --region us-east-1  # inspect, then delete dependencies before the VPC",
+      "details": {
+        "name": "eksctl-mcp-eks-cluster-cluster/VPC",
+        "cidr_block": "192.168.0.0/16",
+        "note": "no direct cost; the VPC itself is free. Subnets, route tables and gateways inside it must be removed before it can be deleted"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-037ebb092f5a90464",
+      "resource_type": "security-group",
+      "region": "us-east-2",
+      "reason": "Security group 'vllm-devops-sg' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-037ebb092f5a90464 --region us-east-2",
+      "details": {
+        "group_name": "vllm-devops-sg",
+        "description": "Security Group for vLLM DevOps Agent",
+        "vpc_id": "vpc-03df50e9bb2f7f594",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-0ff17ece314fc0b92",
+      "resource_type": "security-group",
+      "region": "us-west-1",
+      "reason": "Security group 'vllm-devops-sg' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-0ff17ece314fc0b92 --region us-west-1",
+      "details": {
+        "group_name": "vllm-devops-sg",
+        "description": "Security Group for vLLM DevOps Agent",
+        "vpc_id": "vpc-002e7d27c30a5f53c",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    },
+    {
+      "check": "unused-security-group",
+      "resource_id": "sg-06fce514974e457b4",
+      "resource_type": "security-group",
+      "region": "us-west-2",
+      "reason": "Security group 'vllm-devops-sg' is attached to no interface and referenced by no other group",
+      "monthly_cost": 0.0,
+      "approximate_cost": false,
+      "remediation": "aws ec2 delete-security-group --group-id sg-06fce514974e457b4 --region us-west-2",
+      "details": {
+        "group_name": "vllm-devops-sg",
+        "description": "Security Group for vLLM DevOps Agent",
+        "vpc_id": "vpc-08878cdca39abfe93",
+        "note": "no direct cost; clutters the security posture and blocks VPC deletion"
+      }
+    }
+  ],
+  "errors": []
+}

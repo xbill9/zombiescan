@@ -1,0 +1,12 @@
+# two summation orders over one scan
+# captured_utc: 2026-09-21T16:13:05Z
+# cwd: /home/xbill/zombiescan
+
+findings                              120
+regions                               17
+sum of per-finding costs rounded first 6.90
+sum of exact costs, rounded once       6.92
+sum of the rows the report publishes   6.90
+sum of the by_check sections           6.90
+headline totals.monthly_cost           6.90
+annual                                 82.80

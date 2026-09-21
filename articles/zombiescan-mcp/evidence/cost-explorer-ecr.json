@@ -1,0 +1,67 @@
+{
+  "captured_utc": "2026-09-21T16:13:05Z",
+  "response": {
+    "GroupDefinitions": [
+      {
+        "Type": "DIMENSION",
+        "Key": "USAGE_TYPE"
+      }
+    ],
+    "ResultsByTime": [
+      {
+        "TimePeriod": {
+          "Start": "2026-09-01",
+          "End": "2026-09-21"
+        },
+        "Total": {},
+        "Groups": [
+          {
+            "Keys": [
+              "TimedStorage-ByteHrs"
+            ],
+            "Metrics": {
+              "UnblendedCost": {
+                "Amount": "1.962274464",
+                "Unit": "USD"
+              },
+              "UsageQuantity": {
+                "Amount": "19.622743824",
+                "Unit": "GB-Month"
+              }
+            }
+          },
+          {
+            "Keys": [
+              "USW2-TimedStorage-ByteHrs"
+            ],
+            "Metrics": {
+              "UnblendedCost": {
+                "Amount": "0.033699984",
+                "Unit": "USD"
+              },
+              "UsageQuantity": {
+                "Amount": "0.336999792",
+                "Unit": "GB-Month"
+              }
+            }
+          }
+        ],
+        "Estimated": true
+      }
+    ],
+    "DimensionValueAttributes": [],
+    "ResponseMetadata": {
+      "RequestId": "cee67c9a-ebb1-4862-971a-336418fbe515",
+      "HTTPStatusCode": 200,
+      "HTTPHeaders": {
+        "date": "Mon, 21 Sep 2026 16:14:13 GMT",
+        "content-type": "application/x-amz-json-1.1",
+        "content-length": "530",
+        "connection": "keep-alive",
+        "x-amzn-requestid": "cee67c9a-ebb1-4862-971a-336418fbe515",
+        "cache-control": "no-cache"
+      },
+      "RetryAttempts": 0
+    }
+  }
+}

@@ -1,0 +1,11 @@
+# arithmetic on the artifacts beside this file, not separate measurements
+# captured_utc: 2026-09-21T16:13:05Z
+# cwd: /home/xbill/zombiescan
+
+## ECR: what the check estimates against what the account was billed
+billed GB-Month, 2026-09-01 to 2026-09-21 (20 days)   19.96
+projected over 30 days                              29.94 GB-Month
+at the ECR storage rate $0.10/GB-month         $2.99/month
+ecr-stale-images estimate, 33 repos       $6.40/month
+implied GB at the same rate                         64.0 GB
+ratio, estimate over billed                         2.1x

@@ -1,0 +1,299 @@
+# one stdio session with zombiescan-mcp
+# captured_utc: 2026-09-21T16:13:05Z
+# cwd: /home/xbill/zombiescan
+
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "protocolVersion": "2025-06-18",
+    "capabilities": {
+      "tools": {
+        "listChanged": false
+      }
+    },
+    "serverInfo": {
+      "name": "zombiescan",
+      "version": "0.1.0"
+    },
+    "instructions": "zombiescan finds AWS resources nobody is using and prices them. Every tool is read-only; nothing here deletes anything. Run scan_account once, then ask estimate_savings for any total, count or breakdown of the report it writes -- do not add up findings yourself. Costs are list-price estimates, not the account's bill."
+  }
+}
+
+tools/list -> ['scan_account', 'estimate_savings', 'explain_finding', 'list_checks', 'plan_cleanup']
+
+tools/call isError=False
+{
+  "filter_applied": {
+    "checks": "any",
+    "regions": "any",
+    "resource_types": "any",
+    "min_monthly_cost": 0.0,
+    "max_monthly_cost": null,
+    "findings_in_report": 120,
+    "findings_matched": 120
+  },
+  "matched": {
+    "count": 120,
+    "monthly_cost": 6.9,
+    "annual_cost": 82.8,
+    "free_count": 89,
+    "approximate_count": 100,
+    "costliest": {
+      "check": "ecr-stale-images",
+      "resource_id": "ai-course-creator-app",
+      "region": "us-east-1",
+      "monthly_cost": 0.52
+    },
+    "cheapest": {
+      "check": "ecr-stale-images",
+      "resource_id": "mcp-server-eb",
+      "region": "us-east-1",
+      "monthly_cost": 0.0
+    }
+  },
+  "not_matched": {
+    "count": 0,
+    "monthly_cost": 0.0
+  },
+  "by_check": [
+    {
+      "check": "ecr-stale-images",
+      "count": 33,
+      "monthly_cost": 6.4
+    },
+    {
+      "check": "unused-route53-zone",
+      "count": 1,
+      "monthly_cost": 0.5
+    },
+    {
+      "check": "empty-vpc",
+      "count": 1,
+      "monthly_cost": 0.0
+    },
+    {
+      "check": "log-group-no-retention",
+      "count": 67,
+      "monthly_cost": 0.0
+    },
+    {
+      "check": "unused-security-group",
+      "count": 18,
+      "monthly_cost": 0.0
+    }
+  ],
+  "by_region": [
+    {
+      "region": "us-east-1",
+      "count": 109,
+      "monthly_cost": 6.38
+    },
+    {
+      "region": "global",
+      "count": 1,
+      "monthly_cost": 0.5
+    },
+    {
+      "region": "us-west-2",
+      "count": 7,
+      "monthly_cost": 0.02
+    },
+    {
+      "region": "us-east-2",
+      "count": 1,
+      "monthly_cost": 0.0
+    },
+    {
+      "region": "us-west-1",
+      "count": 2,
+      "monthly_cost": 0.0
+    }
+  ],
+  "by_resource_type": [
+    {
+      "resource_type": "ecr-repository",
+      "count": 33,
+      "monthly_cost": 6.4
+    },
+    {
+      "resource_type": "route53-hosted-zone",
+      "count": 1,
+      "monthly_cost": 0.5
+    },
+    {
+      "resource_type": "log-group",
+      "count": 67,
+      "monthly_cost": 0.0
+    },
+    {
+      "resource_type": "security-group",
+      "count": 18,
+      "monthly_cost": 0.0
+    },
+    {
+      "resource_type": "vpc",
+      "count": 1,
+      "monthly_cost": 0.0
+    }
+  ],
+  "matched_findings": [
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "ai-course-creator-app",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "26 image(s) holding up to 5.21 GB; nothing pushed in 160 days, 25 untagged",
+      "monthly_cost": 0.52,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name ai-course-creator-app --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 26,
+        "untagged_count": 25,
+        "total_gb": 5.21,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/ai-course-creator-app",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "unused-route53-zone",
+      "resource_id": "Z0457877ZLNZ0EMC9ERY",
+      "resource_type": "route53-hosted-zone",
+      "region": "global",
+      "reason": "Private hosted zone agent.local. holds only the 2 record set(s) Route 53 creates with a zone, so it resolves nothing; it belongs to Cloud Map namespace ns-kyjziaevjp3dv2ua, which registers nothing",
+      "monthly_cost": 0.5,
+      "approximate_cost": false,
+      "remediation": "aws servicediscovery delete-namespace --id ns-kyjziaevjp3dv2ua --region us-east-1",
+      "details": {
+        "name": "agent.local.",
+        "private": true,
+        "record_set_count": 2,
+        "zones_in_account": 1,
+        "priced_as": "first_25",
+        "comment": "Created by AWS Cloud Map namespace with ARN arn:aws:servicediscovery:us-east-1:106059658660:namespace/ns-kyjziaevjp3dv2ua",
+        "cloud_map_namespace": "ns-kyjziaevjp3dv2ua",
+        "cloud_map_region": "us-east-1",
+        "note": "Cloud Map owns this zone. Delete the namespace, not the zone: delete-hosted-zone leaves the namespace behind pointing at nothing. delete-namespace refuses while any service is still registered in it, even one with no instances"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "ai-course-creator-orchestrator",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "26 image(s) holding up to 4.79 GB; nothing pushed in 160 days, 25 untagged",
+      "monthly_cost": 0.48,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name ai-course-creator-orchestrator --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 26,
+        "untagged_count": 25,
+        "total_gb": 4.791,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/ai-course-creator-orchestrator",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "course-creator-stack",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "21 image(s) holding up to 4.71 GB; nothing pushed in 149 days, 20 untagged",
+      "monthly_cost": 0.47,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name course-creator-stack --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 21,
+        "untagged_count": 20,
+        "total_gb": 4.71,
+        "newest_push_days": 149,
+        "oldest_push_days": 149,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/course-creator-stack",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    },
+    {
+      "check": "ecr-stale-images",
+      "resource_id": "ai-course-creator-judge",
+      "resource_type": "ecr-repository",
+      "region": "us-east-1",
+      "reason": "26 image(s) holding up to 4.41 GB; nothing pushed in 160 days, 25 untagged",
+      "monthly_cost": 0.44,
+      "approximate_cost": true,
+      "remediation": "aws ecr describe-images --repository-name ai-course-creator-judge --region us-east-1  # review, then delete the tags you do not need and add a lifecycle policy so they do not come back",
+      "details": {
+        "image_count": 26,
+        "untagged_count": 25,
+        "total_gb": 4.414,
+        "newest_push_days": 160,
+        "oldest_push_days": 161,
+        "repository_uri": "106059658660.dkr.ecr.us-east-1.amazonaws.com/ai-course-creator-judge",
+        "note": "upper bound: ECR bills for unique layers, and images sharing a base layer are counted once each here. A stale repository may still be pulled from -- the push date says nothing about pulls",
+        "approximate_reason": "shared-layers"
+      }
+    }
+  ],
+  "pricing": {
+    "generated": "2026-09-21T15:33:49Z",
+    "basis": "AWS Price List API, on-demand USD list prices",
+    "excludes": [
+      "savings plans",
+      "reserved capacity",
+      "private pricing",
+      "credits"
+    ]
+  },
+  "scanned": "2026-09-21T16:13:39Z"
+}
+
+tools/call isError=False
+{
+  "filter_applied": {
+    "checks": [
+      "unattached-ebs-volumes"
+    ],
+    "regions": "any",
+    "resource_types": "any",
+    "min_monthly_cost": 0.0,
+    "max_monthly_cost": null,
+    "findings_in_report": 120,
+    "findings_matched": 0,
+    "no_such_checks_in_report": [
+      "unattached-ebs-volumes"
+    ]
+  },
+  "matched": {
+    "count": 0,
+    "monthly_cost": 0,
+    "annual_cost": 0,
+    "free_count": 0,
+    "approximate_count": 0
+  },
+  "not_matched": {
+    "count": 120,
+    "monthly_cost": 6.9
+  },
+  "by_check": [],
+  "by_region": [],
+  "by_resource_type": [],
+  "matched_findings": [],
+  "pricing": {
+    "generated": "2026-09-21T15:33:49Z",
+    "basis": "AWS Price List API, on-demand USD list prices",
+    "excludes": [
+      "savings plans",
+      "reserved capacity",
+      "private pricing",
+      "credits"
+    ]
+  },
+  "scanned": "2026-09-21T16:13:39Z"
+}
+

@@ -1,0 +1,36 @@
+# uv run zombiescan scan --all-regions --limit 8
+# captured_utc: 2026-09-21T16:13:05Z
+# cwd: /home/xbill/zombiescan
+
+Scanning as arn:aws:iam::106059658660:root
+17 region(s), 30 check(s) — read-only
+
+zombiescan — 120 findings across 17 regions
+
+Check                   Found  Monthly
+ecr-stale-images           33    $6.40
+unused-route53-zone         1    $0.50
+empty-vpc                   1    $0.00
+log-group-no-retention     67    $0.00
+unused-security-group      18    $0.00
+
+┏━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┓
+┃ Region    ┃ Resource                                              ┃  Monthly ┃
+┡━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━┩
+│ us-east-1 │ ai-course-creator-app                                 │   ~$0.52 │
+│ global    │ Z0457877ZLNZ0EMC9ERY                                  │    $0.50 │
+│ us-east-1 │ ai-course-creator-orchestrator                        │   ~$0.48 │
+│ us-east-1 │ course-creator-stack                                  │   ~$0.47 │
+│ us-east-1 │ ai-course-creator-judge                               │   ~$0.44 │
+│ us-east-1 │ /aws/apprunner/mcp-apprunner-python-aws/5d3b4b6570c1… │   ~$0.00 │
+│ us-east-1 │ vpc-0b52b7e6ebc50ba38                                 │    $0.00 │
+│ us-east-1 │ sg-00122a49220e4ef1f                                  │    $0.00 │
+└───────────┴───────────────────────────────────────────────────────┴──────────┘
+showing 8 of 120, costliest first with every check represented; use --limit 0 
+for all, or --json for the full set
+
+Estimated waste: $6.90/month ($82.80/year)
+~ marks an estimate or upper bound; the per-finding 'note' in --json output says
+why.
+Estimates from list prices, not your bill. zombiescan is read-only and deleted 
+nothing.
