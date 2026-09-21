@@ -1,0 +1,15 @@
+# ECR storage and Lightsail rates as stored in the bundled price table.
+# captured 2026-09-21T02:58:34Z
+# source: src/zombiescan/pricing/table.json, generated from the AWS Price List API
+#         and (for bundles/powers) the Lightsail API. See pricing/refresh.py.
+
+table generated: 2026-09-21T01:16:11Z
+hours_per_month: 730
+ecr_gb_month: regions=36 us-east-1=0.1 distinct=[0.1]
+lightsail_disk_gb_month: regions=19 us-east-1=0.1 distinct=[0.1]
+lightsail_static_ip_hour: regions=19 us-east-1=0.005 distinct=[0.005]
+lightsail_load_balancer_hour: regions=19 us-east-1=0.024193548 distinct=[0.024193548]
+lightsail_snapshot_gb_month: regions=19 us-east-1=0.05 distinct=[0.05]
+lightsail_container_power_month us-east-1: {'large': 80.0, 'medium': 40.0, 'micro': 10.0, 'nano': 7.0, 'small': 15.0, 'xlarge': 160.0}
+lightsail_bundle_month us-east-1 nano_3_0: 5.0
+snapshot_gb_month us-east-1: 0.05

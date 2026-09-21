@@ -1,0 +1,98 @@
+{
+  "captured_utc": "2026-09-21T03:03:51Z",
+  "metric": "UnblendedCost",
+  "note": "list-price charges as billed; months after 2026-07 carry offsetting negative rows",
+  "months": [
+    {
+      "start": "2026-04-01",
+      "end": "2026-05-01",
+      "ecr": 1.6576,
+      "lightsail": 9.598,
+      "nonzero": {
+        "EC2 - Other": 100.6597,
+        "Amazon Elastic Load Balancing": 39.2596,
+        "Amazon Virtual Private Cloud": 24.9915,
+        "Amazon Elastic Compute Cloud - Compute": 20.909,
+        "Amazon Lightsail": 9.598,
+        "Amazon Elastic Container Service": 8.0312,
+        "Amazon Elastic Container Service for Kubernetes": 6.0736,
+        "Amazon EC2 Container Registry (ECR)": 1.6576,
+        "Amazon Route 53": 0.5,
+        "Amazon Simple Storage Service": 0.0003,
+        "Amazon API Gateway": 0.0002
+      }
+    },
+    {
+      "start": "2026-05-01",
+      "end": "2026-06-01",
+      "ecr": 0.0,
+      "lightsail": 0.0,
+      "nonzero": {
+        "EC2 - Other": 0.0099,
+        "Amazon Virtual Private Cloud": -0.0099
+      }
+    },
+    {
+      "start": "2026-06-01",
+      "end": "2026-07-01",
+      "ecr": 2.9614,
+      "lightsail": 3.8592,
+      "nonzero": {
+        "EC2 - Other": 90.1431,
+        "Amazon Elastic Compute Cloud - Compute": 43.3693,
+        "Amazon Elastic Load Balancing": 9.95,
+        "Amazon Virtual Private Cloud": 7.2372,
+        "Amazon Lightsail": 3.8592,
+        "Amazon EC2 Container Registry (ECR)": 2.9614,
+        "AWS Key Management Service": 1.9944,
+        "Amazon Route 53": 0.5,
+        "AWS Secrets Manager": 0.4628,
+        "AWS Systems Manager": 0.0861,
+        "Amazon Simple Storage Service": 0.0643,
+        "Amazon Bedrock AgentCore": 0.0004
+      }
+    },
+    {
+      "start": "2026-07-01",
+      "end": "2026-08-01",
+      "ecr": 3.4395,
+      "lightsail": 7.0,
+      "nonzero": {
+        "Amazon Elastic Compute Cloud - Compute": 130.3355,
+        "EC2 - Other": 125.9848,
+        "Amazon Simple Storage Service": 13.696,
+        "Amazon Lightsail": 7.0,
+        "Amazon Virtual Private Cloud": 4.4219,
+        "Amazon EC2 Container Registry (ECR)": 3.4395,
+        "AWS Key Management Service": 1.9973,
+        "AWS Secrets Manager": 1.214,
+        "Amazon Route 53": 0.5,
+        "Amazon Bedrock AgentCore": 0.163,
+        "AWS Cost Explorer": 0.03,
+        "Amazon Cognito": 0.0112,
+        "Amazon Bedrock": 0.0033
+      }
+    },
+    {
+      "start": "2026-08-01",
+      "end": "2026-09-01",
+      "ecr": 0.0,
+      "lightsail": 0.0,
+      "nonzero": {
+        "EC2 - Other": 3.1044,
+        "Amazon Bedrock AgentCore": 0.0003,
+        "AWS Data Transfer": -3.1046
+      }
+    },
+    {
+      "start": "2026-09-01",
+      "end": "2026-09-20",
+      "ecr": 0.0,
+      "lightsail": 0.0,
+      "nonzero": {
+        "EC2 - Other": 0.2913,
+        "AWS Data Transfer": -0.2913
+      }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+# Scan restricted to ONLY the 22 checks that existed before this work.
+# This reproduces the 'before' state on the same account.
+# captured 2026-09-21T02:58:03Z
+# command: uv run zombiescan scan --all-regions --us-only 22 x --check ...
+
+Scanning as arn:aws:iam::106059658660:root
+4 region(s), 22 check(s) — read-only
+
+zombiescan — 86 findings across 4 regions
+
+Check                   Found  Monthly
+log-group-no-retention     67    $0.00
+empty-vpc                   1    $0.00
+unused-security-group      18    $0.00
+
+┏━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┓
+┃ Region    ┃ Resource                                              ┃  Monthly ┃
+┡━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━┩
+│ us-east-1 │ /aws/apprunner/mcp-apprunner-python-aws/5d3b4b6570c1… │   ~$0.00 │
+│ us-east-1 │ /aws/bedrock-agentcore/runtimes/mcpBedrockRustAws_mc… │   ~$0.00 │
+│ us-west-2 │ /aws/bedrock-agentcore/runtimes/currency_aws-9c5IMB2… │   ~$0.00 │
+│ us-east-1 │ /ecs/biometric-scout-task                             │   ~$0.00 │
+│ us-east-1 │ /aws/ecs/default/adkui-ecsexpress-13d5                │   ~$0.00 │
+│ us-east-1 │ /ecs/adk-fargate-task                                 │   ~$0.00 │
+│ us-west-2 │ /aws/bedrock-agentcore/runtimes/research_aws-Renyp76… │   ~$0.00 │
+│ us-east-1 │ /aws/lambda/course-creator-orchestrator               │   ~$0.00 │
+│ us-east-1 │ /aws/ecs/default/mcp-express-python-aws-ddf2          │   ~$0.00 │
+│ us-east-1 │ /aws/ecs/default/biometric-scout-service-d6df         │   ~$0.00 │
+│ us-east-1 │ /aws/bedrock-agentcore/runtimes/currencybench_Curren… │   ~$0.00 │
+│ us-west-2 │ /aws/bedrock-agentcore/runtimes/currency_master-z2l7… │   ~$0.00 │
+│ us-west-2 │ /aws/bedrock-agentcore/runtimes/currency_aws-Z3xfNz6… │   ~$0.00 │
+│ us-east-1 │ /aws/bedrock-agentcore/runtimes/mcpbedrockpython_hel… │   ~$0.00 │
+│ us-west-1 │ /aws/lambda/adkui-lambda                              │   ~$0.00 │
+│ us-east-1 │ /aws/bedrock-agentcore/runtimes/currencybench_Curren… │   ~$0.00 │
+│ us-east-1 │ /aws/lambda/mcp-lambda-python-aws                     │   ~$0.00 │
+│ us-east-1 │ /aws/ecs/default/adk-researcher-fa31                  │   ~$0.00 │
+│ us-east-1 │ /aws/ecs/default/adk-orchestrator-48b9                │   ~$0.00 │
+│ us-east-1 │ /aws/bedrock-agentcore/runtimes/McpBedrockPythonAws_… │   ~$0.00 │
+│ us-east-1 │ /aws/ecs/default/adk-judge-04be                       │   ~$0.00 │
+│ us-east-1 │ /aws/lambda/course-creator-course-builder             │   ~$0.00 │
+│ us-east-1 │ /aws/bedrock-agentcore/runtimes/currencybench_Curren… │   ~$0.00 │
+│ us-east-1 │ vpc-0b52b7e6ebc50ba38                                 │    $0.00 │
+│ us-east-1 │ sg-00122a49220e4ef1f                                  │    $0.00 │
+└───────────┴───────────────────────────────────────────────────────┴──────────┘
+showing 25 of 86, costliest first with every check represented; use --limit 0 
+for all, or --json for the full set
+
+Estimated waste: under $0.01/month. These cost almost nothing today; they are 
+cleanup debt, not a bill.
+~ marks an estimate or upper bound; the per-finding 'note' in --json output says
+why.
+Estimates from list prices, not your bill. zombiescan is read-only and deleted 
+nothing.

@@ -1,0 +1,52 @@
+# Scan with the full catalogue, same account, same regions.
+# captured 2026-09-21T02:58:21Z
+# command: uv run zombiescan scan --all-regions --us-only
+
+Scanning as arn:aws:iam::106059658660:root
+4 region(s), 29 check(s) — read-only
+
+zombiescan — 119 findings across 4 regions
+
+Check                   Found  Monthly
+ecr-stale-images           33    $6.42
+log-group-no-retention     67    $0.00
+empty-vpc                   1    $0.00
+unused-security-group      18    $0.00
+
+┏━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┓
+┃ Region    ┃ Resource                                              ┃  Monthly ┃
+┡━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━┩
+│ us-east-1 │ ai-course-creator-app                                 │   ~$0.52 │
+│ us-east-1 │ ai-course-creator-orchestrator                        │   ~$0.48 │
+│ us-east-1 │ course-creator-stack                                  │   ~$0.47 │
+│ us-east-1 │ ai-course-creator-judge                               │   ~$0.44 │
+│ us-east-1 │ ai-course-creator-researcher                          │   ~$0.44 │
+│ us-east-1 │ ai-course-creator-content-builder                     │   ~$0.44 │
+│ us-east-1 │ biometric-scout                                       │   ~$0.38 │
+│ us-east-1 │ adk-course-creator-app                                │   ~$0.37 │
+│ us-east-1 │ biometric-scout-repo                                  │   ~$0.31 │
+│ us-east-1 │ adk-orchestrator                                      │   ~$0.27 │
+│ us-east-1 │ adk-judge                                             │   ~$0.25 │
+│ us-east-1 │ adk-researcher                                        │   ~$0.25 │
+│ us-east-1 │ adk-content-builder                                   │   ~$0.25 │
+│ us-east-1 │ adk-course-creator-repo                               │   ~$0.14 │
+│ us-east-1 │ course-creator                                        │   ~$0.13 │
+│ us-east-1 │ adk-course-creator-orchestrator                       │   ~$0.13 │
+│ us-east-1 │ orchestrator                                          │   ~$0.12 │
+│ us-east-1 │ adk-course-creator-researcher                         │   ~$0.12 │
+│ us-east-1 │ adk-course-creator-judge                              │   ~$0.12 │
+│ us-east-1 │ adk-course-creator-content-builder                    │   ~$0.12 │
+│ us-east-1 │ judge                                                 │   ~$0.11 │
+│ us-east-1 │ researcher                                            │   ~$0.11 │
+│ us-east-1 │ /aws/apprunner/mcp-apprunner-python-aws/5d3b4b6570c1… │   ~$0.00 │
+│ us-east-1 │ vpc-0b52b7e6ebc50ba38                                 │    $0.00 │
+│ us-east-1 │ sg-00122a49220e4ef1f                                  │    $0.00 │
+└───────────┴───────────────────────────────────────────────────────┴──────────┘
+showing 25 of 119, costliest first with every check represented; use --limit 0 
+for all, or --json for the full set
+
+Estimated waste: $6.42/month ($77.05/year)
+~ marks an estimate or upper bound; the per-finding 'note' in --json output says
+why.
+Estimates from list prices, not your bill. zombiescan is read-only and deleted 
+nothing.

@@ -1,0 +1,36 @@
+# zombiescan check catalogue
+# captured 2026-09-21T02:58:03Z from the check registry:
+#   uv run python -c "import zombiescan.checks; from zombiescan.registry import CHECKS; print('\n'.join(sorted(CHECKS)))"
+# total checks now: 29
+# checks added by this work: 7
+# checks that existed before: 22
+
+available-eni
+detached-internet-gateway
+disabled-kms-key
+ecr-stale-images
+empty-classic-lb
+empty-vpc
+idle-load-balancer
+idle-nat-gateway
+idle-provisioned-dynamodb
+incomplete-multipart-upload
+lightsail-empty-load-balancer
+lightsail-idle-container-service
+lightsail-orphaned-snapshot
+lightsail-stopped-instance
+lightsail-unattached-disk
+lightsail-unattached-static-ip
+log-group-no-retention
+orphaned-rds-snapshot
+orphaned-snapshot
+stale-secret
+stopped-instance
+stopped-rds-instance
+unassociated-eip
+unattached-ebs
+unmounted-efs
+unused-ami
+unused-route53-health-check
+unused-security-group
+unused-vpc-endpoint

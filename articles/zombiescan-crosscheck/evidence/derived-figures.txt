@@ -1,0 +1,34 @@
+# Figures derived from the artifacts beside this file.
+# Each is arithmetic on a measurement, not a separate measurement.
+# written 2026-09-21T03:03:51Z by gather-evidence.py
+
+## July 2026 invoice lines, from cost-explorer.json, rounded to cents
+      130.34   Amazon Elastic Compute Cloud - Compute
+      125.98   EC2 - Other
+       13.70   Amazon Simple Storage Service
+        7.00   Amazon Lightsail
+        4.42   Amazon Virtual Private Cloud
+        3.44   Amazon EC2 Container Registry (ECR)
+        2.00   AWS Key Management Service
+        1.21   AWS Secrets Manager
+        0.50   Amazon Route 53
+        0.16   Amazon Bedrock AgentCore
+        0.03   AWS Cost Explorer
+        0.01   Amazon Cognito
+        0.00   Amazon Bedrock
+
+## Lightsail nano container node, hourly rate x hours per month
+# hourly rate 0.0094086020 USD from the AWS Price List API,
+# group 'Lightsail Container', usagetype USE1-ContainerSvcUsage:Nano-0.25CPU-0.5GB
+0.0094086020 x 744 = 7.00   (Lightsail's 744-hour month)
+0.0094086020 x 730 = 6.87   (the price table's 730-hour month)
+
+## Orphaned snapshot, us-east-1
+80 GiB x 0.05 USD/GB-month = 4.00
+
+## ECR flagged repositories
+repositories flagged: 33 of 37
+flagged bytes: 68931889540
+flagged GiB: 64.198
+64.198 x 0.10 USD/GB-month = 6.42
+

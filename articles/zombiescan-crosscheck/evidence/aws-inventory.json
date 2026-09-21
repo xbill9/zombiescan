@@ -1,0 +1,350 @@
+{
+  "captured_utc": "2026-09-21T03:03:51Z",
+  "ecr": {
+    "repo_count": 37,
+    "empty_repos": 2,
+    "total_bytes": 71383853139,
+    "total_gib": 66.48,
+    "note": "gib is bytes/1024**3, which is what the check uses (BYTES_PER_GB)",
+    "repos": [
+      {
+        "region": "us-east-1",
+        "repo": "ai-course-creator-app",
+        "images": 26,
+        "bytes": 5593827676,
+        "gib": 5.21,
+        "newest_push": "2026-04-14"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "ai-course-creator-orchestrator",
+        "images": 26,
+        "bytes": 5144603271,
+        "gib": 4.791,
+        "newest_push": "2026-04-14"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "course-creator-stack",
+        "images": 21,
+        "bytes": 5056927753,
+        "gib": 4.71,
+        "newest_push": "2026-04-24"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "ai-course-creator-judge",
+        "images": 26,
+        "bytes": 4739240363,
+        "gib": 4.414,
+        "newest_push": "2026-04-14"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "ai-course-creator-researcher",
+        "images": 26,
+        "bytes": 4739150871,
+        "gib": 4.414,
+        "newest_push": "2026-04-14"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "ai-course-creator-content-builder",
+        "images": 26,
+        "bytes": 4739137467,
+        "gib": 4.414,
+        "newest_push": "2026-04-14"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "biometric-scout",
+        "images": 18,
+        "bytes": 4091162568,
+        "gib": 3.81,
+        "newest_push": "2026-04-24"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "adk-course-creator-app",
+        "images": 23,
+        "bytes": 3940953194,
+        "gib": 3.67,
+        "newest_push": "2026-04-15"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "biometric-scout-repo",
+        "images": 25,
+        "bytes": 3363010567,
+        "gib": 3.132,
+        "newest_push": "2026-04-11"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "adk-orchestrator",
+        "images": 20,
+        "bytes": 2950645677,
+        "gib": 2.748,
+        "newest_push": "2026-04-14"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "adk-judge",
+        "images": 20,
+        "bytes": 2721491763,
+        "gib": 2.535,
+        "newest_push": "2026-04-14"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "adk-researcher",
+        "images": 20,
+        "bytes": 2721451207,
+        "gib": 2.535,
+        "newest_push": "2026-04-14"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "adk-content-builder",
+        "images": 20,
+        "bytes": 2721436680,
+        "gib": 2.535,
+        "newest_push": "2026-04-14"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "adk-course-creator-repo",
+        "images": 9,
+        "bytes": 1479440076,
+        "gib": 1.378,
+        "newest_push": "2026-04-14"
+      },
+      {
+        "region": "us-west-2",
+        "repo": "currency-mesh",
+        "images": 27,
+        "bytes": 1442670838,
+        "gib": 1.344,
+        "newest_push": "2026-08-12"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "course-creator",
+        "images": 8,
+        "bytes": 1441147287,
+        "gib": 1.342,
+        "newest_push": "2026-04-13"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "adk-course-creator-orchestrator",
+        "images": 8,
+        "bytes": 1359578949,
+        "gib": 1.266,
+        "newest_push": "2026-04-15"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "orchestrator",
+        "images": 8,
+        "bytes": 1323984895,
+        "gib": 1.233,
+        "newest_push": "2026-04-13"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "adk-course-creator-researcher",
+        "images": 8,
+        "bytes": 1253711693,
+        "gib": 1.168,
+        "newest_push": "2026-04-15"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "adk-course-creator-judge",
+        "images": 8,
+        "bytes": 1253681173,
+        "gib": 1.168,
+        "newest_push": "2026-04-15"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "adk-course-creator-content-builder",
+        "images": 8,
+        "bytes": 1253666746,
+        "gib": 1.168,
+        "newest_push": "2026-04-15"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "judge",
+        "images": 8,
+        "bytes": 1218242370,
+        "gib": 1.135,
+        "newest_push": "2026-04-13"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "researcher",
+        "images": 8,
+        "bytes": 1218218153,
+        "gib": 1.135,
+        "newest_push": "2026-04-13"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "content-builder",
+        "images": 8,
+        "bytes": 1218216155,
+        "gib": 1.135,
+        "newest_push": "2026-04-13"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "course-creator-consolidated",
+        "images": 6,
+        "bytes": 1126669134,
+        "gib": 1.049,
+        "newest_push": "2026-04-22"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "adkui-repo",
+        "images": 6,
+        "bytes": 1057242003,
+        "gib": 0.985,
+        "newest_push": "2026-04-04"
+      },
+      {
+        "region": "us-west-2",
+        "repo": "research-mesh",
+        "images": 18,
+        "bytes": 1009292761,
+        "gib": 0.94,
+        "newest_push": "2026-08-14"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "mcp-server-repo",
+        "images": 12,
+        "bytes": 600405038,
+        "gib": 0.559,
+        "newest_push": "2026-04-04"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "biometric-scout-lambda",
+        "images": 1,
+        "bytes": 205535972,
+        "gib": 0.191,
+        "newest_push": "2026-04-17"
+      },
+      {
+        "region": "us-west-2",
+        "repo": "adk-comic-pipeline-lambda",
+        "images": 1,
+        "bytes": 179699708,
+        "gib": 0.167,
+        "newest_push": "2026-04-11"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "mcp-server-lightsail",
+        "images": 1,
+        "bytes": 72967478,
+        "gib": 0.068,
+        "newest_push": "2026-03-13"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "mcp-ebs-rust-aws",
+        "images": 11,
+        "bytes": 63446398,
+        "gib": 0.059,
+        "newest_push": "2026-05-08"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "mcp-server-eb",
+        "images": 7,
+        "bytes": 42297069,
+        "gib": 0.039,
+        "newest_push": "2026-05-08"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "mcp-lambda-rust-aws",
+        "images": 3,
+        "bytes": 36835386,
+        "gib": 0.034,
+        "newest_push": "2026-05-12"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "course-creator-researcher",
+        "images": 1,
+        "bytes": 3864800,
+        "gib": 0.004,
+        "newest_push": "2026-04-19"
+      },
+      {
+        "region": "us-east-1",
+        "repo": "cdk-hnb659fds-container-assets-106059658660-us-east-1",
+        "images": 0,
+        "bytes": 0,
+        "gib": 0.0,
+        "newest_push": null
+      },
+      {
+        "region": "us-east-2",
+        "repo": "gemma4-optb",
+        "images": 0,
+        "bytes": 0,
+        "gib": 0.0,
+        "newest_push": null
+      }
+    ]
+  },
+  "lightsail_container_services": [
+    {
+      "name": "dog-or-not-lite",
+      "state": "RUNNING",
+      "power": "nano",
+      "scale": 1,
+      "has_currentDeployment": true,
+      "currentDeployment_state": "ACTIVE",
+      "createdAt": "2026-08-15 10:26:08-04:00"
+    }
+  ],
+  "lightsail_container_powers_us_east_1": {
+    "nano": 7.0,
+    "micro": 10.0,
+    "small": 15.0,
+    "medium": 40.0,
+    "large": 80.0,
+    "xlarge": 160.0
+  },
+  "ec2_us_east_1": {
+    "volumes_present": 0,
+    "amis": [
+      {
+        "ImageId": "ami-0b44b90b3d02430ee",
+        "Name": "gpu-vllm-g5g-2b-sm75-vllm0272rc0-80g-v2",
+        "CreationDate": "2026-08-13T14:52:34.000Z",
+        "age_days": 38,
+        "snapshot_ids": [
+          "snap-0eae9560093fac9c9"
+        ]
+      }
+    ],
+    "snapshots": [
+      {
+        "SnapshotId": "snap-0eae9560093fac9c9",
+        "VolumeId": "vol-091123a2014b25abe",
+        "VolumeSize": 80,
+        "StartTime": "2026-08-13 14:51:26.547000+00:00",
+        "Description": "gpu-vllm-g5g-2b SM7.5 vLLM image, 80 GiB, PARTUUID corrected"
+      }
+    ]
+  }
+}
