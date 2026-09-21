@@ -13,5 +13,8 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "zombiescan@zombiescan": true
   }
 }
