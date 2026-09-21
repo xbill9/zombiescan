@@ -12,6 +12,6 @@ Dev.to is here:
 https://dev.to/aws-builders/put-the-arithmetic-in-the-tool-an-mcp-server-for-an-aws-waste-scanner-3n79
 
 Linked In is here:
-PENDING
+https://www.linkedin.com/feed/update/urn:li:share:7507853381034749954/
 
 #AWS #MCP #FinOps #Python
