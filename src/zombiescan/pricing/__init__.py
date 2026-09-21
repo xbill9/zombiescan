@@ -155,6 +155,54 @@ class PriceTable:
         hourly = read_units * rates.get("read", 0.0) + write_units * rates.get("write", 0.0)
         return hourly * self._hours, approximate
 
+    def lightsail_bundle_month(self, region: str, bundle_id: str) -> tuple[float, bool]:
+        """USD per month for a Lightsail instance bundle.
+
+        A Lightsail instance bills its whole bundle whether it is running or
+        stopped, so this is the full price either way.
+        """
+        bundles, approximate = self._lookup("lightsail_bundle_month", region)
+        if not bundles or bundle_id not in bundles:
+            # Bundle ids are versioned (``micro_3_0``) and a new generation
+            # appears before the table is refreshed. Reporting zero would hide
+            # the finding, so say nothing about the price instead.
+            return 0.0, True
+        return bundles[bundle_id], approximate
+
+    def lightsail_container_power_month(self, region: str, power: str) -> tuple[float, bool]:
+        """USD per month for one container service node at this power."""
+        powers, approximate = self._lookup("lightsail_container_power_month", region)
+        if not powers or power not in powers:
+            return 0.0, True
+        return powers[power], approximate
+
+    def lightsail_disk_gb_month(self, region: str) -> tuple[float, bool]:
+        """USD per GB-month of Lightsail block storage."""
+        price, approximate = self._lookup("lightsail_disk_gb_month", region)
+        return (price or 0.0), approximate
+
+    def lightsail_static_ip_month(self, region: str) -> tuple[float, bool]:
+        """USD per month for a static IP attached to nothing.
+
+        An attached static IP is free; this rate only applies once it is not.
+        """
+        hourly, approximate = self._lookup("lightsail_static_ip_hour", region)
+        if not hourly:
+            return 0.0, True
+        return hourly * self._hours, approximate
+
+    def lightsail_load_balancer_month(self, region: str) -> tuple[float, bool]:
+        """USD per month of Lightsail load balancer uptime."""
+        hourly, approximate = self._lookup("lightsail_load_balancer_hour", region)
+        if not hourly:
+            return 0.0, True
+        return hourly * self._hours, approximate
+
+    def lightsail_snapshot_gb_month(self, region: str) -> tuple[float, bool]:
+        """USD per GB-month of Lightsail instance or disk snapshot storage."""
+        price, approximate = self._lookup("lightsail_snapshot_gb_month", region)
+        return (price or 0.0), approximate
+
     def route53_health_check_month(self, aws_endpoint: bool = True) -> tuple[float, bool]:
         """USD per month for one health check. Global, so no region argument."""
         rates = self._data.get("route53_health_check_month") or {}

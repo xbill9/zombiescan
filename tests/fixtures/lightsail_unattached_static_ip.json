@@ -1,0 +1,23 @@
+{
+  "staticIps": [
+    {
+      "name": "orphaned-ip",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:StaticIp/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "createdAt": "2025-02-01T09:00:00+00:00",
+      "location": { "availabilityZone": "all", "regionName": "us-east-1" },
+      "resourceType": "StaticIp",
+      "ipAddress": "203.0.113.24",
+      "isAttached": false
+    },
+    {
+      "name": "api-ip",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:StaticIp/bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "createdAt": "2026-01-15T09:00:00+00:00",
+      "location": { "availabilityZone": "all", "regionName": "us-east-1" },
+      "resourceType": "StaticIp",
+      "ipAddress": "203.0.113.25",
+      "attachedTo": "live-api",
+      "isAttached": true
+    }
+  ]
+}

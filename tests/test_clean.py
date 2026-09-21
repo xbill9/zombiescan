@@ -260,3 +260,69 @@ def test_a_finding_survives_the_json_round_trip():
 def test_real_session_is_never_constructed_in_these_tests():
     """Guard against a test accidentally reaching AWS."""
     assert not isinstance(FakeSession(), boto3.Session)
+
+
+# --- lightsail -----------------------------------------------------------
+
+
+def test_a_lightsail_instance_is_snapshotted_before_it_is_deleted(pricing):
+    """Deleting takes the system disk with it, so the snapshot has to land first."""
+    outcome = clean.plan_for(
+        FakeSession(), _finding("lightsail-stopped-instance", "retired-blog"), pricing, "us-east-1"
+    )
+    assert [s.operation for s in outcome.steps] == [
+        "create_instance_snapshot",
+        "delete_instance",
+    ]
+    assert outcome.steps[0].irreversible is False
+
+
+def test_a_lightsail_disk_is_snapshotted_before_it_is_deleted(pricing):
+    outcome = clean.plan_for(
+        FakeSession(), _finding("lightsail-unattached-disk", "detached-data"), pricing, "us-east-1"
+    )
+    assert [s.operation for s in outcome.steps] == ["create_disk_snapshot", "delete_disk"]
+
+
+def test_an_idle_container_service_is_disabled_not_deleted(pricing):
+    """Disabling stops the billing and keeps the name and URL; deleting frees them."""
+    outcome = clean.plan_for(
+        FakeSession(),
+        _finding("lightsail-idle-container-service", "never-deployed"),
+        pricing,
+        "us-east-1",
+    )
+    assert [s.operation for s in outcome.steps] == ["update_container_service"]
+    assert outcome.steps[0].params["isDisabled"] is True
+    assert outcome.steps[0].irreversible is False
+
+
+def test_releasing_a_static_ip_is_marked_irreversible(pricing):
+    outcome = clean.plan_for(
+        FakeSession(),
+        _finding("lightsail-unattached-static-ip", "orphaned-ip"),
+        pricing,
+        "us-east-1",
+    )
+    assert outcome.steps[0].operation == "release_static_ip"
+    assert outcome.steps[0].irreversible is True
+
+
+@pytest.mark.parametrize(
+    ("kind", "operation", "key"),
+    [
+        ("instance", "delete_instance_snapshot", "instanceSnapshotName"),
+        ("disk", "delete_disk_snapshot", "diskSnapshotName"),
+    ],
+)
+def test_a_lightsail_snapshot_is_deleted_by_its_own_kind(pricing, kind, operation, key):
+    """One finding type covers both, so the plan has to pick the matching call."""
+    outcome = clean.plan_for(
+        FakeSession(),
+        _finding("lightsail-orphaned-snapshot", "snap-1", details={"source_kind": kind}),
+        pricing,
+        "us-east-1",
+    )
+    assert outcome.steps[0].operation == operation
+    assert outcome.steps[0].params == {key: "snap-1"}
+    assert outcome.steps[0].irreversible is True

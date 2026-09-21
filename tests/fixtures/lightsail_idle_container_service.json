@@ -1,0 +1,60 @@
+{
+  "containerServices": [
+    {
+      "containerServiceName": "never-deployed",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:ContainerService/f1111111-1111-1111-1111-111111111111",
+      "createdAt": "2025-11-02T14:26:08+00:00",
+      "location": { "availabilityZone": "all", "regionName": "us-east-1" },
+      "resourceType": "ContainerService",
+      "power": "nano",
+      "powerId": "nano-1",
+      "state": "READY",
+      "scale": 1,
+      "isDisabled": false,
+      "url": "https://never-deployed.abc123.us-east-1.cs.amazonlightsail.com/"
+    },
+    {
+      "containerServiceName": "dog-or-not-lite",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:ContainerService/f2222222-2222-2222-2222-222222222222",
+      "createdAt": "2026-08-15T14:26:08+00:00",
+      "location": { "availabilityZone": "all", "regionName": "us-east-1" },
+      "resourceType": "ContainerService",
+      "power": "nano",
+      "powerId": "nano-1",
+      "state": "RUNNING",
+      "scale": 1,
+      "isDisabled": false,
+      "currentDeployment": {
+        "version": 3,
+        "state": "ACTIVE",
+        "createdAt": "2026-08-15T14:40:00+00:00"
+      },
+      "url": "https://dog-or-not-lite.abc123.us-east-1.cs.amazonlightsail.com/"
+    },
+    {
+      "containerServiceName": "switched-off",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:ContainerService/f3333333-3333-3333-3333-333333333333",
+      "createdAt": "2025-09-01T10:00:00+00:00",
+      "location": { "availabilityZone": "all", "regionName": "us-east-1" },
+      "resourceType": "ContainerService",
+      "power": "micro",
+      "powerId": "micro-1",
+      "state": "DISABLED",
+      "scale": 2,
+      "isDisabled": true
+    },
+    {
+      "containerServiceName": "deployment-deleted",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:ContainerService/f4444444-4444-4444-4444-444444444444",
+      "createdAt": "2025-10-10T10:00:00+00:00",
+      "location": { "availabilityZone": "all", "regionName": "us-east-1" },
+      "resourceType": "ContainerService",
+      "power": "small",
+      "powerId": "small-1",
+      "state": "RUNNING",
+      "scale": 3,
+      "isDisabled": false,
+      "url": "https://deployment-deleted.abc123.us-east-1.cs.amazonlightsail.com/"
+    }
+  ]
+}

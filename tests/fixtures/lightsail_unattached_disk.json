@@ -1,0 +1,39 @@
+{
+  "disks": [
+    {
+      "name": "detached-data",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:Disk/cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "createdAt": "2025-05-20T11:00:00+00:00",
+      "location": { "availabilityZone": "us-east-1a", "regionName": "us-east-1" },
+      "resourceType": "Disk",
+      "sizeInGb": 80,
+      "isSystemDisk": false,
+      "state": "available",
+      "isAttached": false
+    },
+    {
+      "name": "attached-data",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:Disk/dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "createdAt": "2026-01-15T11:00:00+00:00",
+      "location": { "availabilityZone": "us-east-1a", "regionName": "us-east-1" },
+      "resourceType": "Disk",
+      "sizeInGb": 256,
+      "isSystemDisk": false,
+      "state": "in-use",
+      "attachedTo": "live-api",
+      "attachmentState": "attached",
+      "isAttached": true
+    },
+    {
+      "name": "live-api-system-disk",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:Disk/eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
+      "createdAt": "2026-01-15T08:00:00+00:00",
+      "location": { "availabilityZone": "us-east-1a", "regionName": "us-east-1" },
+      "resourceType": "Disk",
+      "sizeInGb": 60,
+      "isSystemDisk": true,
+      "state": "available",
+      "isAttached": false
+    }
+  ]
+}

@@ -11,6 +11,12 @@ from zombiescan.checks import (
     idle_nat_gateway,  # noqa: F401
     idle_provisioned_dynamodb,  # noqa: F401
     incomplete_multipart_upload,  # noqa: F401
+    lightsail_empty_load_balancer,  # noqa: F401
+    lightsail_idle_container_service,  # noqa: F401
+    lightsail_orphaned_snapshot,  # noqa: F401
+    lightsail_stopped_instance,  # noqa: F401
+    lightsail_unattached_disk,  # noqa: F401
+    lightsail_unattached_static_ip,  # noqa: F401
     log_group_no_retention,  # noqa: F401
     orphaned_rds_snapshot,  # noqa: F401
     orphaned_snapshots,  # noqa: F401

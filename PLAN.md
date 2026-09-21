@@ -164,7 +164,10 @@ Shipped past the twelve rows above: `unused-vpc-endpoint`, `empty-classic-lb`,
 `stopped-rds-instance`, `disabled-kms-key`, `stale-secret`, `unmounted-efs`,
 `detached-internet-gateway`, `incomplete-multipart-upload`,
 `orphaned-rds-snapshot`, `idle-provisioned-dynamodb`,
-`unused-route53-health-check`, `ecr-stale-images`.
+`unused-route53-health-check`, `ecr-stale-images`, and six Lightsail checks:
+`lightsail-stopped-instance`, `lightsail-unattached-static-ip`,
+`lightsail-unattached-disk`, `lightsail-idle-container-service`,
+`lightsail-empty-load-balancer`, `lightsail-orphaned-snapshot`.
 
 `ecr-stale-images` reports repositories nothing has pushed to in 90 days, at
 the ECR storage rate ($0.10/GB-month, flat across all 36 regions the Price List
@@ -172,6 +175,23 @@ API returns under `AmazonECR` / `EC2 Container Registry` / `GB-Mo`). Its cost is
 an explicit upper bound: ECR bills for unique layers, and images sharing a base
 layer are counted once each. Added after a manual cross-check of a live account
 found 71 GB across 37 repositories that no check could see.
+
+Lightsail was the other blind spot that cross-check found, and it is a whole
+service the scanner made no call to. The headline trap is
+`lightsail-stopped-instance`: unlike EC2, a *stopped* Lightsail instance bills
+its full bundle, so "stop it to save money" saves nothing.
+
+Lightsail prices come from **Lightsail's own API**, not the Price List API, and
+`refresh.py` says why at the fetcher. `GetBundles` and
+`GetContainerServicePowers` return a monthly price keyed by the exact
+`bundleId` / power name that the describe calls report, while the Price List
+carries the same rates keyed by a usagetype string (`USE1-BundleUsage:1GB`)
+that would have to be mapped back to a bundle by guesswork -- and a wrong
+mapping silently prices the wrong machine. Lightsail also bills containers over
+a 744-hour month, so multiplying its hourly rate by the table's 730 understates
+every one of them. Disk, static IP, load balancer and snapshot rates do come
+from the Price List, bucketed by the `group` attribute because Lightsail
+products leave `productFamily` null.
 
 The engine now supports global checks (`scope="global"`), which run once per
 scan instead of once per region. Route 53 was the first; CloudFront, IAM and

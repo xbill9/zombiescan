@@ -1,0 +1,46 @@
+{
+  "instances": [
+    {
+      "name": "retired-blog",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:Instance/11111111-1111-1111-1111-111111111111",
+      "createdAt": "2025-03-04T10:12:00+00:00",
+      "location": { "availabilityZone": "us-east-1a", "regionName": "us-east-1" },
+      "resourceType": "Instance",
+      "blueprintId": "wordpress",
+      "blueprintName": "WordPress",
+      "bundleId": "micro_3_0",
+      "isStaticIp": false,
+      "state": { "code": 112, "name": "stopped" }
+    },
+    {
+      "name": "live-api",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:Instance/22222222-2222-2222-2222-222222222222",
+      "createdAt": "2026-01-15T08:00:00+00:00",
+      "location": { "availabilityZone": "us-east-1a", "regionName": "us-east-1" },
+      "resourceType": "Instance",
+      "blueprintId": "ubuntu_22_04",
+      "blueprintName": "Ubuntu",
+      "bundleId": "small_3_0",
+      "isStaticIp": true,
+      "state": { "code": 16, "name": "running" }
+    },
+    {
+      "name": "mid-restart",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:Instance/33333333-3333-3333-3333-333333333333",
+      "createdAt": "2026-02-01T08:00:00+00:00",
+      "location": { "availabilityZone": "us-east-1a", "regionName": "us-east-1" },
+      "resourceType": "Instance",
+      "bundleId": "nano_3_0",
+      "state": { "code": 0, "name": "pending" }
+    },
+    {
+      "name": "next-gen-bundle",
+      "arn": "arn:aws:lightsail:us-east-1:111122223333:Instance/44444444-4444-4444-4444-444444444444",
+      "createdAt": "2026-06-01T08:00:00+00:00",
+      "location": { "availabilityZone": "us-east-1a", "regionName": "us-east-1" },
+      "resourceType": "Instance",
+      "bundleId": "nano_9_9",
+      "state": { "code": 112, "name": "stopped" }
+    }
+  ]
+}

@@ -18,6 +18,7 @@ import pathlib
 from typing import Any
 
 import boto3
+import botocore.exceptions
 
 VOLUME_TYPES = ["gp3", "gp2", "io1", "io2", "st1", "sc1", "standard"]
 TABLE_PATH = pathlib.Path(__file__).with_name("table.json")
@@ -417,6 +418,84 @@ def fetch_dynamodb_capacity(client: Any) -> dict[str, dict[str, float]]:
     return table
 
 
+# Lightsail products leave ``productFamily`` null and carry the meaningful
+# grouping in ``group`` instead, so these are bucketed by that attribute.
+LIGHTSAIL_GROUPS = {
+    "Lightsail Block Storage": ("lightsail_disk_gb_month", "GB-Mo"),
+    "Lightsail unused static IP": ("lightsail_static_ip_hour", "Hrs"),
+    "Lightsail Load Balancer": ("lightsail_load_balancer_hour", "Hrs"),
+    "Lightsail Snapshot": ("lightsail_snapshot_gb_month", "GB-Mo"),
+    "Lightsail Instance Snapshot": ("lightsail_snapshot_gb_month", "GB-Mo"),
+}
+
+
+def fetch_lightsail_rates(client: Any) -> dict[str, dict[str, float]]:
+    """Per-region Lightsail commodity rates, in one pass over the service.
+
+    Six groups are wanted and the service is small, so bucketing a single
+    listing beats filtering it once per group.
+    """
+    table: dict[str, dict[str, float]] = {key: {} for key, _ in LIGHTSAIL_GROUPS.values()}
+    for entry in _paginate(client, ServiceCode="AmazonLightsail"):
+        attrs = entry["product"]["attributes"]
+        group = attrs.get("group")
+        if group not in LIGHTSAIL_GROUPS:
+            continue
+        key, unit = LIGHTSAIL_GROUPS[group]
+        region = attrs.get("regionCode")
+        price = _usd_rate(entry, unit)
+        if not region or price is None:
+            continue
+        # Instance and disk snapshots share a rate under two group names.
+        table[key][region] = max(table[key].get(region, 0.0), price)
+    return table
+
+
+def fetch_lightsail_bundles(session: Any) -> tuple[dict[str, Any], dict[str, Any]]:
+    """{region: {bundle_id: usd_month}}, {region: {power: usd_month}} from Lightsail.
+
+    Deliberately *not* the Price List API. Lightsail's own GetBundles returns a
+    monthly price keyed by the exact ``bundleId`` that GetInstances reports,
+    and GetContainerServicePowers does the same for container power names. The
+    Price List carries the same rates keyed by a usagetype string
+    ("USE1-BundleUsage:1GB") that would have to be mapped back to a bundle id
+    by guesswork -- and a wrong mapping silently prices the wrong machine.
+
+    It also prices per month directly, so it does not inherit the 730-hour
+    assumption: Lightsail bills containers over a 744-hour month, and
+    multiplying its hourly rate by 730 understates every one of them.
+    """
+    probe = session.client("lightsail", region_name="us-east-1")
+    regions = [r["name"] for r in probe.get_regions()["regions"] if r.get("name")]
+
+    bundles: dict[str, Any] = {}
+    powers: dict[str, Any] = {}
+    for region in sorted(regions):
+        client = session.client("lightsail", region_name=region)
+        try:
+            found = {}
+            for page in client.get_paginator("get_bundles").paginate():
+                for bundle in page.get("bundles", []):
+                    if bundle.get("isActive") and bundle.get("bundleId"):
+                        found[bundle["bundleId"]] = float(bundle.get("price", 0.0))
+            if found:
+                bundles[region] = dict(sorted(found.items()))
+
+            service_powers = {
+                power["name"]: float(power.get("price", 0.0))
+                for power in client.get_container_service_powers().get("powers", [])
+                if power.get("name")
+            }
+            if service_powers:
+                powers[region] = dict(sorted(service_powers.items()))
+        except botocore.exceptions.BotoCoreError:
+            # A region Lightsail does not serve has no endpoint at all.
+            continue
+        except botocore.exceptions.ClientError:
+            continue
+    return bundles, powers
+
+
 def fetch_route53_health_checks(client: Any) -> dict[str, float]:
     """{aws|non_aws: usd_per_month}. Route 53 is global, so there is no region."""
     entries = _paginate(
@@ -488,6 +567,13 @@ def main() -> None:
     print("fetching DynamoDB capacity prices...")
     ddb = fetch_dynamodb_capacity(client)
     print(f"  {len(ddb)} regions")
+    print("fetching Lightsail commodity rates...")
+    lightsail = fetch_lightsail_rates(client)
+    for key, values in lightsail.items():
+        print(f"  {key}: {len(values)} regions")
+    print("fetching Lightsail bundles and container powers (Lightsail API)...")
+    ls_bundles, ls_powers = fetch_lightsail_bundles(boto3.Session())
+    print(f"  {len(ls_bundles)} bundle regions, {len(ls_powers)} container-power regions")
     print("fetching Route 53 health check prices...")
     r53 = fetch_route53_health_checks(client)
     print(f"  {len(r53)} rates (global)")
@@ -519,6 +605,9 @@ def main() -> None:
         "s3_gb_month": dict(sorted(s3.items())),
         "rds_snapshot_gb_month": dict(sorted(rds_snap.items())),
         "dynamodb_capacity_hour": dict(sorted(ddb.items())),
+        "lightsail_bundle_month": dict(sorted(ls_bundles.items())),
+        "lightsail_container_power_month": dict(sorted(ls_powers.items())),
+        **{key: dict(sorted(values.items())) for key, values in sorted(lightsail.items())},
         "route53_health_check_month": r53,
     }
     TABLE_PATH.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n")
