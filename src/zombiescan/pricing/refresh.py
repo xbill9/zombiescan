@@ -299,6 +299,16 @@ def fetch_secrets(client: Any) -> dict[str, float]:
     return _flat_rate_by_region(client, "AWSSecretsManager", "Secret", "Secrets")
 
 
+def fetch_ecr_storage(client: Any) -> dict[str, float]:
+    """{region: usd_per_gb_month} for ECR image storage.
+
+    The "EC2 Container Registry" family also prices archive retrieval (per GB)
+    and image signing (per Count), so the GB-Mo unit is what picks out the
+    TimedStorage-ByteHrs rate rather than one of those.
+    """
+    return _flat_rate_by_region(client, "AmazonECR", "EC2 Container Registry", "GB-Mo")
+
+
 def fetch_efs_storage(client: Any) -> dict[str, float]:
     """{region: usd_per_gb_month} for EFS Standard regional storage."""
     entries = _paginate(
@@ -463,6 +473,9 @@ def main() -> None:
     print("fetching Secrets Manager prices...")
     secrets = fetch_secrets(client)
     print(f"  {len(secrets)} regions")
+    print("fetching ECR storage prices...")
+    ecr = fetch_ecr_storage(client)
+    print(f"  {len(ecr)} regions")
     print("fetching EFS storage prices...")
     efs = fetch_efs_storage(client)
     print(f"  {len(efs)} regions")
@@ -501,6 +514,7 @@ def main() -> None:
         "rds_storage_gb_month": dict(sorted(rds.items())),
         "kms_key_month": dict(sorted(kms.items())),
         "secret_month": dict(sorted(secrets.items())),
+        "ecr_gb_month": dict(sorted(ecr.items())),
         "efs_gb_month": dict(sorted(efs.items())),
         "s3_gb_month": dict(sorted(s3.items())),
         "rds_snapshot_gb_month": dict(sorted(rds_snap.items())),

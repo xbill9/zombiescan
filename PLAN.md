@@ -164,7 +164,14 @@ Shipped past the twelve rows above: `unused-vpc-endpoint`, `empty-classic-lb`,
 `stopped-rds-instance`, `disabled-kms-key`, `stale-secret`, `unmounted-efs`,
 `detached-internet-gateway`, `incomplete-multipart-upload`,
 `orphaned-rds-snapshot`, `idle-provisioned-dynamodb`,
-`unused-route53-health-check`.
+`unused-route53-health-check`, `ecr-stale-images`.
+
+`ecr-stale-images` reports repositories nothing has pushed to in 90 days, at
+the ECR storage rate ($0.10/GB-month, flat across all 36 regions the Price List
+API returns under `AmazonECR` / `EC2 Container Registry` / `GB-Mo`). Its cost is
+an explicit upper bound: ECR bills for unique layers, and images sharing a base
+layer are counted once each. Added after a manual cross-check of a live account
+found 71 GB across 37 repositories that no check could see.
 
 The engine now supports global checks (`scope="global"`), which run once per
 scan instead of once per region. Route 53 was the first; CloudFront, IAM and

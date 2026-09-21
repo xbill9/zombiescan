@@ -5,6 +5,7 @@ from zombiescan.checks import (
     classic_load_balancer,  # noqa: F401
     detached_internet_gateway,  # noqa: F401
     disabled_kms_key,  # noqa: F401
+    ecr_stale_images,  # noqa: F401
     empty_vpc,  # noqa: F401
     idle_load_balancer,  # noqa: F401
     idle_nat_gateway,  # noqa: F401

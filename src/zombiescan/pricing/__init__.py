@@ -130,6 +130,11 @@ class PriceTable:
         price, approximate = self._lookup("efs_gb_month", region)
         return (price or 0.0), approximate
 
+    def ecr_gb_month(self, region: str) -> tuple[float, bool]:
+        """USD per GB-month of ECR image storage."""
+        price, approximate = self._lookup("ecr_gb_month", region)
+        return (price or 0.0), approximate
+
     def s3_gb_month(self, region: str) -> tuple[float, bool]:
         """USD per GB-month of S3 Standard storage."""
         price, approximate = self._lookup("s3_gb_month", region)

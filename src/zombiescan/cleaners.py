@@ -335,5 +335,14 @@ UNCLEANABLE = {
     "empty-vpc": (
         "a VPC cannot be deleted until its subnets, route tables and gateways "
         "are removed first, in an order this tool does not attempt to work out"
-    )
+    ),
+    # Staleness here means nothing has been *pushed*, which says nothing about
+    # pulls: a repository untouched for a year may still be pulled on every
+    # deploy. There is no snapshot or recovery window for a deleted image
+    # either, so a wrong guess is unrecoverable and breaks the next rollout.
+    "ecr-stale-images": (
+        "a stale repository may still be pulled from on every deploy, and a "
+        "deleted image has no recovery window -- decide which tags to drop, "
+        "then encode that decision as a lifecycle policy"
+    ),
 }

@@ -37,6 +37,7 @@ TEST_PRICES = {
     "vpc_endpoint_hour": {"us-east-1": 0.01, "eu-west-1": 0.011},
     "classic_lb_hour": {"us-east-1": 0.025, "eu-west-1": 0.028},
     "s3_gb_month": {"us-east-1": 0.023, "eu-west-1": 0.024},
+    "ecr_gb_month": {"us-east-1": 0.10, "eu-west-1": 0.10},
     "rds_snapshot_gb_month": {"us-east-1": 0.095, "eu-west-1": 0.105},
     "dynamodb_capacity_hour": {"us-east-1": {"read": 0.00013, "write": 0.00065}},
     "route53_health_check_month": {"aws": 0.50, "non_aws": 0.75},
@@ -62,6 +63,7 @@ _DATETIME_KEYS = (
     "DeletedDate",
     "Initiated",
     "SnapshotCreateTime",
+    "imagePushedAt",
 )
 
 

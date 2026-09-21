@@ -1,0 +1,125 @@
+{
+  "Repositories": [
+    {
+      "repositoryArn": "arn:aws:ecr:us-east-1:111122223333:repository/ai-course-creator-app",
+      "registryId": "111122223333",
+      "repositoryName": "ai-course-creator-app",
+      "repositoryUri": "111122223333.dkr.ecr.us-east-1.amazonaws.com/ai-course-creator-app",
+      "createdAt": "2026-04-12T20:37:46.269000+00:00",
+      "imageTagMutability": "MUTABLE",
+      "imageScanningConfiguration": { "scanOnPush": false },
+      "encryptionConfiguration": { "encryptionType": "AES256" }
+    },
+    {
+      "repositoryArn": "arn:aws:ecr:us-east-1:111122223333:repository/mcp-lambda-rust-aws",
+      "registryId": "111122223333",
+      "repositoryName": "mcp-lambda-rust-aws",
+      "repositoryUri": "111122223333.dkr.ecr.us-east-1.amazonaws.com/mcp-lambda-rust-aws",
+      "createdAt": "2026-05-12T20:05:33.836000+00:00",
+      "imageTagMutability": "MUTABLE",
+      "imageScanningConfiguration": { "scanOnPush": false },
+      "encryptionConfiguration": { "encryptionType": "AES256" }
+    },
+    {
+      "repositoryArn": "arn:aws:ecr:us-east-1:111122223333:repository/cdk-hnb659fds-container-assets-111122223333-us-east-1",
+      "registryId": "111122223333",
+      "repositoryName": "cdk-hnb659fds-container-assets-111122223333-us-east-1",
+      "repositoryUri": "111122223333.dkr.ecr.us-east-1.amazonaws.com/cdk-hnb659fds-container-assets-111122223333-us-east-1",
+      "createdAt": "2026-05-06T01:15:51.090000+00:00",
+      "imageTagMutability": "IMMUTABLE",
+      "imageScanningConfiguration": { "scanOnPush": false },
+      "encryptionConfiguration": { "encryptionType": "AES256" }
+    }
+  ],
+  "ImagesByRepository": {
+    "ai-course-creator-app": [
+      {
+        "registryId": "111122223333",
+        "repositoryName": "ai-course-creator-app",
+        "imageDigest": "sha256:9734e6d95c2291cd41c062e6db83b15a9e9dac5bcf1e7e9b854806906a9089d3",
+        "imageSizeInBytes": 245184050,
+        "imagePushedAt": "2026-04-12T22:16:07.019000+00:00",
+        "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "artifactMediaType": "application/vnd.docker.container.image.v1+json",
+        "imageStatus": "ACTIVE"
+      },
+      {
+        "registryId": "111122223333",
+        "repositoryName": "ai-course-creator-app",
+        "imageDigest": "sha256:634ec62681184d8c8bb4830192ceacc227a531d9e1874121df5ce42aafa5a790",
+        "imageSizeInBytes": 1569,
+        "imagePushedAt": "2026-04-14T14:18:10.219000+00:00",
+        "imageManifestMediaType": "application/vnd.oci.image.manifest.v1+json",
+        "artifactMediaType": "application/vnd.oci.image.config.v1+json",
+        "imageStatus": "ACTIVE"
+      },
+      {
+        "registryId": "111122223333",
+        "repositoryName": "ai-course-creator-app",
+        "imageDigest": "sha256:3a0fb87c2e1b95a4724f602c477bbb0583b097ffd6432e788fa6fc02f3e73b82",
+        "imageSizeInBytes": 244468299,
+        "imagePushedAt": "2026-04-14T02:56:02.697000+00:00",
+        "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "artifactMediaType": "application/vnd.docker.container.image.v1+json",
+        "imageStatus": "ACTIVE"
+      },
+      {
+        "registryId": "111122223333",
+        "repositoryName": "ai-course-creator-app",
+        "imageDigest": "sha256:0c76f37ce589b66c6ca69e4cd6cda9830c759f8d096f22e8da0b0b1a1918d740",
+        "imageSizeInBytes": 244464758,
+        "imagePushedAt": "2026-04-14T02:47:38.832000+00:00",
+        "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "artifactMediaType": "application/vnd.docker.container.image.v1+json",
+        "lastRecordedPullTime": "2026-04-14T02:49:37.426000+00:00",
+        "imageStatus": "ACTIVE"
+      },
+      {
+        "registryId": "111122223333",
+        "repositoryName": "ai-course-creator-app",
+        "imageDigest": "sha256:7c1f0b5f9a2d4e8c3b6a1d9e0f2c5b8a4d7e1f3c6b9a2d5e8f1c4b7a0d3e6f9c",
+        "imageTags": ["multiarch"],
+        "imagePushedAt": "2026-04-13T09:01:00.000000+00:00",
+        "imageManifestMediaType": "application/vnd.oci.image.index.v1+json",
+        "imageStatus": "ACTIVE"
+      }
+    ],
+    "mcp-lambda-rust-aws": [
+      {
+        "registryId": "111122223333",
+        "repositoryName": "mcp-lambda-rust-aws",
+        "imageDigest": "sha256:fa942b210de272be62c7c3c2f44459a504de70fe4eda071f1a96670c1f176a80",
+        "imageSizeInBytes": 12278950,
+        "imagePushedAt": "2026-05-12T20:05:38.252000+00:00",
+        "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "artifactMediaType": "application/vnd.docker.container.image.v1+json",
+        "lastRecordedPullTime": "2026-05-12T20:05:41.472000+00:00",
+        "imageStatus": "ACTIVE"
+      },
+      {
+        "registryId": "111122223333",
+        "repositoryName": "mcp-lambda-rust-aws",
+        "imageDigest": "sha256:456ee5effbc8eb078bee7953df9c053977527239c039f184838216c01ea04e1e",
+        "imageSizeInBytes": 12278200,
+        "imagePushedAt": "2026-05-13T01:39:39.695000+00:00",
+        "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "artifactMediaType": "application/vnd.docker.container.image.v1+json",
+        "lastRecordedPullTime": "2026-05-13T01:39:43.481000+00:00",
+        "imageStatus": "ACTIVE"
+      },
+      {
+        "registryId": "111122223333",
+        "repositoryName": "mcp-lambda-rust-aws",
+        "imageDigest": "sha256:66911b2c5c7e3ba4a97fe66bf1456476c2b0506f8dcbdec642a615ab39751890",
+        "imageTags": ["latest"],
+        "imageSizeInBytes": 12278236,
+        "imagePushedAt": "2026-05-13T02:33:39.211000+00:00",
+        "imageManifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+        "artifactMediaType": "application/vnd.docker.container.image.v1+json",
+        "lastRecordedPullTime": "2026-05-13T02:33:42.570000+00:00",
+        "imageStatus": "ACTIVE"
+      }
+    ],
+    "cdk-hnb659fds-container-assets-111122223333-us-east-1": []
+  }
+}
