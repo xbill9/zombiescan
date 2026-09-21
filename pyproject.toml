@@ -27,7 +27,11 @@ zombiescan = "zombiescan.cli:main"
 zombiescan-mcp = "zombiescan.mcp_server:main"
 
 [dependency-groups]
-dev = ["pytest>=8.0", "ruff>=0.6", "jsonschema>=4.0"]
+# ruff is pinned, not floated. It is a formatter as well as a linter, so a
+# new release reformats files nobody edited and fails CI on a commit that
+# did not touch them. Bump it deliberately, with the reformat in its own
+# commit.
+dev = ["pytest>=8.0", "ruff==0.16.8", "jsonschema>=4.0"]
 
 [build-system]
 requires = ["hatchling"]

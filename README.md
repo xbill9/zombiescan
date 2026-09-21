@@ -85,7 +85,7 @@ credential load if it is missing.
 
 ```
 zombiescan checks                     # list the checks
-zombiescan scan                       # default region
+zombiescan scan                       # the four US regions
 zombiescan scan --all-regions         # every region the account has enabled
 zombiescan scan --all-regions --us-only  # narrow those to the US regions
 zombiescan scan --region eu-west-1 --region us-east-1
@@ -98,7 +98,15 @@ zombiescan scan --html report.html    # shareable report; print to PDF from a br
 zombiescan scan --script cleanup.sh   # write the plan (never runs it)
 ```
 
-A full 22-check sweep of 17 regions takes about 20 seconds.
+A bare `zombiescan scan` covers **us-east-1, us-east-2, us-west-1 and
+us-west-2**. Scanning the one region a profile happens to name reports a clean
+account while the waste sits two regions over — forgotten resources are exactly
+the ones nobody looks at. These four are enabled on every account, so the
+default needs no describe call and cannot fail on a region the account cannot
+reach; the scan names them as it starts. `--region` replaces them, and
+`--all-regions` covers everything the account has enabled.
+
+A full 30-check sweep of 17 regions takes about 30 seconds.
 
 ## The Claude Code plugin
 

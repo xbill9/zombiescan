@@ -75,7 +75,8 @@ constrain root, so the shipped least-privilege policy cannot be verified with it
 
 ```
 uv sync                                    # install deps
-uv run zombiescan scan --all-regions       # run the CLI
+uv run zombiescan scan                     # the CLI; defaults to the 4 US regions
+uv run zombiescan scan --all-regions       # every region the account has enabled
 uv run pytest                              # tests (fixtures, offline)
 ZOMBIESCAN_LIVE=1 uv run pytest -m live    # opt-in live smoke test, real account
 uv run zombiescan-mcp                      # the MCP server, on stdio

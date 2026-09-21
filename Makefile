@@ -47,7 +47,7 @@ checks: ## List every zombie check the engine knows about
 	$(RUN) zombiescan checks
 
 .PHONY: scan
-scan: ## Scan (read-only); REGIONS defaults to your configured region
+scan: ## Scan (read-only); REGIONS defaults to the four US regions
 	$(RUN) zombiescan scan $(PROFILE_ARG) $(REGIONS) $(ARGS)
 
 .PHONY: scan-all

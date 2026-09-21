@@ -267,6 +267,9 @@ Wanted but not built:
 
 - Cost lookback for "idle" judgments (RDS connections, ALB targets) needs
   CloudWatch metrics; decide the default window (7 days is the usual answer)
-- Whether `--all-regions` defaults on or off. Off is faster; on is what people
-  actually want, because the forgotten resources are always in a region nobody
-  looks at.
+- ~~Whether `--all-regions` defaults on or off.~~ **Settled 2026-09-21:**
+  neither. A bare scan covers the four US regions (`engine.DEFAULT_REGIONS`),
+  which is the compromise between one region finding nothing and seventeen
+  taking half a minute. They are enabled on every account, so the default costs
+  no describe call, and the scan prints the scope it chose rather than leaving
+  four regions to look like all of them.

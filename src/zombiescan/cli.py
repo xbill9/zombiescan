@@ -84,7 +84,12 @@ def list_packs() -> None:
 
 @main.command()
 @click.option("--profile", default=None, help="AWS profile to use.")
-@click.option("--region", "regions", multiple=True, help="Region to scan (repeatable).")
+@click.option(
+    "--region",
+    "regions",
+    multiple=True,
+    help="Region to scan (repeatable). Replaces the default four US regions.",
+)
 @click.option("--all-regions", is_flag=True, help="Scan every region this account has enabled.")
 @click.option("--us-only", is_flag=True, help="Narrow the regions to scan to the US ones (us-*).")
 @click.option("--check", "checks", multiple=True, help="Run only this check (repeatable).")
@@ -153,6 +158,13 @@ def scan_command(
     console.print(
         f"[dim]{len(target_regions)} region(s), {len(selected)} check(s) — read-only[/dim]"
     )
+    if not regions and not all_regions:
+        # A default scope has to say what it is. Silently scanning four regions
+        # reads as "these four are all you have" to anyone who did not know.
+        console.print(
+            f"[dim]default scope: {', '.join(target_regions)} — "
+            f"--all-regions covers every region the account has enabled[/dim]"
+        )
 
     pricing = PriceTable.load()
     started = time.monotonic()
@@ -227,7 +239,12 @@ def _describe(outcome: clean.Outcome, console: Console) -> None:
 
 @main.command("clean")
 @click.option("--profile", default=None, help="AWS profile to use.")
-@click.option("--region", "regions", multiple=True, help="Region to scan (repeatable).")
+@click.option(
+    "--region",
+    "regions",
+    multiple=True,
+    help="Region to scan (repeatable). Replaces the default four US regions.",
+)
 @click.option("--all-regions", is_flag=True, help="Scan every region this account has enabled.")
 @click.option("--check", "checks", multiple=True, help="Only this check (repeatable).")
 @click.option(
@@ -309,6 +326,8 @@ def clean_command(
             console.print(f"[red]{exc}[/red]")
             sys.exit(2)
         console.print(f"[dim]Scanning as {caller_arn} — {len(target_regions)} region(s)[/dim]")
+        if not regions and not all_regions:
+            console.print(f"[dim]default scope: {', '.join(target_regions)}[/dim]")
         with console.status("Scanning..."):
             result = scan(session, target_regions, selected, pricing)
         if result.completely_failed:

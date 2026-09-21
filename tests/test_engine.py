@@ -6,7 +6,7 @@ import botocore.exceptions
 import pytest
 
 from tests.conftest import TEST_PRICES
-from zombiescan.engine import filter_us_regions, scan
+from zombiescan.engine import DEFAULT_REGIONS, filter_us_regions, resolve_regions, scan
 from zombiescan.models import Finding
 from zombiescan.pricing import PriceTable
 from zombiescan.registry import CheckSpec
@@ -139,3 +139,35 @@ def test_a_scan_that_found_nowhere_to_look_is_still_reported_as_incomplete(prici
 
     result = scan(None, REGIONS, [CheckSpec(name="ls", title="ls", fn=fn)], pricing)
     assert result.completely_failed is True
+
+
+def test_a_scan_with_no_region_flags_covers_the_us_regions():
+    """The default scope is four regions, not whichever one a profile names.
+
+    Resolving it needs no session and no configured region: these four are
+    enabled on every account, so nothing has to be asked.
+    """
+    assert resolve_regions(None, all_regions=False) == [
+        "us-east-1",
+        "us-east-2",
+        "us-west-1",
+        "us-west-2",
+    ]
+    assert list(DEFAULT_REGIONS) == resolve_regions(None, all_regions=False)
+
+
+def test_all_regions_asks_the_account_which_ones_it_has_enabled():
+    """Opted-out regions are excluded by AWS, so the answer is never guessed."""
+
+    class FakeEc2:
+        def describe_regions(self):
+            return {"Regions": [{"RegionName": "eu-west-1"}, {"RegionName": "us-east-1"}]}
+
+    class FakeSession:
+        region_name = "eu-west-1"
+
+        def client(self, service, region_name=None):
+            assert service == "ec2"
+            return FakeEc2()
+
+    assert resolve_regions(FakeSession(), all_regions=True) == ["eu-west-1", "us-east-1"]

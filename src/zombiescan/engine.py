@@ -55,20 +55,25 @@ class CredentialError(RuntimeError):
     """Raised when there is no usable session. The message names the fix."""
 
 
+# What a scan covers when nothing says otherwise. Scanning the one region a
+# profile happens to name reports a clean account while the waste sits two
+# regions over -- forgotten resources live where nobody looks. These four are
+# the US commercial regions: enabled on every account, never opted out, so the
+# default costs no describe call and cannot fail on a region the account
+# cannot reach. Everything else is one --all-regions away.
+DEFAULT_REGIONS = ("us-east-1", "us-east-2", "us-west-1", "us-west-2")
+
+
 def resolve_regions(session: boto3.Session, all_regions: bool) -> list[str]:
     """Which regions to scan.
 
     ``--all-regions`` asks EC2 for the regions this account has enabled;
     opted-out regions are excluded by AWS, so we never waste calls on them.
+    Without it the answer is ``DEFAULT_REGIONS``, which also means a scan runs
+    on a machine with no region configured at all.
     """
     if not all_regions:
-        region = session.region_name
-        if not region:
-            raise CredentialError(
-                "No region configured. Set one with 'aws configure set region <region>', "
-                "pass --region, or use --all-regions."
-            )
-        return [region]
+        return list(DEFAULT_REGIONS)
 
     client = session.client("ec2", region_name=session.region_name or "us-east-1")
     described = client.describe_regions()["Regions"]

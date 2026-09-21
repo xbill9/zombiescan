@@ -210,7 +210,8 @@ _SCAN_SCHEMA = {
         "regions": {
             "type": "array",
             "items": {"type": "string"},
-            "description": "Regions to scan. Defaults to the configured region.",
+            "description": "Regions to scan. Defaults to the four US regions "
+            "(us-east-1, us-east-2, us-west-1, us-west-2).",
         },
         "all_regions": {
             "type": "boolean",

@@ -459,5 +459,5 @@ requires-dist = [
 dev = [
     { name = "jsonschema", specifier = ">=4.0" },
     { name = "pytest", specifier = ">=8.0" },
-    { name = "ruff", specifier = ">=0.6" },
+    { name = "ruff", specifier = "==0.16.8" },
 ]

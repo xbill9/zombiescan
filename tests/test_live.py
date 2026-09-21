@@ -36,7 +36,7 @@ def test_credentials_resolve(session):
     assert arn.startswith("arn:aws")
 
 
-def test_scan_completes_against_the_default_region(session):
+def test_scan_completes_against_the_default_regions(session):
     result = scan(
         session,
         resolve_regions(session, all_regions=False),
@@ -48,7 +48,9 @@ def test_scan_completes_against_the_default_region(session):
     assert result.errors == []
     for finding in result.findings:
         assert finding.monthly_cost >= 0
-        assert finding.region in result.regions
+        # A global check's findings are labelled "global": Route 53 and friends
+        # have no region of their own to be in.
+        assert finding.region in result.regions or finding.region == "global"
         assert finding.remediation
 
 
