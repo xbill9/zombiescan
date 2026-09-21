@@ -10,6 +10,7 @@ outage, not waste, and calling it waste would be actively misleading.
 
 from __future__ import annotations
 
+import shlex
 from collections.abc import Iterator
 from typing import Any
 
@@ -55,7 +56,8 @@ def build_finding(ctx: ScanContext, balancer: dict[str, Any], group_count: int) 
         reason=f"{kind.title()} load balancer with {detail}",
         monthly_cost=price,
         remediation=(
-            f"aws elbv2 delete-load-balancer --load-balancer-arn {arn} --region {ctx.region}"
+            f"aws elbv2 delete-load-balancer --load-balancer-arn {shlex.quote(arn)} "
+            f"--region {ctx.region}"
         ),
         approximate_cost=approximate,
         details={

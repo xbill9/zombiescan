@@ -12,6 +12,7 @@ abandoned one from here. The finding is a prompt to look, not a verdict.
 from __future__ import annotations
 
 import datetime as dt
+import shlex
 from collections.abc import Iterator
 from typing import Any
 
@@ -50,7 +51,7 @@ def build_finding(ctx: ScanContext, secret: dict[str, Any], idle_days: int | Non
         reason=reason,
         monthly_cost=price,
         remediation=(
-            f"aws secretsmanager delete-secret --secret-id '{name}' "
+            f"aws secretsmanager delete-secret --secret-id {shlex.quote(name)} "
             f"--recovery-window-in-days 30 --region {ctx.region}"
         ),
         approximate_cost=approximate,

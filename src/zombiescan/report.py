@@ -202,6 +202,15 @@ def write_json(result: ScanResult, path: str, caller_arn: str | None = None) -> 
         handle.write("\n")
 
 
+def _comment(text: str) -> str:
+    """Flatten text destined for a shell comment onto one line.
+
+    A newline inside a resource name or reason would end the comment and turn
+    whatever follows into an executable line.
+    """
+    return " ".join(str(text).splitlines())
+
+
 def to_script(result: ScanResult) -> str:
     stamp = dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     lines = [
@@ -220,7 +229,10 @@ def to_script(result: ScanResult) -> str:
         "",
     ]
     for finding in result.findings:
-        lines.append(f"# {finding.region} {finding.resource_id} — {finding.reason}")
+        lines.append(
+            f"# {_comment(finding.region)} {_comment(finding.resource_id)} "
+            f"— {_comment(finding.reason)}"
+        )
         lines.append(f"# saves about ${finding.monthly_cost:,.2f}/month")
         lines.append(finding.remediation)
         lines.append("")

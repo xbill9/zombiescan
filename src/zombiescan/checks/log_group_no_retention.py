@@ -11,6 +11,7 @@ today, and reporting it would bury the ones that do.
 
 from __future__ import annotations
 
+import shlex
 from collections.abc import Iterator
 from typing import Any
 
@@ -38,7 +39,7 @@ def build_finding(ctx: ScanContext, group: dict[str, Any]) -> Finding:
         ),
         monthly_cost=stored_gb * price,
         remediation=(
-            f"aws logs put-retention-policy --log-group-name '{name}' "
+            f"aws logs put-retention-policy --log-group-name {shlex.quote(name)} "
             f"--retention-in-days {SUGGESTED_RETENTION_DAYS} --region {ctx.region}"
         ),
         # The reported figure is what the stored data costs now. Setting a

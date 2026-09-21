@@ -108,3 +108,54 @@ def test_script_header_does_not_promise_snapshots_for_everything(capsys):
     script = to_script(result)
     assert "Volumes are snapshotted first" not in script
     assert "Where a backup is possible" in script
+
+
+HOSTILE_NAME = "/app/'; echo PWNED; #"
+
+
+def test_remediation_cannot_break_out_of_shell_quoting():
+    """A quote in a resource name must not become a command in the plan.
+
+    AWS's own charset rules make this unreachable through the log group and
+    secret APIs today. Relying on a remote service's input validation for
+    local shell safety is the assumption that ages badly.
+    """
+    import shlex
+
+    from tests.conftest import TEST_PRICES, FakeClient
+    from zombiescan.checks.log_group_no_retention import log_group_no_retention
+    from zombiescan.models import ScanContext
+    from zombiescan.pricing import PriceTable
+
+    ctx = ScanContext(session=None, region="us-east-1", pricing=PriceTable(TEST_PRICES))
+    ctx.client = lambda _s: FakeClient(
+        {
+            "describe_log_groups": [
+                {"logGroups": [{"logGroupName": HOSTILE_NAME, "storedBytes": 999}]}
+            ]
+        }
+    )
+    (finding,) = log_group_no_retention(ctx)
+
+    # The property that matters: a shell parsing this line sees the hostile
+    # name as one argument to --log-group-name, and sees no extra commands.
+    tokens = shlex.split(finding.remediation)
+    assert tokens[tokens.index("--log-group-name") + 1] == HOSTILE_NAME
+    assert "echo" not in tokens
+    assert ";" not in tokens
+
+
+def test_script_comments_cannot_become_commands():
+    """A newline in a name would end the comment and execute what follows."""
+    finding = Finding(
+        check="x",
+        resource_id="r\nrm -rf /",
+        resource_type="t",
+        region="us-east-1",
+        reason="line one\nrm -rf /",
+        monthly_cost=1.0,
+        remediation="aws thing delete --id r",
+    )
+    script = to_script(ScanResult(findings=[finding], regions=["us-east-1"]))
+    for line in script.splitlines():
+        assert "rm -rf /" not in line or line.startswith("#")

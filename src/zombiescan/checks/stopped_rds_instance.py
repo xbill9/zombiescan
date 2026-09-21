@@ -8,6 +8,7 @@ compute charge resumes too, usually without anyone noticing.
 
 from __future__ import annotations
 
+import shlex
 from collections.abc import Iterator
 from typing import Any
 
@@ -36,8 +37,9 @@ def build_finding(ctx: ScanContext, instance: dict[str, Any]) -> Finding:
         ),
         monthly_cost=allocated_gb * price,
         remediation=(
-            f"aws rds delete-db-instance --db-instance-identifier {identifier} "
-            f"--final-db-snapshot-identifier {identifier}-final --region {ctx.region}"
+            f"aws rds delete-db-instance --db-instance-identifier {shlex.quote(identifier)} "
+            f"--final-db-snapshot-identifier {shlex.quote(identifier + '-final')} "
+            f"--region {ctx.region}"
         ),
         approximate_cost=approximate,
         details={

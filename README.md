@@ -104,6 +104,14 @@ are dormant by design. `unused-ami` is the least certain check in the catalog: i
 not launch templates, Auto Scaling groups, or cross-account shares. Read its
 findings before acting on them.
 
+## The generated script
+
+`--script` writes a plan; zombiescan never runs it. Every value interpolated
+into a command is shell-quoted, so a resource name cannot become a command in
+the file you are about to execute. AWS's own naming rules make that unreachable
+today, but a tool that hands you a script to run should not depend on a remote
+service's input validation for local shell safety.
+
 ## Exit codes
 
 | Code | Meaning |

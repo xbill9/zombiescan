@@ -7,6 +7,7 @@ rarely a reason to still have one, let alone an empty one.
 
 from __future__ import annotations
 
+import shlex
 from collections.abc import Iterator
 from typing import Any
 
@@ -27,7 +28,8 @@ def build_finding(ctx: ScanContext, balancer: dict[str, Any]) -> Finding:
         reason="Classic load balancer with no instances registered",
         monthly_cost=price,
         remediation=(
-            f"aws elb delete-load-balancer --load-balancer-name {name} --region {ctx.region}"
+            f"aws elb delete-load-balancer --load-balancer-name {shlex.quote(name)} "
+            f"--region {ctx.region}"
         ),
         approximate_cost=approximate,
         details={
