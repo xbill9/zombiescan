@@ -1,0 +1,14 @@
+Put the Arithmetic in the Tool: an MCP Server for an AWS Waste Scanner
+
+A cost report gets read twice: once by a person in a terminal, once by an agent through an MCP server. Making the server compute every total instead of handing back rows keeps the two answers the same, and measures the report's own arithmetic against the AWS bill.
+
+What is in it:
+
+- 🟢 Five read-only MCP tools over stdio, JSON-RPC 2.0, standard library only
+- 🟢 One scan of 17 regions: 120 findings, $6.90 a month, $82.80 a year
+- 🟢 estimate\_savings answers totals, counts, extremes and three breakdowns from one call
+- 🟢 A filter that matches nothing reports which of its terms the report never held
+
+dev.to \(AWS Community Builders\): https://dev.to/aws-builders/put-the-arithmetic-in-the-tool-an-mcp-server-for-an-aws-waste-scanner-3n79
+AWS Builder Center: https://builder.aws.com/content/3Je8ItJpPDju4BG1MGvAPdoe9HM/put-the-arithmetic-in-the-tool-an-mcp-server-for-an-aws-waste-scanner
+Medium: https://xbill999.medium.com/put-the-arithmetic-in-the-tool-an-mcp-server-for-an-aws-waste-scanner-3a3fc3682155

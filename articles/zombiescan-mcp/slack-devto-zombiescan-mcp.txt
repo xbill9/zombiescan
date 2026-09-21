@@ -1,0 +1,17 @@
+A local AWS waste scanner has a second front door now: an MCP server, so an agent drives the same engine the terminal does.
+The write-up covers keeping every tool read-only, returning computed totals instead of rows for the model to add up, and the end-to-end test that holds both front doors to one number.
+It also calibrates the scanner's ECR estimate against Cost Explorer, which came out 2.1x the billed figure because shared layers get counted once per image.
+
+Builder Center Article is here:
+https://builder.aws.com/content/3Je8ItJpPDju4BG1MGvAPdoe9HM/put-the-arithmetic-in-the-tool-an-mcp-server-for-an-aws-waste-scanner
+
+Medium is here:
+https://xbill999.medium.com/put-the-arithmetic-in-the-tool-an-mcp-server-for-an-aws-waste-scanner-3a3fc3682155
+
+Dev.to is here:
+https://dev.to/aws-builders/put-the-arithmetic-in-the-tool-an-mcp-server-for-an-aws-waste-scanner-3n79
+
+Linked In is here:
+PENDING
+
+#AWS #MCP #FinOps #Python

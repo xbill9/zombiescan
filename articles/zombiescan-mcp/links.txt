@@ -1,0 +1,4 @@
+# One destination per line, key = url.
+builder = https://builder.aws.com/content/3Je8ItJpPDju4BG1MGvAPdoe9HM/put-the-arithmetic-in-the-tool-an-mcp-server-for-an-aws-waste-scanner
+medium = https://xbill999.medium.com/put-the-arithmetic-in-the-tool-an-mcp-server-for-an-aws-waste-scanner-3a3fc3682155
+devto-aws = https://dev.to/aws-builders/put-the-arithmetic-in-the-tool-an-mcp-server-for-an-aws-waste-scanner-3n79

@@ -1,0 +1,3 @@
+A local AWS waste scanner has a second front door now: an MCP server, so an agent drives the same engine the terminal does.
+The write-up covers keeping every tool read-only, returning computed totals instead of rows for the model to add up, and the end-to-end test that holds both front doors to one number.
+It also calibrates the scanner's ECR estimate against Cost Explorer, which came out 2.1x the billed figure because shared layers get counted once per image.
