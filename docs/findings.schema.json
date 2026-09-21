@@ -32,6 +32,11 @@
         "caller_arn": { "type": ["string", "null"] },
         "regions": { "type": "array", "items": { "type": "string" } },
         "pairs_attempted": { "type": "integer", "minimum": 0 },
+        "pairs_unavailable": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Pairs skipped because the service has no endpoint in that region. Not failures; counted separately so 'complete' stays meaningful. Optional: absent from reports written before this field existed."
+        },
         "complete": {
           "type": "boolean",
           "description": "False when every region/check pair failed. An incomplete scan that found nothing is NOT an all-clear."

@@ -222,6 +222,7 @@ def to_json(
             "caller_arn": caller_arn,
             "regions": result.regions,
             "pairs_attempted": result.attempted,
+            "pairs_unavailable": result.unavailable,
             "complete": not result.completely_failed,
         },
         "pricing": {

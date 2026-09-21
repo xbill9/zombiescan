@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import botocore.exceptions
 import pytest
 
 from tests.conftest import TEST_PRICES
@@ -113,3 +114,28 @@ def test_us_only_keeps_the_us_regions():
 def test_us_only_refuses_to_scan_nothing():
     with pytest.raises(ValueError, match="none of eu-west-1, ap-south-1 is a US region"):
         filter_us_regions(["eu-west-1", "ap-south-1"])
+
+
+def test_a_service_missing_from_a_region_is_not_an_error(pricing):
+    """Lightsail has no endpoint in several regions; that is not a scan failure."""
+
+    def fn(ctx):
+        raise botocore.exceptions.EndpointConnectionError(
+            endpoint_url=f"https://lightsail.{ctx.region}.amazonaws.com/"
+        )
+        yield  # pragma: no cover - generator marker
+
+    result = scan(None, REGIONS, [CheckSpec(name="ls", title="ls", fn=fn)], pricing)
+    assert result.errors == []
+    assert result.unavailable == len(REGIONS)
+
+
+def test_a_scan_that_found_nowhere_to_look_is_still_reported_as_incomplete(pricing):
+    """Silently skipping everything must not read as a clean account."""
+
+    def fn(ctx):
+        raise botocore.exceptions.EndpointConnectionError(endpoint_url="https://x/")
+        yield  # pragma: no cover - generator marker
+
+    result = scan(None, REGIONS, [CheckSpec(name="ls", title="ls", fn=fn)], pricing)
+    assert result.completely_failed is True

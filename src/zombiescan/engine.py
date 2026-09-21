@@ -31,6 +31,10 @@ class ScanResult:
     errors: list[ScanError] = field(default_factory=list)
     regions: list[str] = field(default_factory=list)
     attempted: int = 0
+    # Pairs where the service has no endpoint in that region at all. A fact
+    # about AWS's footprint, not a failure: Lightsail is absent from several
+    # regions, and reporting six errors per region for it is pure noise.
+    unavailable: int = 0
 
     @property
     def total_monthly_cost(self) -> float:
@@ -44,7 +48,7 @@ class ScanResult:
         findings, which is indistinguishable from a clean account unless the
         caller is told the difference.
         """
-        return self.attempted > 0 and len(self.errors) == self.attempted
+        return self.attempted > 0 and (len(self.errors) + self.unavailable) == self.attempted
 
 
 class CredentialError(RuntimeError):
@@ -151,6 +155,10 @@ def scan(
                     result.errors.append(ScanError(region, spec.name, f"{code}: no access"))
                 else:
                     result.errors.append(ScanError(region, spec.name, str(exc)))
+            except botocore.exceptions.EndpointConnectionError:
+                # The service is not offered in this region, so there is
+                # nothing to find and nothing went wrong.
+                result.unavailable += 1
             except Exception as exc:  # noqa: BLE001 - one bad region must not kill the scan
                 result.errors.append(ScanError(region, spec.name, f"{type(exc).__name__}: {exc}"))
 
