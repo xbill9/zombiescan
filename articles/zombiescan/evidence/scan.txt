@@ -1,0 +1,35 @@
+# timed multi-region scan, captured 2026-09-21T02:07:11Z
+Scanning as arn:aws:iam::106059658660:root
+17 region(s), 22 check(s) — read-only
+
+zombiescan — 86 findings across 17 regions
+
+Check                   Found  Monthly
+log-group-no-retention     67    $0.00
+empty-vpc                   1    $0.00
+unused-security-group      18    $0.00
+
+┏━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┓
+┃ Region    ┃ Resource                                              ┃  Monthly ┃
+┡━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━┩
+│ us-east-1 │ /aws/apprunner/mcp-apprunner-python-aws/5d3b4b6570c1… │   ~$0.00 │
+│ us-east-1 │ /aws/bedrock-agentcore/runtimes/mcpBedrockRustAws_mc… │   ~$0.00 │
+│ us-east-1 │ vpc-0b52b7e6ebc50ba38                                 │    $0.00 │
+│ us-east-1 │ sg-00122a49220e4ef1f                                  │    $0.00 │
+└───────────┴───────────────────────────────────────────────────────┴──────────┘
+showing 4 of 86, costliest first with every check represented; use --limit 0 for
+all, or --json for the full set
+
+Estimated waste: under $0.01/month. These cost almost nothing today; they are 
+cleanup debt, not a bill.
+~ marks an estimate or upper bound; the per-finding 'note' in --json output says
+why.
+Estimates from list prices, not your bill. zombiescan is read-only and deleted 
+nothing.
+findings written to 
+/tmp/claude-1000/-home-xbill-aws-zeroshipped/9c2fd4f5-f3bf-480d-919c-0ece4e711d9
+9/scratchpad/ev.json
+
+real	0m19.943s
+user	0m17.827s
+sys	0m1.541s

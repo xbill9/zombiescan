@@ -1,0 +1,26 @@
+   Building zombiescan @ file:///home/xbill/aws-zeroshipped
+      Built zombiescan @ file:///home/xbill/aws-zeroshipped
+Uninstalled 1 package in 0.77ms
+Installed 1 package in 1ms
+  available-eni  Unattached network interfaces
+  detached-internet-gateway  Internet gateways attached to no VPC
+  disabled-kms-key  Disabled KMS keys still being billed
+  empty-classic-lb  Classic load balancers with no instances
+  empty-vpc  VPCs with nothing in them
+  idle-load-balancer  Load balancers with no registered targets
+  idle-nat-gateway  Idle NAT gateways
+  idle-provisioned-dynamodb  Empty DynamoDB tables on provisioned billing
+  incomplete-multipart-upload  S3 buckets holding incomplete multipart uploads
+  log-group-no-retention  Log groups with no retention policy
+  orphaned-rds-snapshot  Manual RDS snapshots of deleted databases
+  orphaned-snapshot  Orphaned EBS snapshots
+  stale-secret  Secrets nothing has read in 90 days
+  stopped-instance  Stopped instances still billing for storage
+  stopped-rds-instance  Stopped RDS instances still billing for storage
+  unassociated-eip  Unassociated Elastic IPs
+  unattached-ebs  Unattached EBS volumes
+  unmounted-efs  EFS file systems with no mount targets
+  unused-ami  AMIs no instance uses
+  unused-route53-health-check  Route 53 health checks no record uses
+  unused-security-group  Security groups attached to nothing
+  unused-vpc-endpoint  Interface VPC endpoints with no workloads

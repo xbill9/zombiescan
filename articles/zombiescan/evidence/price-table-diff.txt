@@ -1,0 +1,9 @@
+# _usd_per_unit -> _usd_rate: what the fix changed in the bundled price table
+rates before      : 1138
+rates after       : 1169
+changed           : 23  (sections: ['s3_gb_month'])
+added             : 31  (sections: ['dynamodb_capacity_hour'])
+removed           : 0
+us-east-1 dynamodb present before: False
+us-east-1 dynamodb present after : True
+s3 us-east-1: 0.022 -> 0.023
