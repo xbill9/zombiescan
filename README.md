@@ -104,6 +104,14 @@ are dormant by design. `unused-ami` is the least certain check in the catalog: i
 not launch templates, Auto Scaling groups, or cross-account shares. Read its
 findings before acting on them.
 
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| 0 | The scan ran. Findings may or may not exist. |
+| 1 | Nothing could be scanned — every region/check pair failed. Not an all-clear. |
+| 2 | Usage or credentials problem: unknown check, unknown profile, no credentials. |
+
 ## Development
 
 ```

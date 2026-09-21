@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from rich.console import Console
 
-from zombiescan.engine import ScanResult
+from zombiescan.engine import ScanError, ScanResult
 from zombiescan.models import Finding
 from zombiescan.report import _representative, render, to_script
 
@@ -70,3 +70,41 @@ def test_script_warns_before_the_first_command():
     script = to_script(result)
     assert script.index("READ EVERY LINE") < script.index("aws thing delete")
     assert "did not run it" in script
+
+
+def test_total_failure_is_not_reported_as_an_all_clear(capsys):
+    """The worst possible bug: scanning nothing and calling the account clean."""
+    result = ScanResult(findings=[], regions=["not-a-region"], errors=[], attempted=0)
+    result.errors = [ScanError("not-a-region", "x", "EndpointConnectionError")]
+    result.attempted = 1
+    render(result, Console(width=100, force_terminal=False))
+    out = capsys.readouterr().out
+    assert "Nothing could be scanned" in out
+    assert "not an all-clear" in out
+    assert "No waste found" not in out
+
+
+def test_partial_failure_still_reports_normally(capsys):
+    result = ScanResult(findings=[], regions=["us-east-1"], attempted=4)
+    result.errors = [ScanError("us-east-1", "x", "AuthFailure")]
+    render(result, Console(width=100, force_terminal=False))
+    out = capsys.readouterr().out
+    assert "No waste found" in out
+    assert "Nothing could be scanned" not in out
+
+
+def test_everything_filtered_out_is_not_no_waste(capsys):
+    """'No waste found' after --min-cost hid 77 findings is a lie."""
+    result = ScanResult(findings=[], regions=["us-east-1"], attempted=4)
+    render(result, Console(width=100, force_terminal=False), hidden_by_filter=77)
+    out = capsys.readouterr().out
+    assert "77 finding(s) were hidden by the cost filter" in out
+    assert "No waste found" not in out
+
+
+def test_script_header_does_not_promise_snapshots_for_everything(capsys):
+    """Only some resources can be backed up first; the header must not claim all are."""
+    result = ScanResult(findings=[_finding("security-group", "sg-1")], regions=["us-east-1"])
+    script = to_script(result)
+    assert "Volumes are snapshotted first" not in script
+    assert "Where a backup is possible" in script
