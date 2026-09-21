@@ -284,6 +284,65 @@ def fetch_rds_storage(client: Any) -> dict[str, dict[str, dict[str, float]]]:
     return table
 
 
+def _flat_rate_by_region(client: Any, service: str, family: str, unit: str) -> dict[str, float]:
+    """{region: usd} for a service billed at one flat rate per thing per month."""
+    entries = _paginate(
+        client,
+        ServiceCode=service,
+        Filters=[{"Type": "TERM_MATCH", "Field": "productFamily", "Value": family}],
+    )
+    table: dict[str, float] = {}
+    for entry in entries:
+        region = entry["product"]["attributes"].get("regionCode")
+        priced = _usd_per_unit(entry)
+        if not region or not priced:
+            continue
+        found_unit, price = priced
+        if found_unit != unit or price <= 0:
+            continue
+        table[region] = price
+    return table
+
+
+def fetch_kms_keys(client: Any) -> dict[str, float]:
+    """{region: usd_per_key_month} for customer managed KMS keys."""
+    return _flat_rate_by_region(client, "awskms", "Encryption Key", "Keys")
+
+
+def fetch_secrets(client: Any) -> dict[str, float]:
+    """{region: usd_per_secret_month} for Secrets Manager secrets."""
+    return _flat_rate_by_region(client, "AWSSecretsManager", "Secret", "Secrets")
+
+
+def fetch_efs_storage(client: Any) -> dict[str, float]:
+    """{region: usd_per_gb_month} for EFS Standard regional storage."""
+    entries = _paginate(
+        client,
+        ServiceCode="AmazonEFS",
+        Filters=[{"Type": "TERM_MATCH", "Field": "productFamily", "Value": "Storage"}],
+    )
+    table: dict[str, float] = {}
+    for entry in entries:
+        attrs = entry["product"]["attributes"]
+        region = attrs.get("regionCode")
+        usagetype = attrs.get("usagetype", "")
+        # Infrequent Access, Archive, One Zone (-Z-) and Elastic Throughput
+        # variants are all priced separately. Standard regional storage is the
+        # plain TimedStorage-ByteHrs entry.
+        if not region or not usagetype.endswith("TimedStorage-ByteHrs"):
+            continue
+        if any(marker in usagetype for marker in ("IA", "Archive", "-Z-", "ET")):
+            continue
+        priced = _usd_per_unit(entry)
+        if not priced:
+            continue
+        unit, price = priced
+        if unit != "GB-Mo" or price <= 0:
+            continue
+        table[region] = price
+    return table
+
+
 def main() -> None:
     client = boto3.Session().client("pricing", region_name="us-east-1")
     print("fetching EBS volume prices...")
@@ -310,6 +369,15 @@ def main() -> None:
     print("fetching RDS storage prices...")
     rds = fetch_rds_storage(client)
     print(f"  {len(rds)} regions")
+    print("fetching KMS key prices...")
+    kms = fetch_kms_keys(client)
+    print(f"  {len(kms)} regions")
+    print("fetching Secrets Manager prices...")
+    secrets = fetch_secrets(client)
+    print(f"  {len(secrets)} regions")
+    print("fetching EFS storage prices...")
+    efs = fetch_efs_storage(client)
+    print(f"  {len(efs)} regions")
 
     payload = {
         "_meta": {
@@ -331,6 +399,9 @@ def main() -> None:
         "vpc_endpoint_hour": dict(sorted(endpoints.items())),
         "classic_lb_hour": dict(sorted(classic.items())),
         "rds_storage_gb_month": dict(sorted(rds.items())),
+        "kms_key_month": dict(sorted(kms.items())),
+        "secret_month": dict(sorted(secrets.items())),
+        "efs_gb_month": dict(sorted(efs.items())),
     }
     TABLE_PATH.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n")
     print(f"wrote {TABLE_PATH}")

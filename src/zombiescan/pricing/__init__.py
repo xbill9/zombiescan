@@ -114,3 +114,18 @@ class PriceTable:
             return rates[storage_type], approximate
         # Unknown storage type: gp2 is RDS's long-standing default.
         return rates.get("gp2", 0.0), True
+
+    def kms_key_month(self, region: str) -> tuple[float, bool]:
+        """USD per month for one customer managed KMS key."""
+        price, approximate = self._lookup("kms_key_month", region)
+        return (price or 0.0), approximate
+
+    def secret_month(self, region: str) -> tuple[float, bool]:
+        """USD per month for one Secrets Manager secret. Excludes API calls."""
+        price, approximate = self._lookup("secret_month", region)
+        return (price or 0.0), approximate
+
+    def efs_gb_month(self, region: str) -> tuple[float, bool]:
+        """USD per GB-month of EFS Standard regional storage."""
+        price, approximate = self._lookup("efs_gb_month", region)
+        return (price or 0.0), approximate

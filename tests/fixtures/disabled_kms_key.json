@@ -1,0 +1,54 @@
+{
+  "Keys": [
+    {
+      "KeyId": "11111111-1111-1111-1111-111111111111"
+    },
+    {
+      "KeyId": "22222222-2222-2222-2222-222222222222"
+    },
+    {
+      "KeyId": "33333333-3333-3333-3333-333333333333"
+    },
+    {
+      "KeyId": "44444444-4444-4444-4444-444444444444"
+    }
+  ],
+  "Aliases": [
+    {
+      "AliasName": "alias/retired-app",
+      "TargetKeyId": "11111111-1111-1111-1111-111111111111"
+    },
+    {
+      "AliasName": "alias/aws/s3",
+      "TargetKeyId": "44444444-4444-4444-4444-444444444444"
+    }
+  ],
+  "KeyMetadataById": {
+    "11111111-1111-1111-1111-111111111111": {
+      "KeyId": "11111111-1111-1111-1111-111111111111",
+      "KeyManager": "CUSTOMER",
+      "KeyState": "Disabled",
+      "KeySpec": "SYMMETRIC_DEFAULT",
+      "MultiRegion": false,
+      "Description": "key for a retired service"
+    },
+    "22222222-2222-2222-2222-222222222222": {
+      "KeyId": "22222222-2222-2222-2222-222222222222",
+      "KeyManager": "CUSTOMER",
+      "KeyState": "Enabled",
+      "KeySpec": "SYMMETRIC_DEFAULT"
+    },
+    "33333333-3333-3333-3333-333333333333": {
+      "KeyId": "33333333-3333-3333-3333-333333333333",
+      "KeyManager": "CUSTOMER",
+      "KeyState": "PendingDeletion",
+      "KeySpec": "SYMMETRIC_DEFAULT"
+    },
+    "44444444-4444-4444-4444-444444444444": {
+      "KeyId": "44444444-4444-4444-4444-444444444444",
+      "KeyManager": "AWS",
+      "KeyState": "Disabled",
+      "KeySpec": "SYMMETRIC_DEFAULT"
+    }
+  }
+}

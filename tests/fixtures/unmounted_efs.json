@@ -1,0 +1,36 @@
+{
+  "FileSystems": [
+    {
+      "FileSystemId": "fs-00000000000000001",
+      "Name": "abandoned-share",
+      "LifeCycleState": "available",
+      "NumberOfMountTargets": 0,
+      "SizeInBytes": {
+        "Value": 107374182400,
+        "ValueInStandard": 85899345920
+      },
+      "PerformanceMode": "generalPurpose",
+      "Encrypted": true
+    },
+    {
+      "FileSystemId": "fs-00000000000000002",
+      "Name": "live-share",
+      "LifeCycleState": "available",
+      "NumberOfMountTargets": 3,
+      "SizeInBytes": {
+        "Value": 10737418240,
+        "ValueInStandard": 10737418240
+      }
+    },
+    {
+      "FileSystemId": "fs-00000000000000003",
+      "Name": "being-created",
+      "LifeCycleState": "creating",
+      "NumberOfMountTargets": 0,
+      "SizeInBytes": {
+        "Value": 0,
+        "ValueInStandard": 0
+      }
+    }
+  ]
+}

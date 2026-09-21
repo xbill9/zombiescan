@@ -36,6 +36,9 @@ TEST_PRICES = {
     "log_storage_gb_month": {"us-east-1": 0.03, "eu-west-1": 0.03},
     "vpc_endpoint_hour": {"us-east-1": 0.01, "eu-west-1": 0.011},
     "classic_lb_hour": {"us-east-1": 0.025, "eu-west-1": 0.028},
+    "kms_key_month": {"us-east-1": 1.0, "eu-west-1": 1.0},
+    "secret_month": {"us-east-1": 0.40, "eu-west-1": 0.40},
+    "efs_gb_month": {"us-east-1": 0.30, "eu-west-1": 0.33},
     "rds_storage_gb_month": {
         "us-east-1": {
             "single": {"gp2": 0.115, "gp3": 0.115, "io1": 0.125},
@@ -45,7 +48,15 @@ TEST_PRICES = {
 }
 
 # Keys whose values boto3 hands back as datetimes rather than strings.
-_DATETIME_KEYS = ("CreateTime", "StartTime", "LaunchTime")
+_DATETIME_KEYS = (
+    "CreateTime",
+    "StartTime",
+    "LaunchTime",
+    "LastAccessedDate",
+    "LastChangedDate",
+    "CreatedDate",
+    "DeletedDate",
+)
 
 
 def _revive_datetimes(node: Any) -> Any:

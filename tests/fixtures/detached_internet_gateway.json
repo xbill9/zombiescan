@@ -1,0 +1,23 @@
+{
+  "InternetGateways": [
+    {
+      "InternetGatewayId": "igw-00000000000000001",
+      "Attachments": [],
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "orphaned-igw"
+        }
+      ]
+    },
+    {
+      "InternetGatewayId": "igw-00000000000000002",
+      "Attachments": [
+        {
+          "VpcId": "vpc-00000000000000001",
+          "State": "available"
+        }
+      ]
+    }
+  ]
+}

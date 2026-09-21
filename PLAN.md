@@ -158,6 +158,22 @@ the Claude Code plugin in the same repo.
 8. Claude Code plugin: skill, slash command, MCP server
 9. README, read-only policy doc, packaging
 
+## Beyond the original catalog
+
+Shipped past the twelve rows above: `unused-vpc-endpoint`, `empty-classic-lb`,
+`stopped-rds-instance`, `disabled-kms-key`, `stale-secret`, `unmounted-efs`,
+`detached-internet-gateway`.
+
+Wanted but not built:
+
+- **Transit gateway attachments** (~$36/month each). Price List API does not
+  expose transit gateway pricing under any service code tried; building it
+  would mean a second hardcoded constant, so it is on hold.
+- **Metric-driven checks** -- idle RDS by connection count, idle provisioned
+  DynamoDB, KMS keys unused per CloudTrail. Every check so far answers from a
+  single describe call; these need CloudWatch and a lookback window, which is a
+  new capability rather than another row.
+
 ## Open questions
 
 - Cost lookback for "idle" judgments (RDS connections, ALB targets) needs

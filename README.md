@@ -50,11 +50,15 @@ uv run zombiescan scan --script cleanup.sh  # write the (unexecuted) cleanup pla
 | `idle-load-balancer` | ALB/NLB with no registered targets | yes |
 | `empty-classic-lb` | Classic (ELBv1) balancers with no instances | yes |
 | `unused-vpc-endpoint` | Interface endpoints in VPCs with no workloads | yes |
-| `log-group-no-retention` | CloudWatch log groups that never expire | grows |
+| `unmounted-efs` | EFS file systems nothing can reach | yes |
+| `disabled-kms-key` | Customer managed keys disabled but still billed | yes |
+| `stale-secret` | Secrets nothing has read in 90 days | yes |
 | `unused-ami` | AMIs over 90 days old that no instance uses | yes |
+| `log-group-no-retention` | CloudWatch log groups that never expire | grows |
 | `available-eni` | Unattached interfaces blocking subnet/SG deletion | no |
 | `unused-security-group` | Groups attached to nothing, referenced by nothing | no |
 | `empty-vpc` | VPCs holding no network interfaces at all | no |
+| `detached-internet-gateway` | Gateways attached to no VPC, eating region quota | no |
 
 The free ones are reported because they accumulate without limit and block
 deletions, not because of this month's bill.
@@ -91,8 +95,12 @@ Checks would rather miss waste than invent it:
 - Gateway VPC endpoints (S3, DynamoDB) are free.
 - A VPC's default security group cannot be deleted.
 - A default VPC sitting unused is normal in every region.
+- AWS managed KMS keys are free, so a disabled one is not waste.
+- A KMS key or secret already scheduled for deletion is leaving on a timer.
 
-`unused-ami` is the least certain check in the catalog: it can see instances but
+Two checks report *staleness*, which is a prompt to look rather than a verdict.
+`stale-secret` cannot tell an abandoned secret from break-glass credentials that
+are dormant by design. `unused-ami` is the least certain check in the catalog: it can see instances but
 not launch templates, Auto Scaling groups, or cross-account shares. Read its
 findings before acting on them.
 
