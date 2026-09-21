@@ -17,10 +17,12 @@ build/
 .claude/settings.local.json
 CLAUDE.local.md
 
-# scan output
+# scan output -- the Makefile's defaults (JSON/SCRIPT/HTML) and the dated
+# names a hand-run scan writes
 findings.json
 cleanup.sh
 remediation.sh
+report.html
 scan-*.json
 cleanup-*.sh
 zombiescan-report.html
