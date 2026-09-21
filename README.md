@@ -1,41 +1,101 @@
 # zombiescan
 
+[![CI](https://github.com/xbill9/zombiescan/actions/workflows/ci.yml/badge.svg)](https://github.com/xbill9/zombiescan/actions/workflows/ci.yml)
+
 Find the AWS resources nobody is using, and what they cost you.
 
-Not "here are your 14 EBS volumes" — "9 of these are attached to nothing and
-cost you $47/month, here is the plan to kill them."
+Not *"here are your 14 EBS volumes"* — **"9 of these are attached to nothing and
+cost you $47/month, here is the plan to kill them."**
+
+```
+$ zombiescan scan --all-regions
+
+zombiescan — 15 findings across 17 regions
+
+Check                   Found  Monthly
+idle-nat-gateway            1   $67.89
+stopped-instance            1   $58.00
+unattached-ebs              1   $50.00
+unmounted-efs               1   $25.20
+stopped-rds-instance        1   $23.00
+unused-vpc-endpoint         1   $21.90
+empty-classic-lb            1   $18.25
+idle-load-balancer          1   $16.43
+orphaned-snapshot           1    $5.00
+unassociated-eip            1    $3.65
+disabled-kms-key            1    $1.00
+stale-secret                1    $0.40
+log-group-no-retention      1    $0.36
+empty-vpc                   1    $0.00
+unused-security-group       1    $0.00
+
+┏━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Region    ┃ Resource                    ┃  Monthly ┃ Why                                  ┃
+┡━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ sa-east-1 │ nat-0a1b2c3d4e5f6a7b8       │   $67.89 │ NAT gateway in vpc-0f2e with no      │
+│           │                             │          │ workload interfaces behind it        │
+│ us-east-1 │ i-04c8d9e2f1a3b5c7d         │   $58.00 │ Stopped instance still paying for 2  │
+│           │                             │          │ attached volumes (600 GB); stopped   │
+│           │                             │          │ 565 days ago                         │
+│ us-east-1 │ vol-09f8e7d6c5b4a3210       │   $50.00 │ 500 GB gp2 volume in the 'available' │
+│           │                             │          │ state, attached to nothing           │
+└───────────┴─────────────────────────────┴──────────┴──────────────────────────────────────┘
+showing 10 of 15, costliest first with every check represented
+
+Estimated waste: $291.08/month ($3,492.96/year)
+~ marks an estimate or upper bound; the per-finding 'note' in --json output says why.
+Estimates from list prices, not your bill. zombiescan is read-only and deleted nothing.
+```
 
 ## Local-first
 
-zombiescan runs on your machine with your existing AWS credentials. There is no
-hosted service, no cross-account IAM role to create, and no data sent anywhere.
+zombiescan runs on your machine with the AWS credentials you already have.
+There is no hosted service, no account to create, no cross-account IAM role to
+grant, and nothing is sent anywhere. Every SaaS tool in this space asks you to
+hand over a role into your production account. This one never asks.
 
-It is **read-only**: Describe/List/Get calls only. It never deletes anything.
-The cleanup commands it generates are written to a file for you to read and run
-yourself.
+It is **read-only**. Describe, List and Get calls only — there is no code path
+in it that deletes, terminates, modifies or releases anything. The cleanup
+commands it produces are written to a file for you to read and run yourself.
 
 ## Install
 
+Not on PyPI yet — install from the repository:
+
 ```
+git clone https://github.com/xbill9/zombiescan
+cd zombiescan
 uv sync
 uv run zombiescan scan
 ```
 
-`botocore[crt]` is a required dependency, not an optional extra — boto3 cannot
-read `aws login` sessions without it.
+Or as a standalone command, without cloning:
+
+```
+uv tool install git+https://github.com/xbill9/zombiescan
+zombiescan scan
+```
+
+`botocore[crt]` is a hard dependency, not an optional extra: boto3 cannot read
+`aws login` sessions without it, and raises `MissingDependencyException` at
+credential load if it is missing.
 
 ## Usage
 
 ```
-uv run zombiescan checks                    # list the checks
-uv run zombiescan scan                      # default region
-uv run zombiescan scan --all-regions        # every region the account has enabled
-uv run zombiescan scan --check unattached-ebs --check unassociated-eip
-uv run zombiescan scan --min-cost 5         # hide findings under $5/month
-uv run zombiescan scan --limit 0            # show every finding, not just the top 25
-uv run zombiescan scan --json findings.json # machine-readable output
-uv run zombiescan scan --script cleanup.sh  # write the (unexecuted) cleanup plan
+zombiescan checks                     # list the checks
+zombiescan scan                       # default region
+zombiescan scan --all-regions         # every region the account has enabled
+zombiescan scan --region eu-west-1 --region us-east-1
+zombiescan scan --check unattached-ebs --check unassociated-eip
+zombiescan scan --profile production
+zombiescan scan --min-cost 5          # hide findings under $5/month
+zombiescan scan --limit 0             # every finding, not just the top 25
+zombiescan scan --json findings.json  # machine-readable, full detail
+zombiescan scan --script cleanup.sh   # write the plan (never runs it)
 ```
+
+A full 18-check sweep of 17 regions takes about 15 seconds.
 
 ## Checks
 
@@ -65,30 +125,39 @@ deletions, not because of this month's bill.
 
 ## About the numbers
 
-Costs are estimates from on-demand list prices, not from your bill. They ignore
-savings plans, private pricing, and credits.
+Costs are estimates from on-demand **list prices**, not from your bill. They
+ignore savings plans, reserved capacity, private pricing and credits.
 
-Prices come from the AWS Price List API and are regenerated with:
+Prices come from the AWS Price List API, not from anyone's memory, and are
+regenerated with:
 
 ```
 uv run python -m zombiescan.pricing.refresh
 ```
 
+Region matters more than people expect, which is why the table is per-region
+rather than a single rate: a NAT gateway is **$32.85/month in us-east-1 and
+$67.89 in sa-east-1**, and an interface VPC endpoint doubles from $7.30 to
+$15.33 between the same two.
+
 A `~` next to a cost means it is an estimate or an upper bound — the region had
 no price entry, the resource type was unrecognised, or the resource bills
-incrementally. Every finding carries a `note` in `--json` output explaining
-which.
+incrementally rather than on provisioned size. Every finding carries a `note`
+in `--json` output saying which.
 
-Public IPv4 pricing is the one hardcoded figure: the Price List API does not
-expose it.
+Public IPv4 is the one hardcoded figure. The Price List API does not expose it:
+the `IP Address` product family under EC2 turns out to be entirely Wavelength
+CarrierIP, and AmazonVPC has no matching family. It is recorded as a constant
+with its source rather than guessed per-region.
 
 ## What it deliberately does not flag
 
-Checks would rather miss waste than invent it:
+Checks would rather miss waste than invent it. A false positive here costs
+someone an outage.
 
-- A load balancer whose targets are registered but unhealthy is an outage, not
-  waste.
-- A snapshot with no recorded source volume cannot be proven orphaned.
+- A load balancer whose targets are registered but **unhealthy** is an outage,
+  not waste.
+- A snapshot with no recorded source volume cannot be *proven* orphaned.
 - A snapshot backing an AMI is load-bearing.
 - An AMI under 90 days old is probably mid-rollout.
 - A log group with no retention and no data costs nothing today.
@@ -96,36 +165,69 @@ Checks would rather miss waste than invent it:
 - A VPC's default security group cannot be deleted.
 - A default VPC sitting unused is normal in every region.
 - AWS managed KMS keys are free, so a disabled one is not waste.
-- A KMS key or secret already scheduled for deletion is leaving on a timer.
+- A key or secret already scheduled for deletion is leaving on a timer.
 
-Two checks report *staleness*, which is a prompt to look rather than a verdict.
-`stale-secret` cannot tell an abandoned secret from break-glass credentials that
-are dormant by design. `unused-ami` is the least certain check in the catalog: it can see instances but
-not launch templates, Auto Scaling groups, or cross-account shares. Read its
-findings before acting on them.
+Two checks report **staleness**, which is a prompt to look rather than a
+verdict. `stale-secret` cannot tell an abandoned secret from break-glass
+credentials that are dormant by design.
+
+`unused-ami` is the least certain check here: it can see instances but not
+launch templates, Auto Scaling groups, or cross-account shares. An AMI your ASG
+depends on looks unused to it, and deleting one breaks the next scale-out hours
+later. Read its findings before acting on them.
 
 ## The generated script
 
-`--script` writes a plan; zombiescan never runs it. Every value interpolated
-into a command is shell-quoted, so a resource name cannot become a command in
-the file you are about to execute. AWS's own naming rules make that unreachable
-today, but a tool that hands you a script to run should not depend on a remote
-service's input validation for local shell safety.
+`--script` writes a plan. zombiescan never runs it, and has no flag that will.
+
+Every value interpolated into a command is shell-quoted, so a resource name
+cannot become a command in the file you are about to execute. AWS's own naming
+rules make that unreachable today, but a tool whose whole proposition is handing
+you a script to run should not depend on a remote service's input validation for
+local shell safety.
+
+Where a backup is possible the command takes one first — volumes are
+snapshotted, instances imaged, databases given a final snapshot, secrets deleted
+with a 30-day recovery window. A backup is not a substitute for knowing what you
+are deleting.
 
 ## Exit codes
 
 | Code | Meaning |
 | --- | --- |
 | 0 | The scan ran. Findings may or may not exist. |
-| 1 | Nothing could be scanned — every region/check pair failed. Not an all-clear. |
+| 1 | Nothing could be scanned — every region/check pair failed. **Not an all-clear.** |
 | 2 | Usage or credentials problem: unknown check, unknown profile, no credentials. |
+
+The distinction between 0 and 1 matters in CI. A scan of a region that does not
+exist finds nothing, and "found nothing" must never be reported as "you are
+clean".
+
+## Permissions
+
+Read-only. The managed `ReadOnlyAccess` policy is more than enough; a minimal
+policy needs `Describe*`/`List*`/`Get*` on ec2, rds, elasticloadbalancing, logs,
+kms, efs and secretsmanager, plus `sts:GetCallerIdentity`.
+
+Refreshing the price table additionally needs `pricing:GetProducts`, which is
+only used by `zombiescan.pricing.refresh` and never during a scan.
 
 ## Development
 
 ```
-uv run pytest                               # offline, no credentials needed
-ZOMBIESCAN_LIVE=1 uv run pytest -m live     # end-to-end against a real account
+uv run pytest                            # 132 tests, offline, no credentials
+ZOMBIESCAN_LIVE=1 uv run pytest -m live  # end-to-end against a real account
 uv run ruff format . && uv run ruff check --fix .
 ```
+
+The offline suite runs against recorded API fixtures with a price table pinned
+separately from the bundled one, so refreshing real prices cannot break an
+assertion. The live test is excluded by default because it costs money.
+
+Adding a check means a module in `src/zombiescan/checks/`, a fixture, a test, a
+pricing entry and one line in the registry. Checks make Describe/List/Get calls
+only; a check that mutates anything is a bug, not a feature request.
+
+## License
 
 MIT.
