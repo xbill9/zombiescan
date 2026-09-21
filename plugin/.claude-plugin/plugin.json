@@ -1,0 +1,13 @@
+{
+  "name": "zombiescan",
+  "description": "Find the AWS resources nobody is using, price them, and plan the cleanup — from inside Claude Code.",
+  "version": "0.1.0",
+  "author": {
+    "name": "xbill9",
+    "url": "https://github.com/xbill9"
+  },
+  "homepage": "https://github.com/xbill9/zombiescan",
+  "repository": "https://github.com/xbill9/zombiescan",
+  "license": "MIT",
+  "keywords": ["aws", "cost", "finops", "cleanup", "waste"]
+}

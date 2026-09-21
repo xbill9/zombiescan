@@ -50,3 +50,23 @@ def test_scan_completes_against_the_default_region(session):
         assert finding.monthly_cost >= 0
         assert finding.region in result.regions
         assert finding.remediation
+
+
+def test_mcp_scan_writes_a_report_the_other_tools_can_read(tmp_path):
+    """The plugin's path through the same engine, end to end.
+
+    scan_account writes the report; estimate_savings reads it back. If the two
+    disagree about the total, the agent and the terminal are quoting different
+    numbers for the same account.
+    """
+    from zombiescan import mcp_server
+
+    path = tmp_path / "live-report.json"
+    summary = mcp_server.scan_account({"report_path": str(path), "limit": 3})
+    assert summary["caller_arn"].startswith("arn:aws")
+    assert summary["report_path"] == str(path)
+    assert len(summary["top_findings"]) <= 3
+
+    savings = mcp_server.estimate_savings({"report_path": str(path)})
+    assert savings["matched"]["count"] == summary["totals"]["finding_count"]
+    assert savings["matched"]["monthly_cost"] == summary["totals"]["monthly_cost"]

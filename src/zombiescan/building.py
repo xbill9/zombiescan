@@ -31,6 +31,7 @@ do, and forcing them through here would make them harder to read, not easier.
 
 from __future__ import annotations
 
+import inspect
 from collections.abc import Callable, Iterator
 from typing import Any
 
@@ -135,4 +136,11 @@ def simple_check(
     # Tests and cleaners reach for the finding builder directly, the same way
     # they do with a hand-written check.
     run.build_finding = build_finding  # type: ignore[attr-defined]
+    # Attribute the check to the module that declared it rather than to this
+    # one. Everything that asks a check where it came from -- tracebacks, and
+    # the MCP server reading the module docstring to explain a finding -- would
+    # otherwise be told building.py, which explains the wrong thing.
+    caller = inspect.currentframe()
+    if caller is not None and caller.f_back is not None:
+        run.__module__ = caller.f_back.f_globals.get("__name__", run.__module__)
     return run

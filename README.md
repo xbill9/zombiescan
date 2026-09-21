@@ -100,6 +100,50 @@ zombiescan scan --script cleanup.sh   # write the plan (never runs it)
 
 A full 22-check sweep of 17 regions takes about 20 seconds.
 
+## The Claude Code plugin
+
+The same engine, reachable from an agent instead of a terminal. It ships in
+[`plugin/`](plugin/) and installs from this repository:
+
+```
+/plugin marketplace add xbill9/zombiescan
+/plugin install zombiescan@zombiescan
+```
+
+That gives you `/zombiescan` to scan an account, `/zombie-cleanup` to see what
+a cleanup would do, and a skill that picks itself up whenever the conversation
+turns to AWS spend. Behind them is an MCP server with five tools:
+
+| Tool | What it does |
+| --- | --- |
+| `list_checks` | What the scanner looks for. No credentials needed. |
+| `scan_account` | Scans, prices, writes the JSON report, returns the totals |
+| `estimate_savings` | Totals and breakdowns over a report, with a filter |
+| `explain_finding` | Why a resource counts as waste and what keeping it costs |
+| `plan_cleanup` | The calls a cleanup would make, and which have no undo |
+
+**Every tool is read-only.** `plan_cleanup` builds the same plan `clean` shows
+on a dry run and stops there; `clean.apply_outcome`, the one function that
+sends a step to AWS, is not reachable from the server, and the suite asserts
+that the module does not name it. Applying a plan stays `zombiescan clean
+--apply` at your own terminal, where the per-resource prompt and the
+irreversible-step warning are.
+
+The tools return figures already computed — totals, counts, per-check and
+per-region breakdowns, the cheapest and costliest row — and echo the filter
+they applied under `filter_applied`. A filter naming a check that is not in the
+report returns an exact, sourced zero, which reads like good news; the echo
+carries `no_such_checks_in_report` so the mistake is visible in the answer
+rather than in next month's bill.
+
+The server speaks JSON-RPC over stdio using the standard library alone, so
+installing zombiescan does not pull an MCP SDK in behind it. It can also be run
+directly:
+
+```
+zombiescan-mcp     # or: uv run zombiescan-mcp
+```
+
 ## Checks
 
 | Check | Finds | Costs money |

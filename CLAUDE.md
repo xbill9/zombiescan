@@ -78,6 +78,7 @@ uv sync                                    # install deps
 uv run zombiescan scan --all-regions       # run the CLI
 uv run pytest                              # tests (fixtures, offline)
 ZOMBIESCAN_LIVE=1 uv run pytest -m live    # opt-in live smoke test, real account
+uv run zombiescan-mcp                      # the MCP server, on stdio
 uv run ruff format . && uv run ruff check --fix .
 ```
 
@@ -98,6 +99,26 @@ needs one. Every table section must have exactly one `@price_fetcher`, which
 
 `docs/PACKS.md` is the pack-author guide. Keep it current — it is the contract
 third-party packs are written against, along with `PACK_API_VERSION`.
+
+## The plugin and the MCP server
+
+`plugin/` is the Claude Code plugin: two slash commands, a skill, and
+`.mcp.json` pointing at the `zombiescan-mcp` console script. The server itself
+is `src/zombiescan/mcp_server.py`.
+
+**Every tool on it is read-only, and it must stay that way.** `plan_cleanup`
+may call `clean.plan_for`, which only builds `Step` objects;
+`clean.apply_outcome` sends them to AWS and must never be reachable from the
+server. `tests/test_mcp_server.py` asserts the module names no `clean.*`
+attribute beyond `plan_for` and `UNSUPPORTED`, so a tool that applies a plan
+fails the suite.
+
+Tools return computed figures — totals, counts, breakdowns, cheapest and
+costliest — and echo the filter they applied. Do not add a tool that returns
+rows for the caller to add up.
+
+The protocol is JSON-RPC over stdio, standard library only. Do not add an MCP
+SDK dependency for about a hundred lines of framing.
 
 ## Testing
 

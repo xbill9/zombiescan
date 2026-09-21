@@ -22,6 +22,9 @@ Issues = "https://github.com/xbill9/zombiescan/issues"
 
 [project.scripts]
 zombiescan = "zombiescan.cli:main"
+# The MCP server behind the Claude Code plugin. Same engine, same
+# read-only guarantee; it speaks JSON-RPC over stdio instead of to a terminal.
+zombiescan-mcp = "zombiescan.mcp_server:main"
 
 [dependency-groups]
 dev = ["pytest>=8.0", "ruff>=0.6", "jsonschema>=4.0"]

@@ -1,0 +1,18 @@
+{
+  "name": "zombiescan",
+  "owner": {
+    "name": "xbill9",
+    "url": "https://github.com/xbill9"
+  },
+  "metadata": {
+    "description": "The zombiescan AWS waste scanner as a Claude Code plugin.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "zombiescan",
+      "source": "./plugin",
+      "description": "Scan an AWS account for unused resources, price them, and plan the cleanup. Read-only."
+    }
+  ]
+}

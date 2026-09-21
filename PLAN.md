@@ -216,6 +216,31 @@ The engine now supports global checks (`scope="global"`), which run once per
 scan instead of once per region. Route 53 was the first; CloudFront, IAM and
 account-level S3 settings can use it next.
 
+**The Claude Code plugin (2026-09-21).** Built as the second front door, in
+`plugin/`: two slash commands, a skill, and an MCP server
+(`src/zombiescan/mcp_server.py`, console script `zombiescan-mcp`) with five
+tools — `list_checks`, `scan_account`, `estimate_savings`, `explain_finding`
+and `plan_cleanup`. `.claude-plugin/marketplace.json` at the repo root makes it
+installable with `/plugin marketplace add xbill9/zombiescan`.
+
+Two decisions worth keeping:
+
+- **The server is read-only, and the suite holds it to that.** `plan_cleanup`
+  reaches `clean.plan_for` and nothing else; `tests/test_mcp_server.py` asserts
+  the module names no other `clean.*` attribute, so adding a tool that applies
+  a plan fails the suite rather than shipping. Applying stays `zombiescan clean
+  --apply` at a terminal, which is where the per-resource prompt and the
+  irreversible warning live.
+- **The tools compute the arithmetic.** `estimate_savings` takes a filter and
+  returns exact totals, counts, minima, maxima and per-check, per-region and
+  per-type breakdowns, and echoes the filter it applied — a filter naming a
+  check the report does not contain returns a precise zero that reads like an
+  all-clear, and `no_such_checks_in_report` is what makes that visible.
+
+The protocol (JSON-RPC 2.0 over stdio) is implemented against the standard
+library, so an install of zombiescan does not carry an MCP SDK it would have to
+keep current.
+
 Wanted but not built:
 
 - **Transit gateway attachments** (~$36/month each). Price List API does not
