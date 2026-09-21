@@ -16,7 +16,7 @@ https://github.com/xbill9/zombiescan
 
 A volume survives the instance it was attached to. An Elastic IP outlives the migration that freed it. A NAT gateway keeps running in a VPC whose workload was torn down last year. Each one bills every hour and reports nothing.
 
-Cost Explorer shows the total. Trusted Advisor lists candidates. The figure that drives a decision is per-resource: this volume is attached to nothing and costs $50 a month.
+Cost Explorer shows the total. Trusted Advisor lists candidates. The figure that drives a decision names one resource and its monthly cost.
 
 `zombiescan` produces that figure for 22 classes of resource.
 

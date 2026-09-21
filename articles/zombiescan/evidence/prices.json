@@ -1,28 +1,53 @@
 {
   "_source": "zombiescan bundled price table, generated from the AWS Price List API",
   "_generated": "2026-09-21T01:16:11Z",
+  "_note": "raw values plus the same figures formatted as the article prints them",
   "us-east-1": {
     "ebs_gp3_gb_month": 0.08,
     "nat_gateway_month": 32.85,
     "vpc_endpoint_month": 7.3,
-    "alb_month": 16.43
+    "alb_month": 16.43,
+    "as_published": {
+      "gp3_per_gb_month": "$0.080",
+      "nat_gateway_per_month": "$32.85",
+      "vpc_endpoint_per_month": "$7.30",
+      "alb_per_month": "$16.43"
+    }
   },
   "eu-west-1": {
     "ebs_gp3_gb_month": 0.088,
     "nat_gateway_month": 35.04,
     "vpc_endpoint_month": 8.03,
-    "alb_month": 18.4
+    "alb_month": 18.4,
+    "as_published": {
+      "gp3_per_gb_month": "$0.088",
+      "nat_gateway_per_month": "$35.04",
+      "vpc_endpoint_per_month": "$8.03",
+      "alb_per_month": "$18.40"
+    }
   },
   "ap-southeast-2": {
     "ebs_gp3_gb_month": 0.096,
     "nat_gateway_month": 43.07,
     "vpc_endpoint_month": 9.49,
-    "alb_month": 18.4
+    "alb_month": 18.4,
+    "as_published": {
+      "gp3_per_gb_month": "$0.096",
+      "nat_gateway_per_month": "$43.07",
+      "vpc_endpoint_per_month": "$9.49",
+      "alb_per_month": "$18.40"
+    }
   },
   "sa-east-1": {
     "ebs_gp3_gb_month": 0.152,
     "nat_gateway_month": 67.89,
     "vpc_endpoint_month": 15.33,
-    "alb_month": 24.82
+    "alb_month": 24.82,
+    "as_published": {
+      "gp3_per_gb_month": "$0.152",
+      "nat_gateway_per_month": "$67.89",
+      "vpc_endpoint_per_month": "$15.33",
+      "alb_per_month": "$24.82"
+    }
   }
 }
